@@ -1,1 +1,1 @@
- 
+Systèm jesyon biznis operasyonèl 
