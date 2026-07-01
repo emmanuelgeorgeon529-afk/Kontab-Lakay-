@@ -1,2 +1,2 @@
-# KontabLakay
+# KontabPro
 Sistèm jesyon biznis(operasyonèl)
