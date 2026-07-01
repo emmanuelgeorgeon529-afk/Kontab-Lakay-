@@ -1,144 +1,30 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KontaPro</title>
+<script>
+const form = document.querySelector("form");
+const email = document.getElementById("email");
+const password = document.getElementById("password");
+const toggle = document.getElementById("togglePassword");
 
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+if(toggle){
+  toggle.onclick = () => {
+    password.type = password.type === "password" ? "text" : "password";
+    toggle.textContent = password.type === "password" ? "👁" : "🙈";
+  };
 }
 
-body{
+if(form){
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
 
-display:flex;
+    if(email.value.trim()==="" || password.value.trim()===""){
+      alert("Tanpri ranpli tout chan yo.");
+      return;
+    }
 
-justify-content:center;
+    localStorage.setItem("userEmail", email.value);
 
-align-items:center;
+    alert("Koneksyon reyisi!");
 
-height:100vh;
-
-background:linear-gradient(135deg,#0A5C30,#1B8A4A);
-
+    window.location.href="index.html";
+  });
 }
-
-.card{
-
-width:90%;
-
-max-width:380px;
-
-background:white;
-
-padding:30px;
-
-border-radius:20px;
-
-box-shadow:0 15px 40px rgba(0,0,0,.25);
-
-text-align:center;
-
-}
-
-.logo{
-
-font-size:60px;
-
-margin-bottom:15px;
-
-}
-
-h1{
-
-color:#0A5C30;
-
-margin-bottom:5px;
-
-}
-
-p{
-
-color:#666;
-
-margin-bottom:25px;
-
-}
-
-input{
-
-width:100%;
-
-padding:14px;
-
-margin-bottom:15px;
-
-border-radius:12px;
-
-border:1px solid #ccc;
-
-font-size:16px;
-
-}
-
-button{
-
-width:100%;
-
-padding:14px;
-
-background:#1B8A4A;
-
-color:white;
-
-border:none;
-
-border-radius:12px;
-
-font-size:17px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-}
-
-button:hover{
-
-background:#0A5C30;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="card">
-
-<div class="logo">🏠</div>
-
-<h1>KontaPro</h1>
-
-<p>Système Intelligent de Gestion</p>
-
-<input
-type="email"
-placeholder="Adresse Email">
-
-<input
-type="password"
-placeholder="Mot de passe">
-
-<button>Connexion</button>
-
-</div>
-
-</body>
-</html>
+</script>
