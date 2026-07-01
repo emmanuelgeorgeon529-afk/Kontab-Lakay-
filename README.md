@@ -1,2 +1,2 @@
-# Kontab-Lakay-
+# KontabLakay
 Sistèm jesyon biznis(operasyonèl)
