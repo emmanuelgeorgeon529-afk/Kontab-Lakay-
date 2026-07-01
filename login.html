@@ -3,16 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KontaPro Login</title>
+<title>KontaPro</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+height:100vh;
+
+background:linear-gradient(135deg,#0A5C30,#1B8A4A);
+
+}
+
+.card{
+
+width:90%;
+
+max-width:380px;
+
+background:white;
+
+padding:30px;
+
+border-radius:20px;
+
+box-shadow:0 15px 40px rgba(0,0,0,.25);
+
+text-align:center;
+
+}
+
+.logo{
+
+font-size:60px;
+
+margin-bottom:15px;
+
+}
+
+h1{
+
+color:#0A5C30;
+
+margin-bottom:5px;
+
+}
+
+p{
+
+color:#666;
+
+margin-bottom:25px;
+
+}
+
+input{
+
+width:100%;
+
+padding:14px;
+
+margin-bottom:15px;
+
+border-radius:12px;
+
+border:1px solid #ccc;
+
+font-size:16px;
+
+}
+
+button{
+
+width:100%;
+
+padding:14px;
+
+background:#1B8A4A;
+
+color:white;
+
+border:none;
+
+border-radius:12px;
+
+font-size:17px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#0A5C30;
+
+}
+
+</style>
+
 </head>
 
 <body>
 
+<div class="card">
+
+<div class="logo">🏠</div>
+
 <h1>KontaPro</h1>
 
-<p>Login Page</p>
+<p>Système Intelligent de Gestion</p>
+
+<input
+type="email"
+placeholder="Adresse Email">
+
+<input
+type="password"
+placeholder="Mot de passe">
 
 <button>Connexion</button>
+
+</div>
 
 </body>
 </html>
