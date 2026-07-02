@@ -3,146 +3,164 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KontaPro Login</title>
+<title>KontaPro - Connexion</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{
+*{
 margin:0;
-font-family:Arial;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
 background:linear-gradient(135deg,#0A5C30,#1B8A4A);
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
+padding:20px;
 }
 
 .card{
-background:white;
-padding:25px;
-border-radius:20px;
-width:90%;
-max-width:360px;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
+width:100%;
+max-width:400px;
+background:#fff;
+border-radius:25px;
+padding:30px;
+box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+
+.logo{
 text-align:center;
+font-size:60px;
+}
+
+h1{
+text-align:center;
+color:#0A5C30;
+margin-top:10px;
+}
+
+.slogan{
+text-align:center;
+font-size:14px;
+color:#777;
+margin-bottom:25px;
+}
+
+.welcome{
+font-size:22px;
+font-weight:600;
+color:#333;
+margin-bottom:5px;
+}
+
+.subtitle{
+font-size:14px;
+color:#777;
+margin-bottom:20px;
+}
+
+label{
+display:block;
+font-weight:600;
+margin-bottom:6px;
+margin-top:12px;
 }
 
 input{
 width:100%;
-padding:12px;
-margin:10px 0;
-border-radius:10px;
-border:1px solid #ccc;
+padding:14px;
+border:1px solid #ddd;
+border-radius:12px;
+font-size:15px;
 }
 
 button{
 width:100%;
-padding:12px;
+padding:14px;
+margin-top:20px;
 background:#1B8A4A;
 color:white;
 border:none;
-border-radius:10px;
-font-weight:bold;
+border-radius:12px;
+font-size:16px;
+font-weight:600;
 cursor:pointer;
-margin-top:8px;
 }
 
 button:hover{
 background:#0A5C30;
 }
 
-.small{
-font-size:13px;
+.links{
+text-align:center;
+margin-top:18px;
+}
+
+.links a{
+display:block;
+margin:10px 0;
+text-decoration:none;
 color:#1B8A4A;
-cursor:pointer;
-margin-top:10px;
-}
-
-.eye{
-position:absolute;
-right:15px;
-top:12px;
-cursor:pointer;
-}
-
-.pass-box{
-position:relative;
+font-weight:600;
 }
 
 .fingerprint{
+text-align:center;
+font-size:45px;
 margin-top:15px;
-font-size:40px;
 cursor:pointer;
 }
-
 </style>
+
 </head>
 
 <body>
 
 <div class="card">
 
-<h2>🏠 KontaPro</h2>
-<p>Konekte sou kont ou</p>
+<div class="logo">📊</div>
 
-<input id="email" type="email" placeholder="Email">
+<h1>KONTAPRO</h1>
 
-<div class="pass-box">
-<input id="password" type="password" placeholder="Mot de passe">
-<span class="eye" onclick="toggle()">👁</span>
+<p class="slogan">
+Gérez mieux, développez plus.
+</p>
+
+<div class="welcome">
+Bienvenue !
 </div>
 
-<button onclick="login()">Connexion</button>
-
-<div class="small" onclick="forgot()">
-Mot de passe oublié ?
+<div class="subtitle">
+Connectez-vous à votre compte
 </div>
 
-<div class="fingerprint" onclick="fingerLogin()">
+<label>📧 Adresse e-mail</label>
+<input type="email" placeholder="nom@email.com">
+
+<label>🔒 Mot de passe</label>
+<input type="password" placeholder="********">
+
+<button>Se connecter</button>
+
+<div class="fingerprint">
 👆
 </div>
 
-<p style="font-size:12px;color:#666;">Login ak empreinte</p>
+<div class="links">
+<a href="#">Mot de passe oublié ?</a>
+
+<hr style="margin:15px 0;">
+
+<a href="#">Créer un compte</a>
 
 </div>
 
-<script>
-
-function toggle(){
-let p = document.getElementById("password");
-p.type = p.type === "password" ? "text" : "password";
-}
-
-function login(){
-let email = document.getElementById("email").value;
-let pass = document.getElementById("password").value;
-
-if(!email || !pass){
-alert("Ranpli tout chan yo!");
-return;
-}
-
-localStorage.setItem("user", email);
-alert("Koneksyon reyisi!");
-window.location.href = "index.html";
-}
-
-function forgot(){
-let email = prompt("Antre email ou pou reset modpas:");
-if(email){
-alert("Nou voye yon lyen reset pou: " + email);
-}
-}
-
-function fingerLogin(){
-let ok = confirm("Sèvi ak empreinte pou konekte?");
-if(ok){
-localStorage.setItem("user", "finger-user");
-alert("Empreinte verifye!");
-window.location.href = "index.html";
-}
-}
-
-</script>
+</div>
 
 </body>
 </html>
