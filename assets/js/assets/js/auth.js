@@ -1,21 +1,71 @@
-// ==========================
-// AUTH.JS
-// ==========================
+// =============================
+// KONTAPRO AUTH.JS
+// =============================
 
-function login(){
+document.addEventListener("DOMContentLoaded", () => {
 
-    const email=document.getElementById("email").value.trim();
+    const form = document.getElementById("loginForm");
+    const toggle = document.getElementById("togglePassword");
+    const password = document.getElementById("password");
+    const fingerprint = document.getElementById("fingerprintLogin");
 
-    const password=document.getElementById("password").value.trim();
+    // Montrer / Cacher le mot de passe
+    if (toggle) {
+        toggle.addEventListener("click", () => {
+            if (password.type === "password") {
+                password.type = "text";
+                toggle.textContent = "🙈";
+            } else {
+                password.type = "password";
+                toggle.textContent = "👁";
+            }
+        });
+    }
 
-    if(email==="" || password===""){
+    // Connexion
+    if (form) {
+        form.addEventListener("submit", function (e) {
 
-        toast("Veuillez remplir tous les champs.");
+            e.preventDefault();
 
-        return;
+            const email = document.getElementById("email").value.trim();
+            const pass = document.getElementById("password").value.trim();
+
+            if (email === "" || pass === "") {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            if (!email.includes("@")) {
+                alert("Adresse e-mail invalide.");
+                return;
+            }
+
+            alert("Connexion réussie !");
+            // Plus tard :
+            // window.location.href="dashboard.html";
+
+        });
+    }
+
+    // Empreinte
+    if (fingerprint) {
+
+        fingerprint.addEventListener("click", () => {
+
+            alert("Connexion par empreinte disponible dans une prochaine version.");
+
+        });
 
     }
 
-    toast("Connexion réussie.");
+});
 
-}
+// Mot de passe oublié
+document.getElementById("forgotPassword")?.addEventListener("click", function(e){
+
+    e.preventDefault();
+
+    alert("La récupération du mot de passe sera disponible prochainement.");
+
+});
