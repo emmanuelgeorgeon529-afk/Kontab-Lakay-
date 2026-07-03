@@ -28,15 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             e.preventDefault();
 
-            const email = document.getElementById("email").value.trim();
+            const gmail = document.getElementById("gmail").value.trim();
             const pass = document.getElementById("password").value.trim();
 
-            if (email === "" || pass === "") {
+            if (gmail === "" || pass === "") {
                 alert("Veuillez remplir tous les champs.");
                 return;
             }
 
-        console.log(email);
+        console.log(gmail);
 
 alert("Connexion réussie !");
             
