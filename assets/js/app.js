@@ -1,14 +1,11 @@
-// ==========================
-// KONTAPRO v2.0
-// APP.JS
-// ==========================
+// =============================
+// KONTAPRO APP.JS
+// Version 2.0
+// =============================
 
-const APP_NAME = "KontaPro";
+console.log("KontaPro démarré.");
 
-console.log(APP_NAME + " démarré.");
-
-function toast(message){
-
-    alert(message);
-
-}
+// Initialisation de l'application
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Application chargée avec succès.");
+});
