@@ -36,10 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            if (!email.includes("@")) {
-                alert("Adresse e-mail invalide.");
-                return;
-            }
+        console.log(email);
+
+alert("Connexion réussie !");
+            
 
             alert("Connexion réussie !");
             // Plus tard :
