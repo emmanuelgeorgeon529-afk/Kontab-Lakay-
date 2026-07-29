@@ -1,0 +1,193 @@
+<!--
+  Sprint 4 v3 (FINAL pou kounye a) — Ekran Akèy
+  ================================================
+  Desizyon final yo (konfime):
+  - Koulè: Indigo #4F46E5 (prensipal) + Violet #7C3AED (segondè)
+  - Bottom nav FIKS 5 items, PA gen "Plis": Akèy|Lavant|Stòk|Finans|Kliyan
+  - 13 modil ERP yo aksesib via yon ikòn grid (⊞) nan header la, PA nan nav la
+  - Dark Mode / ApexCharts / Glassmorphism / Skeleton / Toast / Swipe —
+    KENBE kòm dokiman Faz 2+, PA aplike isit la (konfime pa Emmanuel)
+
+  Kote pou kole:
+  1. <section id="akèy-view"> → <body> index.html
+  2. <style> → app.css
+  3. Bottom nav + header → si w vle yo pataje ant tout views, mete yo
+     yon sèl fwa deyò <section> views yo, jere .active via JS routing
+-->
+
+<!-- Header — pataje ant tout views -->
+<header class="kl-header px-4 pt-5 pb-8">
+  <div class="flex items-center justify-between">
+    <button id="kl-btn-modil" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/15" aria-label="Tout modil yo">
+      <span class="text-white text-lg">⊞</span>
+    </button>
+    <div class="text-center">
+      <div class="text-white/80 text-xs">Manno S.A</div>
+      <div class="text-white text-[11px]" id="kl-dat-jodi">—</div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="relative w-9 h-9 flex items-center justify-center rounded-full bg-white/15">
+        <span class="text-white text-lg">🔔</span>
+        <span id="kl-notif-dot" class="hidden absolute top-1 right-1 w-2 h-2 rounded-full bg-red-400"></span>
+      </button>
+      <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-semibold">E</div>
+    </div>
+  </div>
+  <div class="text-white text-xl font-bold mt-4">Bonjou Emmanuel 👋</div>
+</header>
+
+<section id="akèy-view" class="min-h-screen bg-[--kl-fon] pb-20 px-4 -mt-4">
+
+  <!-- Kès Aktyèl — kat hero -->
+  <div id="kl-kes-card" class="kl-card kl-card--hero mb-3">
+    <div class="flex items-center justify-between">
+      <span class="text-2xl">💰</span>
+      <span id="kl-kes-chanjman" class="text-xs font-medium"></span>
+    </div>
+    <div class="text-xs mt-1 opacity-80">Kès Aktyèl</div>
+    <div id="kl-kes-valè" class="text-2xl font-bold">—</div>
+  </div>
+
+  <!-- Grid 2x2 KPI -->
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <div id="kl-lavant-card" class="kl-card">
+      <div class="flex items-center justify-between">
+        <span class="text-xl">🛒</span>
+        <span id="kl-lavant-badge" class="text-xs font-medium"></span>
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Lavant Jodi a</div>
+      <div id="kl-lavant-valè" class="text-lg font-bold text-[--kl-success]">—</div>
+    </div>
+
+    <div id="kl-depans-card" class="kl-card">
+      <div class="flex items-center justify-between">
+        <span class="text-xl">📉</span>
+        <span id="kl-depans-badge" class="text-xs font-medium"></span>
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Depans Jodi a</div>
+      <div id="kl-depans-valè" class="text-lg font-bold text-[--kl-danger]">—</div>
+    </div>
+
+    <div id="kl-benefis-card" class="kl-card col-span-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xl">📈</span>
+        <span id="kl-benefis-badge" class="text-xs font-medium"></span>
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Benefis Jodi a</div>
+      <div id="kl-benefis-valè" class="text-lg font-bold text-[--kl-primary]">—</div>
+    </div>
+  </div>
+
+  <!-- Aksyon Rapid -->
+  <div class="mb-4">
+    <div class="text-sm font-semibold text-[--kl-text] mb-2">Aksyon Rapid</div>
+    <div class="grid grid-cols-4 gap-2 text-center">
+      <button class="kl-aksyon" data-aksyon="lavant">
+        <span class="kl-aksyon-icon" style="background:var(--kl-secondary)">➕</span>
+        <span class="text-[11px] text-gray-600 mt-1">Nouvo Lavant</span>
+      </button>
+      <button class="kl-aksyon" data-aksyon="pwodwi">
+        <span class="kl-aksyon-icon" style="background:var(--kl-success)">📦</span>
+        <span class="text-[11px] text-gray-600 mt-1">Ajoute Pwodwi</span>
+      </button>
+      <button class="kl-aksyon" data-aksyon="kliyan">
+        <span class="kl-aksyon-icon" style="background:var(--kl-warning)">👤</span>
+        <span class="text-[11px] text-gray-600 mt-1">Ajoute Kliyan</span>
+      </button>
+      <button class="kl-aksyon" data-aksyon="depans">
+        <span class="kl-aksyon-icon" style="background:var(--kl-danger)">💸</span>
+        <span class="text-[11px] text-gray-600 mt-1">Ajoute Depans</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Graf 7 jou -->
+  <div class="kl-card mb-4">
+    <div class="text-sm font-semibold mb-2">📊 Evolisyon lavant 7 jou</div>
+    <div id="kl-graf-7jou" class="text-xs text-gray-400 italic py-6 text-center">
+      Ap vini — bezwen getVantePa7Jou() nan db.js
+    </div>
+  </div>
+
+  <!-- Alèt -->
+  <div class="kl-card">
+    <div class="text-sm font-semibold mb-2">⚠️ Alèt</div>
+    <ul id="kl-alertes-list" class="text-sm space-y-2">
+      <li class="text-gray-400 italic">Chajman...</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- Bottom Navigation — 5 items FIKS, san "Plis" -->
+<nav class="kl-bottomnav">
+  <button class="kl-navitem kl-navitem--active" data-view="akèy">
+    <span class="text-xl">🏠</span><span class="text-[10px]">Akèy</span>
+  </button>
+  <button class="kl-navitem" data-view="lavant">
+    <span class="text-xl">🛒</span><span class="text-[10px]">Lavant</span>
+  </button>
+  <button class="kl-navitem" data-view="stòk">
+    <span class="text-xl">📦</span><span class="text-[10px]">Stòk</span>
+  </button>
+  <button class="kl-navitem" data-view="finans">
+    <span class="text-xl">💼</span><span class="text-[10px]">Finans</span>
+  </button>
+  <button class="kl-navitem" data-view="kliyan">
+    <span class="text-xl">👥</span><span class="text-[10px]">Kliyan</span>
+  </button>
+</nav>
+
+<style>
+  :root {
+    --kl-primary:   #4F46E5;   /* Indigo — prensipal: header, valè kle, nav aktif */
+    --kl-secondary: #7C3AED;   /* Violet — sèlman bouton "Nouvo Lavant" (aksyon #1) */
+    --kl-success:   #22C55E;
+    --kl-danger:    #EF4444;
+    --kl-warning:   #F59E0B;
+    --kl-fon:       #F8FAFC;
+    --kl-text:      #0F172A;
+  }
+
+  body { font-family: "Inter", "Plus Jakarta Sans", sans-serif; color: var(--kl-text); }
+
+  .kl-header {
+    background: linear-gradient(135deg, var(--kl-primary) 0%, var(--kl-secondary) 100%);
+    border-radius: 0 0 24px 24px;
+  }
+
+  .kl-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+    padding: 16px;
+  }
+  .kl-card--hero {
+    background: linear-gradient(135deg, var(--kl-primary) 0%, var(--kl-secondary) 100%);
+    color: #fff;
+  }
+
+  .kl-aksyon { display: flex; flex-direction: column; align-items: center; }
+  .kl-aksyon-icon {
+    width: 44px; height: 44px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+  }
+
+  .kl-bottomnav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid #E2E8F0;
+    display: flex; justify-content: space-around;
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+    z-index: 40;
+  }
+  .kl-navitem {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    color: #94A3B8; background: none; border: none;
+  }
+  .kl-navitem--active { color: var(--kl-primary); }
+
+  .kl-badge-pozitif { color: var(--kl-success); }
+  .kl-badge-negatif { color: var(--kl-danger); }
+</style>
