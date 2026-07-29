@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "pwennaj",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "anplwayeId", "order": "ASCENDING" },
+        { "fieldPath": "kreyeLe", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
