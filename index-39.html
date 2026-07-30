@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Kontab Lakay</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  :root {
+    --ink: #14323D;
+    --gold: #C9932E;
+    --bg: #F5F6F4;
+    --text: #1D2B2E;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Fraunces', Georgia, serif;
+  }
+  /* Zòn ki respekte "safe area" sou telefòn ak nòch/gestures */
+  #app-shell {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    min-height: 100dvh;
+  }
+  header.app-header {
+    background: var(--ink);
+  }
+  /* Siyati vizyèl: bòdi tab-bar la sanble ak papye resi ki chire/pèfore */
+  #tab-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -1px 0 rgba(0,0,0,0.06);
+  }
+  #tab-bar::before {
+    content: "";
+    display: block;
+    height: 6px;
+    background-image: radial-gradient(circle, var(--bg) 2.2px, transparent 2.3px);
+    background-size: 14px 14px;
+    background-position: center;
+    background-color: white;
+  }
+  .tab-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; padding: 8px 0; flex: 1;
+    color: #8A9296;
+    font-size: 11px;
+    font-weight: 600;
+    transition: color 0.15s ease;
+  }
+  .tab-btn.active { color: var(--ink); }
+  .tab-btn.active .tab-icon { color: var(--gold); }
+  .tab-icon { font-size: 20px; line-height: 1; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .hidden { display: none; }
+
+  /* Fokis klavye vizib pou aksesibilite */
+  button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== EKRAN AUTH (koneksyon/enskripsyon) ==================== -->
+<div id="auth-screen" class="min-h-dvh flex items-center justify-center px-4" style="background: var(--ink)">
+  <div class="w-full max-w-sm">
+    <h1 class="display text-3xl text-white text-center mb-1">Kontab Lakay</h1>
+    <p class="text-white/60 text-center text-sm mb-6">Jesyon biznis ou, an Kreyòl.</p>
+
+    <div class="bg-white rounded-lg shadow p-5">
+      <!-- Tab: Konekte / Enskri -->
+      <div class="flex mb-4 border-b">
+        <button id="tab-auth-konekte" class="flex-1 py-2 text-sm font-semibold border-b-2" style="border-color: var(--gold)">Konekte</button>
+        <button id="tab-auth-enskri" class="flex-1 py-2 text-sm font-semibold text-gray-400 border-b-2 border-transparent">Kreye Biznis</button>
+      </div>
+
+      <!-- Fòm Koneksyon -->
+      <form id="form-konekte" class="space-y-3">
+        <input name="email" type="email" placeholder="Email" required autocomplete="email" class="w-full border rounded p-2 text-sm" />
+        <input name="modpas" type="password" placeholder="Modpas" required autocomplete="current-password" class="w-full border rounded p-2 text-sm" />
+        <button type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Konekte</button>
+        <button type="button" id="btn-reyajis-manpas" class="w-full text-xs text-gray-500 underline">Bliye modpas?</button>
+      </form>
+
+      <!-- Fòm Enskripsyon (kache pa default) -->
+      <form id="form-enskri" class="space-y-3 hidden">
+        <input name="bizNon" placeholder="Non biznis ou" required class="w-full border rounded p-2 text-sm" />
+        <input name="itilizatèNon" placeholder="Non pa w" required class="w-full border rounded p-2 text-sm" />
+        <input name="email" type="email" placeholder="Email" required autocomplete="email" class="w-full border rounded p-2 text-sm" />
+        <input name="modpas" type="password" placeholder="Modpas (6+ karaktè)" required minlength="6" autocomplete="new-password" class="w-full border rounded p-2 text-sm" />
+        <button type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Kreye Biznis</button>
+      </form>
+
+      <!-- Fòm Enskripsyon pa Envitasyon (kache pa default, montre si lyen gen ?biz=&kod=) -->
+      <form id="form-enskri-envitasyon" class="space-y-3 hidden">
+        <p id="envitasyon-detay" class="text-sm bg-amber-50 border border-amber-200 rounded p-2"></p>
+        <input name="email" type="email" placeholder="Email" required autocomplete="email" class="w-full border rounded p-2 text-sm" />
+        <input name="modpas" type="password" placeholder="Modpas (6+ karaktè)" required minlength="6" autocomplete="new-password" class="w-full border rounded p-2 text-sm" />
+        <button type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Enskri</button>
+      </form>
+
+      <p id="auth-mesaj-erè" class="text-red-600 text-sm mt-3 hidden"></p>
+    </div>
+  </div>
+</div>
+
+<div id="app-shell" class="hidden">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="app-header text-white px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+    <div>
+      <h1 class="display text-lg leading-none">Kontab Lakay</h1>
+      <p id="header-sub-titre" class="text-xs text-white/60 mt-0.5">Chajman...</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span id="koneksyon-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400" title="Konekte"></span>
+      <button id="btn-dekonekte" class="text-white/70 text-xs underline">Dekonekte</button>
+    </div>
+  </header>
+
+  <!-- ==================== TABLO (Dashboard) ==================== -->
+  <section id="panel-dashboard" class="panel active px-4 py-4">
+    <h2 class="display text-xl mb-3">Tablo</h2>
+
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="bg-white rounded-lg shadow p-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Vant Jodi a</p>
+        <div id="kpi-ventes">…</div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Depans Jodi a</p>
+        <div id="kpi-depans">…</div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Benefis Jodi a</p>
+        <div id="kpi-benefis">…</div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Balans Kès</p>
+        <div id="kpi-kès">…</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="bg-white rounded-lg shadow p-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Dèt Kliyan</p>
+        <div id="kpi-dette-kliyan">…</div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Dèt Founisè</p>
+        <div id="kpi-dette-founisè">…</div>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm text-gray-500 mb-2 uppercase tracking-wide">Alèt Stòk</h3>
+    <div id="dashboard-alèt-stok" class="bg-white rounded-lg shadow divide-y p-1"></div>
+  </section>
+
+  <!-- ==================== POS ==================== -->
+  <section id="panel-pos" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Pwen de Vant</h2>
+
+    <div id="katalog-grid" class="grid grid-cols-2 gap-3 mb-6"></div>
+
+    <div class="bg-white rounded-lg shadow p-3 mb-3">
+      <h3 class="font-semibold text-sm text-gray-500 mb-2 uppercase tracking-wide">Panyen</h3>
+      <div id="panyen-list"></div>
+      <div class="flex justify-between items-center pt-3 mt-2 border-t">
+        <span class="font-semibold">Total</span>
+        <span id="panyen-total" class="text-xl font-bold" style="color: var(--ink)">0 HTG</span>
+      </div>
+    </div>
+
+    <fieldset class="flex gap-3 mb-3 text-sm">
+      <legend class="sr-only">Mòd peman</legend>
+      <label class="flex items-center gap-1"><input type="radio" name="mod-peman" value="Cash" checked /> Kach</label>
+      <label class="flex items-center gap-1"><input type="radio" name="mod-peman" value="MonCash" /> MonCash</label>
+      <label class="flex items-center gap-1"><input type="radio" name="mod-peman" value="Transfè Bank" /> Bank</label>
+      <label class="flex items-center gap-1"><input type="radio" name="mod-peman" value="Kredi" /> Kredi</label>
+    </fieldset>
+
+    <button id="btn-peye" class="w-full text-white font-semibold py-3 rounded-lg" style="background: var(--ink)">
+      Peye
+    </button>
+  </section>
+
+  <!-- ==================== STOK ==================== -->
+  <section id="panel-stock" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Stòk</h2>
+
+    <details class="bg-white rounded-lg shadow p-3 mb-4">
+      <summary class="font-semibold text-sm cursor-pointer">+ Nouvo pwodwi</summary>
+      <form id="form-nouvo-pwodwi" class="mt-3 space-y-2">
+        <input name="non" placeholder="Non pwodwi" required class="w-full border rounded p-2 text-sm" />
+        <div class="grid grid-cols-2 gap-2">
+          <input name="priVant" type="number" step="0.01" placeholder="Pri vant" required class="border rounded p-2 text-sm" />
+          <input name="cmp" type="number" step="0.01" placeholder="Kout (CMP)" class="border rounded p-2 text-sm" />
+        </div>
+        <input name="kantiteInisyal" type="number" placeholder="Kantite inisyal" class="w-full border rounded p-2 text-sm" />
+        <input name="stokMinimòm" type="number" placeholder="Sèy alèt stòk (opsyonèl)" class="w-full border rounded p-2 text-sm" />
+        <button type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Ajoute</button>
+      </form>
+    </details>
+
+    <div id="stok-liste" class="bg-white rounded-lg shadow divide-y"></div>
+  </section>
+
+  <!-- ==================== DEPANS ==================== -->
+  <section id="panel-expenses" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Depans</h2>
+
+    <form id="form-nouvo-depans" class="bg-white rounded-lg shadow p-3 mb-4 space-y-2">
+      <input name="libele" placeholder="Libellé (egz: Elektrisite, Kaye)" required class="w-full border rounded p-2 text-sm" />
+      <input name="montan" type="number" step="0.01" placeholder="Montan (HTG)" required class="w-full border rounded p-2 text-sm" />
+      <select name="modePeman" class="w-full border rounded p-2 text-sm">
+        <option value="Cash">Kach</option>
+        <option value="MonCash">MonCash</option>
+        <option value="Transfè Bank">Bank</option>
+      </select>
+      <button id="btn-soumèt-depans" type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Anrejistre depans</button>
+    </form>
+
+    <div id="depans-liste" class="bg-white rounded-lg shadow divide-y"></div>
+  </section>
+
+  <!-- ==================== KLIYAN (DÈT) ==================== -->
+  <section id="panel-receivables" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Dèt Kliyan</h2>
+
+    <div id="kliyan-dèt-liste" class="mb-4"></div>
+
+    <form id="form-peman-kliyan" class="hidden bg-white rounded-lg shadow p-3 space-y-2">
+      <p id="peman-kliyan-non" class="font-semibold text-sm"></p>
+      <input name="montanPeye" type="number" step="0.01" placeholder="Montan yo peye" required class="w-full border rounded p-2 text-sm" />
+      <select name="modePeman" class="w-full border rounded p-2 text-sm">
+        <option value="Cash">Kach</option>
+        <option value="MonCash">MonCash</option>
+        <option value="Transfè Bank">Bank</option>
+      </select>
+      <button id="btn-soumèt-peman" type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Anrejistre peman</button>
+    </form>
+  </section>
+
+  <!-- ==================== FOUNISÈ (ACHA / DÈT) ==================== -->
+  <section id="panel-payables" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Founisè</h2>
+
+    <details class="bg-white rounded-lg shadow p-3 mb-4">
+      <summary class="font-semibold text-sm cursor-pointer">+ Nouvo acha a kredi</summary>
+      <form id="form-acha-kredi" class="mt-3 space-y-2">
+        <input name="founisèId" placeholder="ID Founisè" required class="w-full border rounded p-2 text-sm" />
+        <input name="founisèNon" placeholder="Non Founisè" required class="w-full border rounded p-2 text-sm" />
+        <input name="produitId" placeholder="ID Pwodwi" required class="w-full border rounded p-2 text-sm" />
+        <div class="grid grid-cols-2 gap-2">
+          <input name="quantite" type="number" placeholder="Kantite" required class="border rounded p-2 text-sm" />
+          <input name="prixAchat" type="number" step="0.01" placeholder="Pri achat/inite" required class="border rounded p-2 text-sm" />
+        </div>
+        <button id="btn-soumèt-acha" type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Anrejistre acha</button>
+      </form>
+    </details>
+
+    <div id="founisè-dèt-liste" class="mb-4"></div>
+
+    <form id="form-peman-founisè" class="hidden bg-white rounded-lg shadow p-3 space-y-2">
+      <p id="peman-founisè-non" class="font-semibold text-sm"></p>
+      <input name="montanPeye" type="number" step="0.01" placeholder="Montan w ap peye" required class="w-full border rounded p-2 text-sm" />
+      <select name="modePeman" class="w-full border rounded p-2 text-sm">
+        <option value="Cash">Kach</option>
+        <option value="MonCash">MonCash</option>
+        <option value="Transfè Bank">Bank</option>
+      </select>
+      <button id="btn-soumèt-peman-founisè" type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Peye founisè</button>
+    </form>
+  </section>
+
+  <!-- ==================== RH (PWENNAJ & PEWÒL) ==================== -->
+  <section id="panel-hr" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Pwennaj & Pewòl</h2>
+
+    <div class="flex gap-3 mb-4">
+      <button id="btn-pwennaj-antre" class="flex-1 text-white font-semibold py-3 rounded-lg" style="background: #2E7D5B">Antre</button>
+      <button id="btn-pwennaj-sòti" class="flex-1 text-white font-semibold py-3 rounded-lg" style="background: #B3432B">Sòti</button>
+    </div>
+
+    <details class="bg-white rounded-lg shadow p-3 mb-4">
+      <summary class="font-semibold text-sm cursor-pointer">+ Peye Pewòl</summary>
+      <form id="form-pewòl" class="mt-3 space-y-2">
+        <input name="anplwayeId" placeholder="ID Anplwaye" required class="w-full border rounded p-2 text-sm" />
+        <input name="anplwayeNon" placeholder="Non Anplwaye" required class="w-full border rounded p-2 text-sm" />
+        <input name="salèDeBaz" type="number" step="0.01" placeholder="Salè de baz" required class="w-full border rounded p-2 text-sm" />
+        <div class="grid grid-cols-2 gap-2">
+          <input name="prim" type="number" step="0.01" placeholder="Prim" class="border rounded p-2 text-sm" />
+          <input name="dediksyon" type="number" step="0.01" placeholder="Dediksyon" class="border rounded p-2 text-sm" />
+        </div>
+        <select name="modePeman" class="w-full border rounded p-2 text-sm">
+          <option value="Cash">Kach</option>
+          <option value="MonCash">MonCash</option>
+          <option value="Transfè Bank">Bank</option>
+        </select>
+        <button id="btn-soumèt-pewòl" type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Peye</button>
+      </form>
+    </details>
+
+    <div id="pewòl-liste" class="bg-white rounded-lg shadow divide-y"></div>
+  </section>
+
+  <!-- ==================== EKIP (Propriétaire/Administratè sèlman) ==================== -->
+  <section id="panel-team" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Ekip</h2>
+
+    <details class="bg-white rounded-lg shadow p-3 mb-4">
+      <summary class="font-semibold text-sm cursor-pointer">+ Envite anplwaye</summary>
+      <form id="form-envite-anplwaye" class="mt-3 space-y-2">
+        <input name="non" placeholder="Non anplwaye" required class="w-full border rounded p-2 text-sm" />
+        <input name="email" type="email" placeholder="Email anplwaye" required class="w-full border rounded p-2 text-sm" />
+        <select name="wòl" required class="w-full border rounded p-2 text-sm">
+          <option value="">— Chwazi wòl —</option>
+          <option value="Administratè">Administratè</option>
+          <option value="Vandè">Vandè</option>
+          <option value="Magasinier">Magasinier</option>
+          <option value="Kòmis">Kòmis</option>
+          <option value="Kontablè">Kontablè</option>
+        </select>
+        <button id="btn-envite-anplwaye" type="submit" class="w-full text-white font-semibold py-2 rounded" style="background: var(--ink)">Ajoute anplwaye</button>
+      </form>
+      <div id="envite-rezilta"></div>
+    </details>
+
+    <h3 class="font-semibold text-sm text-gray-500 mb-2 uppercase tracking-wide">Envitasyon An Atant</h3>
+    <div id="envitasyon-an-atant-liste" class="bg-white rounded-lg shadow divide-y mb-4"></div>
+
+    <h3 class="font-semibold text-sm text-gray-500 mb-2 uppercase tracking-wide">Manm ekip la</h3>
+    <div id="manm-liste" class="bg-white rounded-lg shadow divide-y"></div>
+  </section>
+
+  <!-- ==================== KONTABILITE ==================== -->
+  <section id="panel-accounting" class="panel px-4 py-4">
+    <h2 class="display text-xl mb-3">Kontabilite</h2>
+
+    <div id="bilan-tab" class="bg-white rounded-lg shadow p-3 mb-4"></div>
+
+    <div class="mb-2">
+      <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Grand Livre — Kont</label>
+      <select id="grand-livre-select-kont" class="w-full border rounded p-2 text-sm mt-1"></select>
+    </div>
+    <div id="grand-livre-tab" class="bg-white rounded-lg shadow p-3 mb-4 overflow-x-auto"></div>
+
+    <h3 class="font-semibold text-sm text-gray-500 mb-2 uppercase tracking-wide">Jounal Jeneral</h3>
+    <div id="jounal-tab" class="bg-white rounded-lg shadow p-3 overflow-x-auto"></div>
+  </section>
+
+</div>
+
+<!-- ==================== TAB BAR ==================== -->
+<nav id="tab-bar" class="flex">
+  <button class="tab-btn active" data-tab="dashboard"><span class="tab-icon">🧭</span>Tablo</button>
+  <button class="tab-btn" data-tab="pos"><span class="tab-icon">🛒</span>Vant</button>
+  <button class="tab-btn" data-tab="stock"><span class="tab-icon">📦</span>Stòk</button>
+  <button class="tab-btn" data-tab="expenses"><span class="tab-icon">🧾</span>Depans</button>
+  <button class="tab-btn" data-tab="receivables"><span class="tab-icon">👤</span>Kliyan</button>
+  <button class="tab-btn" data-tab="payables"><span class="tab-icon">🚚</span>Founisè</button>
+  <button class="tab-btn" data-tab="hr"><span class="tab-icon">⏱️</span>RH</button>
+  <button id="tab-btn-team" class="tab-btn hidden" data-tab="team"><span class="tab-icon">🧑‍🤝‍🧑</span>Ekip</button>
+  <button class="tab-btn" data-tab="accounting"><span class="tab-icon">📊</span>Kontab</button>
+</nav>
+
+<script type="module" src="js/core/app.js"></script>
+</body>
+</html>
