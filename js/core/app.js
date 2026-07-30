@@ -24,13 +24,18 @@ import { inisyalizePayables } from "../modules/payables.js";
 import { inisyalizeHR } from "../modules/hr.js";
 import { inisyalizeAccounting } from "../modules/accounting.js";
 import { inisyalizeTeam } from "../modules/team.js";
+import { inisyalizeDashboard } from "../modules/dashboard.js";
 
+/* ------------------------------------------------------------------ */
+/* ETA APLIKASYON AN                                                     */
+/* ------------------------------------------------------------------ */
 let BIZ_ID = null;
 let ITILIZATÈ_ID = null;
 let ITILIZATÈ_NON = null;
 const modilInisyalize = new Set();
 
 const INISYALIZATÈ = {
+  dashboard: () => inisyalizeDashboard(BIZ_ID),
   pos: () => inisyalizePOS(BIZ_ID, ITILIZATÈ_ID, ITILIZATÈ_NON),
   stock: () => inisyalizeStock(BIZ_ID),
   expenses: () => inisyalizeExpenses(BIZ_ID, ITILIZATÈ_ID, ITILIZATÈ_NON),
@@ -41,10 +46,16 @@ const INISYALIZATÈ = {
   team: () => inisyalizeTeam(BIZ_ID),
 };
 
+/* ------------------------------------------------------------------ */
+/* ELEMAN DOM                                                            */
+/* ------------------------------------------------------------------ */
 const authScreen = document.getElementById("auth-screen");
 const appShell = document.getElementById("app-shell");
 const authMesajErè = document.getElementById("auth-mesaj-erè");
 
+/* ------------------------------------------------------------------ */
+/* TAB NAVIGATION                                                        */
+/* ------------------------------------------------------------------ */
 async function ouvriTab(non) {
   document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.tab === non);
@@ -68,6 +79,9 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => ouvriTab(btn.dataset.tab));
 });
 
+/* ------------------------------------------------------------------ */
+/* AUTH — tab Konekte / Enskri                                           */
+/* ------------------------------------------------------------------ */
 const tabKonekte = document.getElementById("tab-auth-konekte");
 const tabEnskri = document.getElementById("tab-auth-enskri");
 const formKonekte = document.getElementById("form-konekte");
@@ -101,6 +115,7 @@ formKonekte.addEventListener("submit", async (e) => {
       email: formData.get("email"),
       modpas: formData.get("modpas"),
     });
+    // koumanseKouteAuth() ap detekte chanjman an otomatikman epi montre app-shell la
   } catch (error) {
     afficheErèAuth(error.message);
   } finally {
@@ -120,6 +135,10 @@ formEnskri.addEventListener("submit", async (e) => {
       bizNon: formData.get("bizNon"),
       itilizatèNon: formData.get("itilizatèNon"),
     });
+    // NÒT: pa depann sèlman sou koumanseKouteAuth() paske li ka gentan
+    // deklanche AVAN ekriti Firestore yo fin fèt (race condition — gade
+    // auth.js pou detay). Rele rechèch la ankò MANYÈLMAN, kounye a nou
+    // sèten ekriti yo fini paske enskriNouvoBiznis() fin egzekite.
     const kontèks = await jwennKontèksItilizatè(uid, formData.get("email"));
     aplikeKontèks(kontèks);
   } catch (error) {
@@ -147,6 +166,9 @@ document.getElementById("btn-dekonekte").addEventListener("click", async () => {
   await dekonekte();
 });
 
+/* ------------------------------------------------------------------ */
+/* LYEN ENVITASYON (?biz=...&kod=...) — pran priyorite sou fòm nòmal la  */
+/* ------------------------------------------------------------------ */
 const paramèt = new URLSearchParams(window.location.search);
 const bizIdEnvitasyon = paramèt.get("biz");
 const kòdEnvitasyon = paramèt.get("kod");
@@ -155,6 +177,7 @@ if (bizIdEnvitasyon && kòdEnvitasyon) {
   const formEnskriEnvitasyon = document.getElementById("form-enskri-envitasyon");
   const detayEl = document.getElementById("envitasyon-detay");
 
+  // Kache tab nòmal yo, montre sèlman fòm envitasyon an
   document.querySelector(".flex.mb-4.border-b")?.classList.add("hidden");
   formKonekte.classList.add("hidden");
   formEnskri.classList.add("hidden");
@@ -198,6 +221,10 @@ if (bizIdEnvitasyon && kòdEnvitasyon) {
   });
 }
 
+/* ------------------------------------------------------------------ */
+/* APLIKE KONTÈKS — separe de listener a pou l ka rele ni pa listener a  */
+/* pasif la, ni MANYÈLMAN apre yon enskripsyon reyisi (gade pi ba).      */
+/* ------------------------------------------------------------------ */
 function aplikeKontèks(kontèks) {
   if (!kontèks) {
     BIZ_ID = null;
@@ -234,7 +261,7 @@ function aplikeKontèks(kontèks) {
   authScreen.classList.add("hidden");
   appShell.classList.remove("hidden");
 
-  ouvriTab("pos");
+  ouvriTab("dashboard");
 }
 
 koumanseKouteAuth(aplikeKontèks);
