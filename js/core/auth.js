@@ -1,237 +1,60 @@
 // js/core/auth.js
-import { auth, db } from "./firebase-config.js";
-import {
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  sendEmailVerification,
+import { auth } from './firebase-config.js';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* ------------------------------------------------------------------ */
-/* TRADIKSYON ERÈ FIREBASE → MESAJ KREYÒL EDIKATIF                       */
-/* ------------------------------------------------------------------ */
-function tradiErèFirebase(error) {
-  const kòd = error?.code || "";
-  const mesaj = {
-    "auth/email-already-in-use": "Yon kont deja egziste ak email sa a.",
-    "auth/invalid-email": "Fòma email lan pa kòrèk.",
-    "auth/weak-password": "Modpas la twò fèb — mete omwen 6 karaktè.",
-    "auth/user-not-found": "Pa gen kont ak email sa a.",
-    "auth/wrong-password": "Modpas la pa kòrèk.",
-    "auth/invalid-credential": "Email oswa modpas la pa kòrèk.",
-    "auth/too-many-requests": "Twòp tantativ — tann yon ti moman anvan w eseye ankò.",
-    "auth/network-request-failed": "Pwoblèm koneksyon entènèt — verifye rezo w.",
-  };
-  return mesaj[kòd] || `Erè inatandi: ${error?.message || "Erè enkoni"}`;
-}
+// Variable globale pour suivre l'utilisateur connecté
+let currentUser = null;
 
-/* ------------------------------------------------------------------ */
-/* JWENN KONTÈKS ITILIZATÈ — separe de listener a pou l ka rele ankò    */
-/* MANYÈLMAN apre yon enskripsyon reyisi, san pa gen depann sèlman sou  */
-/* `onAuthStateChanged` (ki ka deklanche TWÒ BONÈ, anvan ekriti          */
-/* Firestore yo fin fèt — gade koumanseKouteAuth() pi ba pou detay).    */
-/* ------------------------------------------------------------------ */
-export async function jwennKontèksItilizatè(uid, email) {
+// 1. Connexion (Login)
+export async function loginUser(email, password) {
   try {
-    const lookupRef = doc(db, "itilizate_biznis", uid);
-    const lookupSnap = await getDoc(lookupRef);
-
-    if (!lookupSnap.exists()) {
-      return { uid, email, bizId: null, non: null, wòl: null };
-    }
-
-    const bizId = lookupSnap.data().bizId;
-    const manmRef = doc(db, "biznis", bizId, "manm", uid);
-    const manmSnap = await getDoc(manmRef);
-
-    return {
-      uid,
-      email,
-      bizId,
-      non: manmSnap.exists() ? manmSnap.data().non : email,
-      wòl: manmSnap.exists() ? manmSnap.data().wol : null,
-    };
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    currentUser = userCredential.user;
+    return { success: true, user: currentUser };
   } catch (error) {
-    console.error("Erè chajman kontèks itilizatè:", error);
-    return { uid, email, bizId: null, non: null, wòl: null, erè: error.message };
+    console.error("Erreur de connexion:", error.message);
+    return { success: false, error: error.message };
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* KOUTE CHANJMAN AUTH — rele onChanje(null) si dekonekte, oswa           */
-/* onChanje({ uid, email, bizId, non, wòl }) si konekte ak biznis konplè  */
-/*                                                                       */
-/* ATANSYON — RACE CONDITION KONNI: `onAuthStateChanged` deklanche       */
-/* IMEDYATMAN apre `createUserWithEmailAndPassword()` — sa vle di li ka  */
-/* rive AVAN ekriti Firestore yo (biznis/manm/itilizate_biznis) nan      */
-/* enskriNouvoBiznis()/enskriAkEnvitasyon() fin egzekite. Se poutèt sa    */
-/* app.js dwe rele jwennKontèksItilizatè() MANYÈLMAN apre yon enskripsyon */
-/* reyisi, olye l depann sèlman sou premye deklanchman listener sa a.     */
-/* ------------------------------------------------------------------ */
-export function koumanseKouteAuth(onChanje) {
-  return onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      onChanje(null);
-      return;
-    }
-    const kontèks = await jwennKontèksItilizatè(user.uid, user.email);
-    onChanje(kontèks);
+// 2. Inscription (Register)
+export async function registerUser(email, password, displayName) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    currentUser = userCredential.user;
+    // Note : On peut ajouter le displayName dans Firestore plus tard
+    return { success: true, user: currentUser };
+  } catch (error) {
+    console.error("Erreur d'inscription:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+// 3. Déconnexion (Logout)
+export async function logoutUser() {
+  try {
+    await signOut(auth);
+    currentUser = null;
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// 4. Observateur d'état (pour protéger les pages)
+export function onAuthStateChange(callback) {
+  return onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    callback(user);
   });
 }
 
-/* ------------------------------------------------------------------ */
-/* ENSKRIPSYON — kreye kont + biznis + premye manm kòm Propriétaire       */
-/*                                                                       */
-/* NÒT: sa a se 3 ekriti separe, PA yon transaction Firestore, paske      */
-/* createUserWithEmailAndPassword() se yon apèl Auth, pa Firestore.       */
-/* ------------------------------------------------------------------ */
-export async function enskriNouvoBiznis({ email, modpas, bizNon, itilizatèNon }) {
-  if (!email || !modpas || !bizNon || !itilizatèNon) {
-    throw new Error("Ranpli tout chan yo pou enskri.");
-  }
-
-  let userCredential;
-  try {
-    userCredential = await createUserWithEmailAndPassword(auth, email, modpas);
-  } catch (error) {
-    throw new Error(tradiErèFirebase(error));
-  }
-
-  const uid = userCredential.user.uid;
-
-  // Voye email verifikasyon an — pa bloke enskripsyon si sa echwe (egzanp
-  // kota Firebase depase, oswa pwoblèm rezo tanporè); se yon "bonus", pa
-  // yon kondisyon obligatwa pou kontinye.
-  try {
-    await sendEmailVerification(userCredential.user);
-  } catch (error) {
-    console.error("Erè voye email verifikasyon (non-fatal):", error);
-  }
-
-  try {
-    const bizRef = doc(collection(db, "biznis"));
-    const bizId = bizRef.id;
-
-    await setDoc(bizRef, {
-      non: bizNon,
-      kreyeLe: serverTimestamp(),
-    });
-
-    await setDoc(doc(db, "biznis", bizId, "manm", uid), {
-      non: itilizatèNon,
-      email,
-      wol: "Propriétaire",
-      kreyeLe: serverTimestamp(),
-    });
-
-    await setDoc(doc(db, "itilizate_biznis", uid), {
-      bizId,
-      kreyeLe: serverTimestamp(),
-    });
-
-    return { uid, bizId };
-  } catch (error) {
-    console.error("Erè kreyasyon biznis apre kont kreye:", error);
-    throw new Error(
-      "Kont ou kreye, men gen yon pwoblèm pou kreye biznis la. Rekonekte pou eseye ankò."
-    );
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* ENSKRIPSYON PA ENVITASYON                                             */
-/* ------------------------------------------------------------------ */
-export async function enskriAkEnvitasyon({ email, modpas, non, bizId, kòd, wòl }) {
-  if (!email || !modpas || !non || !bizId || !kòd || !wòl) {
-    throw new Error("Enfòmasyon envitasyon an enkonplè — verifye lyen an.");
-  }
-
-  let userCredential;
-  try {
-    userCredential = await createUserWithEmailAndPassword(auth, email, modpas);
-  } catch (error) {
-    throw new Error(tradiErèFirebase(error));
-  }
-  const uid = userCredential.user.uid;
-
-  try {
-    await sendEmailVerification(userCredential.user);
-  } catch (error) {
-    console.error("Erè voye email verifikasyon (non-fatal):", error);
-  }
-
-  try {
-    // Kreye dosye manm lan — firestore.rules verifye kòd la valid AVAN
-    // aksepte ekriti sa a (pa fè konfyans nan kliyan an sèlman).
-    await setDoc(doc(db, "biznis", bizId, "manm", uid), {
-      non,
-      email,
-      wol: wòl,
-      envitasyonKod: kòd,
-      kreyeLe: serverTimestamp(),
-    });
-
-    await setDoc(
-      doc(db, "biznis", bizId, "envitasyon", kòd),
-      { itilize: true, itilizePa: uid },
-      { merge: true }
-    );
-
-    await setDoc(doc(db, "itilizate_biznis", uid), {
-      bizId,
-      kreyeLe: serverTimestamp(),
-    });
-
-    return { uid, bizId };
-  } catch (error) {
-    console.error("Erè finalizasyon enskripsyon pa envitasyon:", error);
-    throw new Error(
-      "Kont ou kreye, men lyezon ak biznis la echwe — kontak Propriétaire a pou l verifye kòd la toujou valid."
-    );
-  }
-}
-
-export async function jwennEnvitasyon(bizId, kòd) {
-  const ref = doc(db, "biznis", bizId, "envitasyon", kòd);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() };
-}
-
-/* ------------------------------------------------------------------ */
-/* KONEKSYON / DEKONEKSYON                                                */
-/* ------------------------------------------------------------------ */
-export async function konekteItilizatè({ email, modpas }) {
-  if (!email || !modpas) {
-    throw new Error("Antre email ak modpas.");
-  }
-  try {
-    await signInWithEmailAndPassword(auth, email, modpas);
-  } catch (error) {
-    throw new Error(tradiErèFirebase(error));
-  }
-}
-
-export async function dekonekte() {
-  await signOut(auth);
-}
-
-export async function voyeReyajisManPas(email) {
-  if (!email) {
-    throw new Error("Antre email ou pou resevwa lyen reyajisman an.");
-  }
-  try {
-    await sendPasswordResetEmail(auth, email);
-  } catch (error) {
-    throw new Error(tradiErèFirebase(error));
-  }
+// 5. Obtenir l'utilisateur actuel
+export function getCurrentUser() {
+  return currentUser;
 }
