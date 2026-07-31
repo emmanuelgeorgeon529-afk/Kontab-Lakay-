@@ -231,6 +231,8 @@ function aplikeKontèks(kontèks) {
     ITILIZATÈ_ID = null;
     ITILIZATÈ_NON = null;
     modilInisyalize.clear();
+    authMesajErè.innerHTML = "";
+    authMesajErè.classList.add("hidden");
     authScreen.classList.remove("hidden");
     appShell.classList.add("hidden");
     return;
