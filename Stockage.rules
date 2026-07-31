@@ -1,0 +1,24 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Vérification de l'authentification
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Permet l'accès uniquement si l'utilisateur est connecté et appartient à la société 
+    // (en vérifiant le chemin du fichier : /companies/{companyId}/...)
+    match /companies/{companyId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid in firestore.get(/databases/(default)/documents/companies/$(companyId)/users).data;
+      allow delete: if isAuthenticated() && request.auth.uid in firestore.get(/databases/(default)/documents/companies/$(companyId)/users).data;
+    }
+
+    // Dossier public / temporaire pour les imports CSV/Excel
+    match /temp/{allPaths=**} {
+      allow read, write: if isAuthenticated();
+      allow delete: if request.time < timestamp.date(2026, 1, 1); // Auto-suppression après une date
+    }
+  }
+}
