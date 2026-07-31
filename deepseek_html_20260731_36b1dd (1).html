@@ -1,0 +1,62 @@
+<section id="dashboard" class="view-section active">
+    <h2 style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">Vue d'ensemble exécutive</h2>
+    
+    <!-- KPI Grid 1 -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="label">Trésorerie (Trezori)</div>
+            <div class="value">$ 284,5k</div>
+            <div class="change up">↑ 12,5%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">Ventes (Vant)</div>
+            <div class="value">$ 12,8k</div>
+            <div class="change up">↑ 8,2%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">Marge Bénéficiaire</div>
+            <div class="value">68,4%</div>
+            <div class="change up">↑ 2,1%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">Dépenses (Depans)</div>
+            <div class="value">$ 4,2k</div>
+            <div class="change down">↑ 3,1%</div>
+        </div>
+    </div>
+
+    <!-- KPI Grid 2 -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="label">Comptes Clients (A/R)</div>
+            <div class="value" style="color: var(--primary);">$ 42,1k</div>
+            <div class="change up">↑ 4%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">Comptes Fournisseurs (A/P)</div>
+            <div class="value" style="color: var(--danger);">$ 18,3k</div>
+            <div class="change down">↓ 2%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">Valeur des Stocks</div>
+            <div class="value" style="color: var(--secondary);">$ 92,7k</div>
+            <div class="change up">↑ 1,5%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="label">Employés (Anplwaye)</div>
+            <div class="value">347</div>
+            <div class="change up">↑ 5</div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+        <div class="chart-header" style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="font-weight: 600;">Revenus vs Dépenses (6 mois)</h3>
+            <span style="color:var(--text-muted); font-size:13px;">Mise à jour en temps réel</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="mainChart"></canvas>
+        </div>
+    </div>
+</section>
