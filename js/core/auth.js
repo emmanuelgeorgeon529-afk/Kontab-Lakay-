@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  sendEmailVerification,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   doc,
@@ -90,12 +91,8 @@ export function koumanseKouteAuth(onChanje) {
 /* ------------------------------------------------------------------ */
 /* ENSKRIPSYON — kreye kont + biznis + premye manm kòm Propriétaire       */
 /*                                                                       */
-/* NÒT: sa a se 3 ekriti separe (kreyasyon itilizatè Auth, biznis,        */
-/* manm) — PA yon transaction Firestore, paske createUserWithEmailAnd    */
-/* Password() se yon apèl Auth, pa Firestore, e li pa ka antre nan yon    */
-/* runTransaction(). Si yon etap echwe apre kont Auth la kreye, itilizatè */
-/* a ap gen yon kont "enkonplè" (bizId: null) — ki detekte pa             */
-/* koumanseKouteAuth() epi ki ka reyesèye kreye biznis la ankò.           */
+/* NÒT: sa a se 3 ekriti separe, PA yon transaction Firestore, paske      */
+/* createUserWithEmailAndPassword() se yon apèl Auth, pa Firestore.       */
 /* ------------------------------------------------------------------ */
 export async function enskriNouvoBiznis({ email, modpas, bizNon, itilizatèNon }) {
   if (!email || !modpas || !bizNon || !itilizatèNon) {
@@ -110,6 +107,15 @@ export async function enskriNouvoBiznis({ email, modpas, bizNon, itilizatèNon }
   }
 
   const uid = userCredential.user.uid;
+
+  // Voye email verifikasyon an — pa bloke enskripsyon si sa echwe (egzanp
+  // kota Firebase depase, oswa pwoblèm rezo tanporè); se yon "bonus", pa
+  // yon kondisyon obligatwa pou kontinye.
+  try {
+    await sendEmailVerification(userCredential.user);
+  } catch (error) {
+    console.error("Erè voye email verifikasyon (non-fatal):", error);
+  }
 
   try {
     const bizRef = doc(collection(db, "biznis"));
@@ -134,8 +140,6 @@ export async function enskriNouvoBiznis({ email, modpas, bizNon, itilizatèNon }
 
     return { uid, bizId };
   } catch (error) {
-    // Kont Auth la kreye deja men biznis la echwe — pa efase kont Auth la
-    // isit la (mande privilèj admin), men avèti itilizatè a klèman.
     console.error("Erè kreyasyon biznis apre kont kreye:", error);
     throw new Error(
       "Kont ou kreye, men gen yon pwoblèm pou kreye biznis la. Rekonekte pou eseye ankò."
@@ -144,12 +148,7 @@ export async function enskriNouvoBiznis({ email, modpas, bizNon, itilizatèNon }
 }
 
 /* ------------------------------------------------------------------ */
-/* ENSKRIPSYON PA ENVITASYON — yon nouvo anplwaye enskri TÈT LI ak yon    */
-/* kòd yon jesyonè te kreye. Sa a se apèl Auth "self-service" — li PA     */
-/* mande Admin SDK/Cloud Function, kidonk li mache sou plan Spark        */
-/* (gratis), pa Blaze. Sekirite a garanti pa firestore.rules: yon kòd     */
-/* pa ka itilize 2 fwa, e wòl la dwe egzakteman matche sa envitasyon an   */
-/* bay la (verifye ak yon `get()` nan règ Firestore a).                  */
+/* ENSKRIPSYON PA ENVITASYON                                             */
 /* ------------------------------------------------------------------ */
 export async function enskriAkEnvitasyon({ email, modpas, non, bizId, kòd, wòl }) {
   if (!email || !modpas || !non || !bizId || !kòd || !wòl) {
@@ -165,6 +164,12 @@ export async function enskriAkEnvitasyon({ email, modpas, non, bizId, kòd, wòl
   const uid = userCredential.user.uid;
 
   try {
+    await sendEmailVerification(userCredential.user);
+  } catch (error) {
+    console.error("Erè voye email verifikasyon (non-fatal):", error);
+  }
+
+  try {
     // Kreye dosye manm lan — firestore.rules verifye kòd la valid AVAN
     // aksepte ekriti sa a (pa fè konfyans nan kliyan an sèlman).
     await setDoc(doc(db, "biznis", bizId, "manm", uid), {
@@ -175,7 +180,6 @@ export async function enskriAkEnvitasyon({ email, modpas, non, bizId, kòd, wòl
       kreyeLe: serverTimestamp(),
     });
 
-    // Konsome kòd envitasyon an pou l pa ka itilize 2 fwa
     await setDoc(
       doc(db, "biznis", bizId, "envitasyon", kòd),
       { itilize: true, itilizePa: uid },
