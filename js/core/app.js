@@ -141,6 +141,7 @@ formEnskri.addEventListener("submit", async (e) => {
     // sèten ekriti yo fini paske enskriNouvoBiznis() fin egzekite.
     const kontèks = await jwennKontèksItilizatè(uid, formData.get("email"));
     aplikeKontèks(kontèks);
+    alert("Biznis kreye! Nou voye yon email verifikasyon nan bwat resepsyon ou — verifye l lè w gen tan.");
   } catch (error) {
     afficheErèAuth(error.message);
   } finally {
