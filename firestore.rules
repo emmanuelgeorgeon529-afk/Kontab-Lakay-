@@ -1,195 +1,59 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /* ================================================================
-       FONKSYON ITILITE
-       NOT TEKNIK ENPOTAN: non fonksyon, non chan (dot-access), ak segman
-       chemen (match /xxx/{y}) DWE ASCII PI (san aksan) — lang Firestore
-       Rules la PA sipote karaktè Kreyol aksantye (ò, è) nan idantifyan
-       yo, byenke Firestore DATABASE limenm sipòte Unicode san pwoblèm.
-       Valè STRING (egzanp non wòl "Propriétaire", "Administratè") rete
-       an Kreyòl/Fransè konplè paske se JIS valè, pa idantifyan.
-       ================================================================ */
-    function konekte() {
+    
+    // --- FONCTION DE SÉCURITÉ GLOBALE ---
+    // Vérifie si l'utilisateur est authentifié et appartient à l'entreprise cible
+    function isAuthenticated() {
       return request.auth != null;
     }
-
-    // Yon moun se manm biznis la si gen yon dokiman biznis/{bizId}/manm/{uid}
-    function manm(bizId) {
-      return konekte() &&
-        exists(/databases/$(database)/documents/biznis/$(bizId)/manm/$(request.auth.uid));
+    
+    function belongsToCompany(companyId) {
+      return isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/companies/$(companyId)/users).data;
     }
 
-    function wolManm(bizId) {
-      return get(/databases/$(database)/documents/biznis/$(bizId)/manm/$(request.auth.uid)).data.wol;
+    function hasRole(companyId, roleName) {
+      return belongsToCompany(companyId) && 
+             get(/databases/$(database)/documents/companies/$(companyId)/users/$(request.auth.uid)).data.role == roleName;
     }
 
-    // Egzanp: genWol(bizId, ['Propriétaire', 'Administratè'])
-    function genWol(bizId, wolAksepte) {
-      return manm(bizId) && (wolManm(bizId) in wolAksepte);
-    }
-
-    function jesyonye(bizId) {
-      return genWol(bizId, ['Propriétaire', 'Administratè']);
-    }
-
-    /* ================================================================
-       TAB RECHECH: uid -> bizId (paske manm yo anba biznis/{bizId}/manm/
-       {uid}, yon itilizate ki fek konekte bezwen yon fason rapid pou
-       jwenn ki biznis li fè pati — pa gen "rechèch global" fasil sinon)
-       ================================================================ */
-    match /itilizate_biznis/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow create: if request.auth != null && request.auth.uid == uid;
-      allow update, delete: if false; // yon itilizate pa chanje biznis — kreye yon nouvo kont si sa nesesè
-    }
-
-    /* ================================================================
-       BIZNIS — dokiman rasin ak enfo jeneral biznis la
-       ================================================================ */
-    match /biznis/{bizId} {
-      allow read: if manm(bizId);
-      allow write: if jesyonye(bizId);
-
-      /* --- Manm & wòl (RBAC) --- */
-      match /manm/{uid} {
-        // Yon moun ka toujou li pwòp dosye manm li (bootstrap: verifye pwòp wòl li)
-        allow read: if konekte() && (request.auth.uid == uid || manm(bizId));
-
-        // De fason pou kreye yon dokiman manm:
-        //   1. Yon jesyonè ajoute yon manm dirèkteman (pa itilize kounye a — mande Admin SDK pou kont Auth)
-        //   2. Yon nouvo itilizatè ENSKRI TÈT LI ak yon kòd envitasyon valid, ki pa itilize
-        //      deja, e wòl li mande a matche EGZAKTEMAN wòl envitasyon an bay
-        allow create: if jesyonye(bizId) || (
-          konekte() &&
-          request.auth.uid == uid &&
-          request.resource.data.envitasyonKod != null &&
-          get(/databases/$(database)/documents/biznis/$(bizId)/envitasyon/$(request.resource.data.envitasyonKod)).data.itilize == false &&
-          get(/databases/$(database)/documents/biznis/$(bizId)/envitasyon/$(request.resource.data.envitasyonKod)).data.wol == request.resource.data.wol &&
-          get(/databases/$(database)/documents/biznis/$(bizId)/envitasyon/$(request.resource.data.envitasyonKod)).data.ekspireLe > request.time
-        );
-        allow update, delete: if jesyonye(bizId);
+    // --- COLLECTION : ENTREPRISES (Multi-Biznis) ---
+    // Seuls les Super Admins peuvent lire/créer une entreprise
+    match /companies/{companyId} {
+      allow read: if isAuthenticated() && (request.auth.token.superAdmin == true || belongsToCompany(companyId));
+      allow write: if isAuthenticated() && request.auth.token.superAdmin == true;
+      
+      // --- COLLECTION : UTILISATEURS DE L'ENTREPRISE ---
+      match /users/{userId} {
+        allow read: if isAuthenticated() && belongsToCompany(companyId);
+        allow write: if isAuthenticated() && (hasRole(companyId, 'Admin') || userId == request.auth.uid);
+      }
+      
+      // --- COLLECTION : MODULES MÉTIER ---
+      // Exemple : Module Finance (Seul Admin + Finance peuvent écrire)
+      match /finance/{document} {
+        allow read: if isAuthenticated() && belongsToCompany(companyId);
+        allow write: if isAuthenticated() && (hasRole(companyId, 'Admin') || hasRole(companyId, 'Finance'));
       }
 
-      /* --- Envitasyon — kòd itilizab YON SÈL FWA pou envite anplwaye
-             san Cloud Function (100% Spark, pa gen Admin SDK ki itilize) --- */
-      match /envitasyon/{kod} {
-        allow read: if konekte(); // menm yon nouvo itilizatè san manm ankò dwe ka li kòd la
-        allow create: if jesyonye(bizId);
-        // Sèl chanjman aksepte: "itilize" pase de false a true (konsome kòd la)
-        allow update: if konekte() &&
-          resource.data.itilize == false &&
-          request.resource.data.itilize == true;
-        allow delete: if jesyonye(bizId);
+      // Exemple : Module RH (Seul Admin + RH peuvent écrire)
+      match /rh/{document} {
+        allow read: if isAuthenticated() && belongsToCompany(companyId);
+        allow write: if isAuthenticated() && (hasRole(companyId, 'Admin') || hasRole(companyId, 'RH'));
       }
 
-      /* --- Kontè sekansyèl (LV-, DEP-, ACH-, REC-, REG-, PAY-...) ---
-         Nenpòt manm ka ekri (paske plizyè modil ki pa jesyonè bezwen sa,
-         egz. yon Vandè k ap fè yon vant), MEN nou egzije kontè a SÈLMAN
-         ka ogmante pa egzakteman 1 — anpeche manipilasyon/kase sekans lan. */
-      match /konte/{konteId} {
-        allow read: if manm(bizId);
-        allow create: if manm(bizId) && request.resource.data.denye == 1;
-        allow update: if manm(bizId) &&
-          request.resource.data.denye == resource.data.denye + 1;
-        allow delete: if false;
+      // Exemple : Module Ventes (Tout le monde peut lire, Admin+Vente peut écrire)
+      match /sales/{document} {
+        allow read: if isAuthenticated() && belongsToCompany(companyId);
+        allow write: if isAuthenticated() && (hasRole(companyId, 'Admin') || hasRole(companyId, 'Sales'));
       }
 
-      /* --- STOK: pwodwi, kantite, CMP --- */
-      match /stok/{produitId} {
-        allow read: if manm(bizId);
-        allow create, update: if genWol(bizId, ['Propriétaire', 'Administratè', 'Magasinier', 'Vandè']);
-        allow delete: if false; // pa efase — dezaktive pwodwi olye sa
-      }
-
-      /* --- VANT: rekò facti — APPEND-ONLY, jamè modifye --- */
-      match /lavant/{vantId} {
-        allow read: if manm(bizId);
-        allow create: if genWol(bizId, ['Propriétaire', 'Administratè', 'Vandè', 'Kòmis']);
-        allow update, delete: if false;
-      }
-
-      /* --- MOUVMAN KES: antre/sòti kach — APPEND-ONLY --- */
-      match /kes_mouvman/{mouvmanId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow create: if manm(bizId);
-        allow update, delete: if false;
-      }
-
-      /* --- JOUNAL KONTAB: kè sistèm nan — APPEND-ONLY STRICT ---
-         Pa gen OKENN wòl ki ka modifye oswa efase yon ekriti jounal.
-         Sèl fason pou korije yon erè se yon nouvo ekriti kontrè. */
-      match /jounal/{jounalId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow create: if manm(bizId);
-        allow update, delete: if false;
-      }
-
-      /* --- KONT KLIYAN (dèt kliyan) --- */
-      match /konpte/{kliyanId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Vandè', 'Kontablè']);
-        allow create, update: if genWol(bizId, ['Propriétaire', 'Administratè', 'Vandè', 'Kontablè']);
-        allow delete: if false;
-      }
-
-      /* --- PEMAN KLIYAN (recouvrement) — APPEND-ONLY --- */
-      match /peman_kliyan/{pemanId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow create: if genWol(bizId, ['Propriétaire', 'Administratè', 'Vandè', 'Kontablè']);
-        allow update, delete: if false;
-      }
-
-      /* --- FOUNISE (dèt nou dwe) --- */
-      match /founise/{founiseId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Magasinier', 'Kontablè']);
-        allow create, update: if genWol(bizId, ['Propriétaire', 'Administratè', 'Magasinier', 'Kontablè']);
-        allow delete: if false;
-      }
-
-      /* --- ACHA (a kredi bò kote founisè) — APPEND-ONLY --- */
-      match /acha/{achaId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Magasinier', 'Kontablè']);
-        allow create: if genWol(bizId, ['Propriétaire', 'Administratè', 'Magasinier']);
-        allow update, delete: if false;
-      }
-
-      /* --- PEMAN FOUNISE (règleman dèt) — APPEND-ONLY --- */
-      match /peman_founise/{pemanId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow create: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow update, delete: if false;
-      }
-
-      /* --- DEPANS — APPEND-ONLY --- */
-      match /depans/{depansId} {
-        allow read: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow create: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow update, delete: if false;
-      }
-
-      /* --- PWENNAJ (antre/sòti anplwaye) — APPEND-ONLY ---
-         Yon anplwaye SÈLMAN ka kreye pwennaj pou TÈT PA LI (anpeche yon
-         moun tape antre pou yon kòlèg). Jesyonè yo ka li tout pwennaj. */
-      match /pwennaj/{pwennajId} {
-        allow read: if manm(bizId) &&
-          (jesyonye(bizId) || request.auth.uid == resource.data.anplwayeId);
-        allow create: if manm(bizId) &&
-          request.auth.uid == request.resource.data.anplwayeId;
-        allow update, delete: if false;
-      }
-
-      /* --- PEWOL — done sansib, sèlman jesyonè/kontab ka wè/ekri ---
-         APPEND-ONLY: yon fèy pewòl deja peye pa dwe janm modifye. */
-      match /pewol/{pewolId} {
-        allow read, create: if genWol(bizId, ['Propriétaire', 'Administratè', 'Kontablè']);
-        allow update, delete: if false;
+      // RÈGLE GÉNÉRALE DE SÉCURITÉ (Fallback) : 
+      // Si aucun module spécifique n'est défini, seul l'Admin peut écrire.
+      match /{document=**} {
+        allow read: if isAuthenticated() && belongsToCompany(companyId);
+        allow write: if isAuthenticated() && hasRole(companyId, 'Admin');
       }
     }
-
-    /* ================================================================
-       DEFO: tout lòt chemen refize pa default (pa gen match ki dakò)
-       ================================================================ */
   }
 }
