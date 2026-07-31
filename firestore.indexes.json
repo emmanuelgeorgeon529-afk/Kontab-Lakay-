@@ -1,11 +1,27 @@
 {
   "indexes": [
     {
-      "collectionGroup": "pwennaj",
+      "collectionGroup": "sales",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "anplwayeId", "order": "ASCENDING" },
-        { "fieldPath": "kreyeLe", "order": "DESCENDING" }
+        { "fieldPath": "companyId", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "companyId", "order": "ASCENDING" },
+        { "fieldPath": "stockLevel", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "payroll",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "companyId", "order": "ASCENDING" },
+        { "fieldPath": "period", "order": "DESCENDING" }
       ]
     }
   ],
