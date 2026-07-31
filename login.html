@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Kontab Lakay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load Firebase via CDN (Compat mode) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="js/core/firebase-config.js"></script>
+    <style>
+        :root { --primary: #4F46E5; --bg-gradient: linear-gradient(135deg, #EEF2FF 0%, #ffffff 100%); --glass-bg: rgba(255, 255, 255, 0.7); --glass-border: rgba(255, 255, 255, 0.3); --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); --text-dark: #0F172A; --text-muted: #64748B; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-gradient); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .login-card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; box-shadow: var(--shadow); }
+        .brand { text-align: center; margin-bottom: 32px; }
+        .brand h1 { font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: -1px; }
+        .brand p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 500; color: var(--text-dark); margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 12px 16px; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; background: white; }
+        .form-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .btn-primary:hover { background: #4338CA; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .switch-action { text-align: center; margin-top: 16px; font-size: 14px; color: var(--text-muted); }
+        .switch-action a { color: var(--primary); font-weight: 600; cursor: pointer; text-decoration: none; }
+        .switch-action a:hover { text-decoration: underline; }
+        #errorMessage { background: #FEE2E2; color: #B91C1C; padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; display: none; }
+        #successMessage { background: #D1FAE5; color: #047857; padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; display: none; }
+        .loader { text-align: center; margin-top: 12px; display: none; }
+        .loader::after { content: ''; display: inline-block; width: 20px; height: 20px; border: 3px solid #E2E8F0; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="brand">
+            <h1>Kontab Lakay</h1>
+            <p>Konekte w nan espas pwofesyonèl ou</p>
+        </div>
+        <div id="errorMessage"></div>
+        <div id="successMessage"></div>
+
+        <form id="authForm">
+            <div class="form-group">
+                <label>Imèl</label>
+                <input type="email" id="emailInput" placeholder="egzanp@konpayi.com" required>
+            </div>
+            <div class="form-group">
+                <label>Modpas</label>
+                <input type="password" id="passwordInput" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="submitBtn" class="btn-primary">Konekte</button>
+            <div class="loader" id="loader"></div>
+        </form>
+        <div class="switch-action">
+            <span id="switchText">Pokenn kont ? </span>
+            <a id="switchBtn">Kreye yon kont</a>
+        </div>
+    </div>
+
+    <script>
+        // VARIABLES
+        const form = document.getElementById('authForm');
+        const email = document.getElementById('emailInput');
+        const password = document.getElementById('passwordInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMsg = document.getElementById('errorMessage');
+        const successMsg = document.getElementById('successMessage');
+        const switchBtn = document.getElementById('switchBtn');
+        const switchText = document.getElementById('switchText');
+        const loader = document.getElementById('loader');
+        let isLoginMode = true;
+
+        // SWITCH LOGIN / REGISTER
+        switchBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                switchText.textContent = "Pokenn kont ? ";
+                switchBtn.textContent = "Kreye yon kont";
+                submitBtn.textContent = "Konekte";
+            } else {
+                switchText.textContent = "Deja yon kont ? ";
+                switchBtn.textContent = "Konekte";
+                submitBtn.textContent = "Enskri";
+            }
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+        });
+
+        // SOUMMET FÒM LAN
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            loader.style.display = 'block';
+            submitBtn.disabled = true;
+
+            const emailVal = email.value.trim();
+            const passVal = password.value.trim();
+
+            try {
+                let userCredential;
+                if (isLoginMode) {
+                    userCredential = await auth.signInWithEmailAndPassword(emailVal, passVal);
+                } else {
+                    userCredential = await auth.createUserWithEmailAndPassword(emailVal, passVal);
+                }
+                
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
+                successMsg.textContent = isLoginMode ? "Koneksyon reyisi! Redireksyon..." : "Kont kreye avèk siksè!";
+                successMsg.style.display = 'block';
+                setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+            } catch (error) {
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
+                errorMsg.textContent = error.message || "Yon erè te fèt.";
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        // SI DEJA KONEKTE, REDIRIJE
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
