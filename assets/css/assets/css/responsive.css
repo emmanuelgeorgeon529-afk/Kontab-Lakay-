@@ -1,0 +1,44 @@
+/* Responsive pou tablet ak mobil */
+@media (max-width: 1024px) {
+    .sidebar { width: 80px; padding: 12px; }
+    .brand h1, .brand span, .nav-item span, .nav-section-title, .sidebar-footer { display: none; }
+    .nav-item { justify-content: center; padding: 12px; }
+    .nav-item .icon { font-size: 24px; }
+}
+
+@media (max-width: 768px) {
+    /* 1. Montre bouton hamburger (☰) la */
+    #hamburgerBtn { display: block !important; }
+    
+    /* 2. Kache bar rechèch Desktop la, montre ikon loupe mobil la */
+    #desktopSearch { display: none !important; }
+    #mobileSearchBtn { display: block !important; }
+    
+    /* 3. Sidebar la vin yon meni ki glise soti bò gòch */
+    .sidebar {
+        position: fixed;
+        left: -270px;
+        top: 0;
+        height: 100vh;
+        width: 270px;
+        transition: left 0.3s ease;
+        z-index: 999;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+    .sidebar.open { left: 0; }
+    
+    /* 4. Retabli tèks nan sidebar lè li ouvri */
+    .sidebar.open .brand h1, 
+    .sidebar.open .brand span, 
+    .sidebar.open .nav-item span, 
+    .sidebar.open .nav-section-title, 
+    .sidebar.open .sidebar-footer { display: block; }
+    .sidebar.open .nav-item { justify-content: flex-start; padding: 10px 12px; }
+    .sidebar.open .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+
+    /* 5. Espas tèt la */
+    .topbar { padding: 12px 16px; }
+    
+    /* 6. Kache nenpòt bouton flotant ki koupe (pa egzanp bouton woz la) */
+    .action-btn.secondary { display: none; }
+}
