@@ -1,8 +1,11 @@
 <!-- views/finance_comptabilite.html -->
 <section id="finance" class="view-section">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:8px;">
         <h2 style="font-size:22px; font-weight:600;">Finans & Kontabilite</h2>
-        <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer;" onclick="alert('Fonksyon nouvo ekriti ap vini...')">➕ Nouvo Ekriti</button>
+        <div style="display:flex; gap:8px;">
+            <button onclick="openJournalModal()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer;">➕ Nouvo Ekriti</button>
+            <button style="background:white; border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer;">📊 Rapò</button>
+        </div>
     </div>
 
     <!-- KPI Finansye (Ak ID) -->
@@ -22,6 +25,51 @@
         <div class="chart-section">
             <div class="chart-header"><h4 style="font-weight:600;">Flux de Trésorerie</h4></div>
             <div class="chart-container"><canvas id="financeChart2"></canvas></div>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL NOUVO EKRITI JOUNAL ===================== -->
+    <div id="newJournalModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:white; padding:24px; border-radius:16px; max-width:400px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.1);">
+            <h3 style="margin-bottom:16px;">Nouvo Ekriti Jounal</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <label style="font-size:13px; color:var(--text-muted);">Dat</label>
+                    <input type="date" id="journalDate" style="width:100%; padding:8px; border:1px solid #E2E8F0; border-radius:6px;">
+                </div>
+                <div>
+                    <label style="font-size:13px; color:var(--text-muted);">Referans</label>
+                    <input type="text" id="journalRef" placeholder="EC-001" style="width:100%; padding:8px; border:1px solid #E2E8F0; border-radius:6px;">
+                </div>
+                <div>
+                    <label style="font-size:13px; color:var(--text-muted);">Deskripsyon</label>
+                    <input type="text" id="journalDesc" placeholder="Achat founiti..." style="width:100%; padding:8px; border:1px solid #E2E8F0; border-radius:6px;">
+                </div>
+                <div>
+                    <label style="font-size:13px; color:var(--text-muted);">Kont Débit (Kont ki resevwa lajan)</label>
+                    <select id="journalDebitAcc" style="width:100%; padding:8px; border:1px solid #E2E8F0; border-radius:6px;">
+                        <option value="1000">Kès</option>
+                        <option value="1200">Bank</option>
+                        <option value="1400">Kliyan</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:13px; color:var(--text-muted);">Kont Crédit (Kont ki bay lajan)</label>
+                    <select id="journalCreditAcc" style="width:100%; padding:8px; border:1px solid #E2E8F0; border-radius:6px;">
+                        <option value="4000">Ventes (Revni)</option>
+                        <option value="6000">Depans</option>
+                        <option value="2000">Founisè</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:13px; color:var(--text-muted);">Montan (HTG)</label>
+                    <input type="number" id="journalAmount" placeholder="0" style="width:100%; padding:8px; border:1px solid #E2E8F0; border-radius:6px;">
+                </div>
+                <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;">
+                    <button onclick="closeJournalModal()" style="padding:8px 16px; border:1px solid #E2E8F0; background:white; border-radius:6px; cursor:pointer;">Anile</button>
+                    <button onclick="saveJournalEntry()" style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Anrejistre</button>
+                </div>
+            </div>
         </div>
     </div>
 </section>
