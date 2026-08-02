@@ -1,5 +1,5 @@
-// js/core/router.js
-// Mappage des vues HTML et des modules JS
+// js/core/router.js (Nouvo vèsyon ki pa sèvi ak import)
+
 const moduleMap = {
     'dashboard': { view: 'views/dashboard.html', js: null },
     'structure': { view: 'views/structure_gouvernance.html', js: '../modules/01_structure_gouvernance.js' },
@@ -15,32 +15,25 @@ const moduleMap = {
     'bi': { view: 'views/business_intelligence.html', js: '../modules/11_business_intelligence.js' },
     'ia': { view: 'views/ia_automatisation.html', js: '../modules/12_ia_automatisation.js' },
     'ecommerce': { view: 'views/ecommerce_omnicanal.html', js: '../modules/13_ecommerce_omnicanal.js' },
-    'settings': { view: 'views/settings.html', js: null } // Settings ka jere dirèkteman nan view la oswa pita
+    'settings': { view: 'views/settings.html', js: null }
 };
 
-// Fonksyon navigasyon global
 async function navigate(targetId) {
-    // 1. Mettre à jour l'état actif de la sidebar
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[data-target="${targetId}"]`);
     if (activeNav) activeNav.classList.add('active');
 
-    // 2. Vérifier si le module existe dans le map
     const route = moduleMap[targetId];
-    if (!route) {
-        console.warn(`Modil "${targetId}" pa egziste.`);
-        return;
-    }
+    if (!route) { console.warn(`Modil "${targetId}" pa egziste.`); return; }
 
     const container = document.getElementById('view-container');
 
     try {
-        // 3. Charger le HTML depuis le dossier views/
+        // 1. Chaje HTML
         const response = await fetch(route.view);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const html = await response.text();
 
-        // 4. Injecter ou remplacer la section
         let existingSection = document.getElementById(targetId);
         if (existingSection) {
             existingSection.outerHTML = html;
@@ -48,28 +41,37 @@ async function navigate(targetId) {
             container.insertAdjacentHTML('beforeend', html);
         }
 
-        // 5. Afficher la vue cible (enlever la classe active des autres)
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.getElementById(targetId).classList.add('active');
 
-        // 6. Charger et initialiser le module JS associé (si applicable)
+        // 2. Chaje JavaScript la (san import, anbalan ak eval)
         if (route.js) {
             try {
-                const module = await import(route.js);
-                if (typeof module.init === 'function') {
-                    module.init(); // Appelle la fonction init() du module
+                // Telechaje kòd JS la
+                const jsRes = await fetch(route.js);
+                const jsCode = await jsRes.text();
+                
+                // Kreye yon eleman script epi mete kòd la ladan l
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.textContent = jsCode;
+                document.body.appendChild(script);
+                // Retire script la apre ekzekisyon
+                setTimeout(() => script.remove(), 100);
+
+                // Apele init la si li egziste (modil yo dwe defini window.init)
+                if (typeof window.init === 'function') {
+                    window.init();
                 }
             } catch (jsError) {
                 console.warn(`Erè chajman JS pou ${targetId}:`, jsError);
             }
         }
 
-        // 7. Fermer le sidebar sur mobile
         document.getElementById('sidebar').classList.remove('open');
 
     } catch (error) {
         console.error("Erè chajman view:", error);
-        // Fallback: Si view la pa jwenn, mete yon placeholder
         const fallbackContainer = document.getElementById(targetId) || container;
         fallbackContainer.innerHTML = `
             <div class="view-section" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:80%; color:var(--text-muted);">
@@ -81,8 +83,6 @@ async function navigate(targetId) {
     }
 }
 
-// Initialisation du routeur
 function initRouter() {
-    // Si on est sur la page d'accueil, on charge le dashboard
     navigate('dashboard');
-                                           }
+}
