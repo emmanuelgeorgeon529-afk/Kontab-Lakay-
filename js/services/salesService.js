@@ -6,7 +6,6 @@ const COLLECTION_CUSTOMERS = 'customers';
 const COLLECTION_INVOICES = 'invoices';
 const COLLECTION_QUOTES = 'quotes';
 
-// --- KLIYAN ---
 export async function createCustomer(companyId, customerData) {
   const data = { companyId, ...customerData, createdAt: Timestamp.now() };
   const ref = await addDoc(collection(db, COLLECTION_CUSTOMERS), data);
@@ -19,28 +18,25 @@ export async function getCustomers(companyId) {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// --- FAKTIRASYON (REVNI) ---
+// --- NOUVO: Kreye yon fakti ---
 export async function createInvoice(companyId, invoiceData) {
-  const data = { companyId, ...invoiceData, date: Timestamp.now(), status: 'En attente' };
+  // Ajoute companyId ak dat Firestore
+  const data = { 
+    companyId, 
+    ...invoiceData, 
+    createdAt: Timestamp.now(),
+    date: Timestamp.fromDate(invoiceData.date) // Konvèti dat la an Timestamp
+  };
   const ref = await addDoc(collection(db, COLLECTION_INVOICES), data);
   return { id: ref.id, ...data };
 }
 
-export async function getInvoicesByCustomer(companyId, customerId) {
-  const q = query(collection(db, COLLECTION_INVOICES), where('companyId', '==', companyId), where('customerId', '==', customerId));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-// NOUVO: Rekipere tout faktirasyon yon konpayi
 export async function getAllInvoices(companyId) {
   const q = query(collection(db, COLLECTION_INVOICES), where('companyId', '==', companyId));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// --- DEVIS ---
-// NOUVO: Rekipere tout devis yon konpayi
 export async function getAllQuotes(companyId) {
   const q = query(collection(db, COLLECTION_QUOTES), where('companyId', '==', companyId));
   const snap = await getDocs(q);
