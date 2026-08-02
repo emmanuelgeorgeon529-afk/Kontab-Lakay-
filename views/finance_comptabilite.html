@@ -1,0 +1,238 @@
+<!-- ===================== 2. FINANS & KONTABILITE ===================== -->
+<section id="finance" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">Finans & Kontabilite</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Kè finansye ERP la — Journal, Grand Livre, Trésorerie & Rapò</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📖 Grand Livre</button>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">➕ Nouvo Ekriti</button>
+        </div>
+    </div>
+
+    <!-- 2.1 Dashboard Finansye -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">💰 Kès Aktyèl</div><div class="value">45 200 HTG</div><div class="change up">↑ 5%</div></div>
+        <div class="kpi-card"><div class="label">🏦 Solde Bank</div><div class="value">1 240 000 HTG</div><div class="change up">↑ 2,4%</div></div>
+        <div class="kpi-card"><div class="label">📈 Revni Mwa a</div><div class="value">890 000 HTG</div><div class="change up">↑ 12%</div></div>
+        <div class="kpi-card"><div class="label">📉 Depans Mwa a</div><div class="value">645 000 HTG</div><div class="change down">↑ 4%</div></div>
+        <div class="kpi-card"><div class="label">💵 Benefis Net</div><div class="value" style="color:var(--secondary);">245 000 HTG</div><div class="change up">↑ 8%</div></div>
+        <div class="kpi-card"><div class="label">🧾 Dèt Kliyan</div><div class="value" style="color:var(--primary);">320 000 HTG</div><div class="change up">↑ 15%</div></div>
+        <div class="kpi-card"><div class="label">📋 Dèt Founisè</div><div class="value" style="color:var(--danger);">180 000 HTG</div><div class="change down">↓ 10%</div></div>
+        <div class="kpi-card"><div class="label">📊 Flux de Trésorerie</div><div class="value" style="color:var(--secondary);">+65 000 HTG</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Revni vs Depans</h3></div><div class="chart-container"><canvas id="financeChart1"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Evolisyon Trésorerie</h3></div><div class="chart-container"><canvas id="financeChart2"></canvas></div></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Top Kliyan</h3></div><div class="chart-container"><canvas id="financeTopClients"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Top Depans</h3></div><div class="chart-container"><canvas id="financeTopExpenses"></canvas></div></div>
+    </div>
+
+    <!-- 2.2 Plan de Comptes -->
+    <details class="chart-section" style="padding:0; margin-top:8px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📚 2.2 — Plan de Comptes</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><td class="account-cat">Actifs (1000)</td><td></td></tr>
+                <tr><td class="account-sub">Kès</td><td style="text-align:right;">1010</td></tr>
+                <tr><td class="account-sub">Bank</td><td style="text-align:right;">1020</td></tr>
+                <tr><td class="account-sub">Kliyan</td><td style="text-align:right;">1030</td></tr>
+                <tr><td class="account-sub">Stock</td><td style="text-align:right;">1040</td></tr>
+                <tr><td class="account-sub">Immobilisations</td><td style="text-align:right;">1050</td></tr>
+                <tr><td class="account-cat">Passifs (2000)</td><td></td></tr>
+                <tr><td class="account-sub">Founisè</td><td style="text-align:right;">2010</td></tr>
+                <tr><td class="account-sub">Emprunts</td><td style="text-align:right;">2020</td></tr>
+                <tr><td class="account-sub">Salè pou peye</td><td style="text-align:right;">2030</td></tr>
+                <tr><td class="account-cat">Capitaux Propres (3000)</td><td></td></tr>
+                <tr><td class="account-sub">Capital Social</td><td style="text-align:right;">3010</td></tr>
+                <tr><td class="account-sub">Réserves</td><td style="text-align:right;">3020</td></tr>
+                <tr><td class="account-sub">Résultat</td><td style="text-align:right;">3030</td></tr>
+                <tr><td class="account-cat">Revenus (4000)</td><td></td></tr>
+                <tr><td class="account-sub">Ventes</td><td style="text-align:right;">4010</td></tr>
+                <tr><td class="account-sub">Prestations de Services</td><td style="text-align:right;">4020</td></tr>
+                <tr><td class="account-sub">Revenus Divers</td><td style="text-align:right;">4030</td></tr>
+                <tr><td class="account-cat">Charges (6000)</td><td></td></tr>
+                <tr><td class="account-sub">Loyer</td><td style="text-align:right;">6010</td></tr>
+                <tr><td class="account-sub">Électricité</td><td style="text-align:right;">6020</td></tr>
+                <tr><td class="account-sub">Internet</td><td style="text-align:right;">6030</td></tr>
+                <tr><td class="account-sub">Salaires</td><td style="text-align:right;">6040</td></tr>
+                <tr><td class="account-sub">Transport</td><td style="text-align:right;">6050</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 2.3 Journal Général -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📒 2.3 — Journal Général</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚡ Journal Automatique</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✍️ Journal Manuel</button>
+                <input type="text" placeholder="🔍 Rechèch..." style="flex:1; min-width:140px; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; font-size:13px;">
+                <input type="date" style="border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; font-size:13px;">
+            </div>
+            <table class="fin-table">
+                <tr><th>Dat</th><th>Libellé</th><th>Kont</th><th>Débit</th><th>Crédit</th></tr>
+                <tr><td>01/01/2026</td><td rowspan="2">Vente kach</td><td>Kès</td><td style="text-align:right;">5 000</td><td></td></tr>
+                <tr><td></td><td>Ventes</td><td></td><td style="text-align:right;">5 000</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 2.4 Grand Livre -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📖 2.4 — Grand Livre</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Kont: <strong>Kès</strong></p>
+            <table class="fin-table">
+                <tr><th>Dat</th><th>Libellé</th><th>Débit</th><th>Crédit</th></tr>
+                <tr><td>01/01</td><td>Vente</td><td style="text-align:right;">5 000</td><td style="text-align:right;">0</td></tr>
+                <tr><td>02/01</td><td>Dépense</td><td style="text-align:right;">0</td><td style="text-align:right;">1 500</td></tr>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📄 Export PDF</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📊 Export Excel</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 2.5 Balance Générale -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">⚖️ 2.5 — Balance Générale</summary>
+        <div style="padding:0 20px 20px;">
+            <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); margin-bottom:0;">
+                <div class="kpi-card"><div class="label">Total Débits</div><div class="value">3 450 000 HTG</div></div>
+                <div class="kpi-card"><div class="label">Total Crédits</div><div class="value">3 450 000 HTG</div></div>
+                <div class="kpi-card"><div class="label">Estati</div><div class="value" style="color:var(--secondary); font-size:18px;">🟢 Ekilib</div></div>
+            </div>
+        </div>
+    </details>
+
+    <!-- 2.6 Trésorerie + 2.7 Multi-Comptes -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💵 2.6 — Gestion de Trésorerie</summary>
+            <div style="padding:0 20px 20px;">
+                <p style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Kès</p>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">Antre</span>
+                    <span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Sòti</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Ajustement</span>
+                </div>
+                <p style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Bank</p>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">Dépôts</span>
+                    <span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Retraits</span>
+                    <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Virements</span>
+                </div>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏦 2.7 — Multi-Comptes Bancaires</summary>
+            <div style="padding:0 20px 20px;">
+                <div class="bank-card"><span class="bank-name">Unibank</span><span class="bank-balance">520 000 HTG</span></div>
+                <div class="bank-card"><span class="bank-name">Sogebank</span><span class="bank-balance">410 000 HTG</span></div>
+                <div class="bank-card"><span class="bank-name">Capital Bank</span><span class="bank-balance">180 000 HTG</span></div>
+                <div class="bank-card"><span class="bank-name">BNC</span><span class="bank-balance">130 000 HTG</span></div>
+                <button style="margin-top:8px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajoute Kont</button>
+            </div>
+        </details>
+    </div>
+
+    <!-- 2.8 Rapprochement Bancaire -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔍 2.8 — Rapprochement Bancaire</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Kont</th><th>ERP</th><th>Bank</th><th>Rezilta</th></tr>
+                <tr><td>Unibank</td><td style="text-align:right;">520 000</td><td style="text-align:right;">520 000</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Conforme</span></td></tr>
+                <tr><td>Sogebank</td><td style="text-align:right;">410 000</td><td style="text-align:right;">398 500</td><td><span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">🔴 Différence</span></td></tr>
+                <tr><td>Capital Bank</td><td style="text-align:right;">180 000</td><td style="text-align:right;">—</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">⚠️ Transaction Manquante</span></td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 2.9 Dépenses + 2.10 Revenus -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📉 2.9 — Gestion des Dépenses</summary>
+            <div style="padding:0 20px 20px;">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                    <span class="ged-status" style="background:#F1F5F9;">Loyer</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Transport</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Salaires</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Téléphone</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Marketing</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Maintenance</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted);">Création → Validation → Paiement → Archivage</p>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📈 2.10 — Gestion des Revenus</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">Vente Produits</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">Services</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">Commissions</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">Revenus Divers</span>
+            </div>
+        </details>
+    </div>
+
+    <!-- 2.11 Budgétisation -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📅 2.11 — Budgétisation</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Rubrik</th><th>Prévu</th><th>Réel</th><th>Ekar</th></tr>
+                <tr><td>Ventes prévues</td><td style="text-align:right;">900 000</td><td style="text-align:right;">890 000</td><td style="text-align:right; color:var(--danger);">-10 000</td></tr>
+                <tr><td>Dépenses prévues</td><td style="text-align:right;">600 000</td><td style="text-align:right;">645 000</td><td style="text-align:right; color:var(--danger);">+45 000</td></tr>
+                <tr><td>Investissements</td><td style="text-align:right;">150 000</td><td style="text-align:right;">120 000</td><td style="text-align:right; color:var(--secondary);">-30 000</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 2.12 Immobilisations + 2.13 Amortissements -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏭 2.12 — Immobilisations</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><th>Byen</th><th>Dat Achat</th><th>Valeur</th><th>Durée</th></tr>
+                    <tr><td>Véhicule</td><td>12/03/2023</td><td style="text-align:right;">1 200 000</td><td>8 ans</td></tr>
+                    <tr><td>Ordinateur</td><td>05/06/2024</td><td style="text-align:right;">60 000</td><td>5 ans</td></tr>
+                    <tr><td>Machine</td><td>20/01/2022</td><td style="text-align:right;">850 000</td><td>10 ans</td></tr>
+                </table>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📉 2.13 — Amortissements</summary>
+            <div style="padding:0 20px 20px;">
+                <p style="font-size:13px; margin-bottom:10px;">Metòd: <strong>Linéaire</strong> · <strong>Dégressif</strong></p>
+                <table class="fin-table">
+                    <tr><td>Ordinateur (60 000 HTG / 5 ans)</td><td style="text-align:right; font-weight:600;">12 000 HTG/an</td></tr>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <!-- 2.14 Comptes Clients + 2.15 Comptes Fournisseurs -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧾 2.14 — Comptes Clients</summary>
+            <div style="padding:0 20px 20px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">Solde Kliyan</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">Historique</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">Recouvrement</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">Relances</button>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📋 2.15 — Comptes Fournisseurs</summary>
+            <div style="padding:0 20px 20px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">Factures</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-
