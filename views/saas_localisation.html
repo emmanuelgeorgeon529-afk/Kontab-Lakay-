@@ -1,0 +1,232 @@
+<!-- ===================== 10. SAAS, LOCALISATION, MULTI-DEVISES & PARAMÈTRES GLOBAUX ===================== -->
+<section id="saas" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">SaaS, Localisation & Paramètres Globaux</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Peyi, lang, deviz, taks, abònman & entegrasyon API</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">🔗 Entegrasyon</button>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">🌍 Ajoute Lang</button>
+        </div>
+    </div>
+
+    <!-- 10.1 Dashboard Paramètres Globaux -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">🌍 Peyi Aktif</div><div class="value" style="color:var(--primary);">6</div></div>
+        <div class="kpi-card"><div class="label">💱 Deviz Aktif</div><div class="value">5</div></div>
+        <div class="kpi-card"><div class="label">🌐 Lang Aktif</div><div class="value">4</div></div>
+        <div class="kpi-card"><div class="label">🏢 Antrepriz Aktif</div><div class="value">3</div></div>
+        <div class="kpi-card"><div class="label">👥 Itilizatè Aktif</div><div class="value">12</div></div>
+        <div class="kpi-card"><div class="label">📈 Abònman SaaS</div><div class="value" style="color:var(--secondary);">Professional</div></div>
+        <div class="kpi-card"><div class="label">🔒 Lisans Aktif</div><div class="value" style="color:var(--secondary);">🟢 Active</div></div>
+        <div class="kpi-card"><div class="label">⚙️ API Connectées</div><div class="value">4</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Deviz Itilize</h3></div><div class="chart-container"><canvas id="saasCurrencyChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">API Konekte</h3></div><div class="chart-container"><canvas id="saasApiChart"></canvas></div></div>
+    </div>
+
+    <!-- 10.2 Gestion des Pays -->
+    <details class="chart-section" open style="padding:0;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🌎 10.2 — Gestion des Pays</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Peyi</th><th>Kòd ISO</th><th>Deviz</th><th>Lang</th></tr>
+                <tr><td>🇭🇹 Haiti</td><td>HT</td><td>HTG</td><td>Kreyòl</td></tr>
+                <tr><td>🇺🇸 United States</td><td>US</td><td>USD</td><td>English</td></tr>
+                <tr><td>🇨🇦 Canada</td><td>CA</td><td>CAD</td><td>Français</td></tr>
+                <tr><td>🇫🇷 France</td><td>FR</td><td>EUR</td><td>Français</td></tr>
+                <tr><td>🇩🇴 République Dominicaine</td><td>DO</td><td>DOP</td><td>Español</td></tr>
+                <tr><td>🇧🇷 Brazil</td><td>BR</td><td>BRL</td><td>Português</td></tr>
+            </table>
+            <button style="margin-top:14px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajoute Peyi</button>
+        </div>
+    </details>
+
+    <!-- 10.3 Gestion des Langues -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🌐 10.3 — Gestion des Langues</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">🇭🇹 Kreyòl</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">🇫🇷 Français</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">🇺🇸 English</span>
+                <span class="ged-status" style="background:#F1F5F9;">🇪🇸 Español</span>
+                <span class="ged-status" style="background:#F1F5F9;">🇧🇷 Português</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted);">Chanje lang imedyatman · Tradiksyon dinamik · Dat lokal · Fòma nimewo lokal</p>
+        </div>
+    </details>
+
+    <!-- 10.4 Multi-Devises -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💱 10.4 — Multi-Devises</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Kòd</th><th>Non</th><th>Senbòl</th><th>To Chanj Aktyèl</th></tr>
+                <tr><td>HTG</td><td>Gourde Haïtienne</td><td>G</td><td style="text-align:right;">1,00</td></tr>
+                <tr><td>USD</td><td>Dollar Américain</td><td>$</td><td style="text-align:right;">132,50</td></tr>
+                <tr><td>EUR</td><td>Euro</td><td>€</td><td style="text-align:right;">143,20</td></tr>
+                <tr><td>CAD</td><td>Dollar Canadien</td><td>C$</td><td style="text-align:right;">96,80</td></tr>
+                <tr><td>DOP</td><td>Peso Dominicain</td><td>RD$</td><td style="text-align:right;">2,23</td></tr>
+            </table>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;">
+                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Kliyan</span>
+                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Founisè</span>
+                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Fakti</span>
+                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Kont Labank</span>
+            </div>
+        </div>
+    </details>
+
+    <!-- 10.5 Taux de Change -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📈 10.5 — Gestion des Taux de Change</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Dat</th><th>Deviz Sous</th><th>Deviz Destinasyon</th><th>To Chanj</th></tr>
+                <tr><td>02/08/2026</td><td>USD</td><td>HTG</td><td style="text-align:right;">132,50</td></tr>
+                <tr><td>02/08/2026</td><td>EUR</td><td>HTG</td><td style="text-align:right;">143,20</td></tr>
+                <tr><td>02/08/2026</td><td>CAD</td><td>HTG</td><td style="text-align:right;">96,80</td></tr>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✍️ Manyèl</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚡ API Otomatik</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📜 Istorik</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 10.6 Moteur Fiscal International -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧾 10.6 — Moteur Fiscal International</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Taks</th><th>To</th><th>Kalite</th></tr>
+                <tr><td>TVA</td><td style="text-align:right;">10%</td><td>Inclusif</td></tr>
+                <tr><td>TCA</td><td style="text-align:right;">10%</td><td>Exclusif</td></tr>
+                <tr><td>Sales Tax</td><td style="text-align:right;">8,5%</td><td>Exclusif</td></tr>
+                <tr><td>VAT</td><td style="text-align:right;">20%</td><td>Inclusif</td></tr>
+                <tr><td>GST</td><td style="text-align:right;">5%</td><td>Exclusif</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 10.7 Multi-Entreprises + 10.8 Multi-Succursales -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏢 10.7 — Multi-Entreprises</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>Entreprise A</td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
+                    <tr><td>Entreprise B</td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
+                    <tr><td>Entreprise C</td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
+                </table>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Rapò separe · Done izole pa antrepriz</p>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏬 10.8 — Multi-Succursales</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#F1F5F9;">Branch</span>
+                <span class="ged-status" style="background:#F1F5F9;">Magazen</span>
+                <span class="ged-status" style="background:#F1F5F9;">Depo</span>
+                <span class="ged-status" style="background:#F1F5F9;">Faktori</span>
+                <p style="font-size:12px; color:var(--text-muted); width:100%; margin-top:8px;">Dashboard konsolide pou tout branch ansanm</p>
+            </div>
+        </details>
+    </div>
+
+    <!-- 10.9 Abonnements SaaS -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 10.9 — Gestion des Abonnements SaaS</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:12px;">
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center;">🥉<br><strong>Starter</strong></div>
+            <div style="border:2px solid var(--primary); border-radius:12px; padding:14px; text-align:center; background:#EEF2FF;">🥈<br><strong>Professional</strong><br><span style="font-size:11px; color:var(--primary);">Plan Aktyèl</span></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center;">🥇<br><strong>Enterprise</strong></div>
+        </div>
+        <div style="padding:0 20px 20px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔄 Renouvèlman</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🧾 Facturation</button>
+            <button style="background:var(--secondary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⬆️ Upgrade</button>
+        </div>
+    </details>
+
+    <!-- 10.10 Gestion des Licences -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 10.10 — Gestion des Licences</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>N° Lisans</th><th>Plan</th><th>Dat Ekspirasyon</th><th>Estati</th></tr>
+                <tr><td>LIC-88213</td><td>Professional</td><td>14/03/2027</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Active</span></td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 10.11 Centre d'Intégration API -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔗 10.11 — Centre d'Intégration API</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Sèvis</th><th>Estati</th><th></th></tr>
+                <tr><td>📧 Gmail</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--danger); font-weight:600;">Déconnecter</a></td></tr>
+                <tr><td>📂 Google Drive</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--danger); font-weight:600;">Déconnecter</a></td></tr>
+                <tr><td>💬 WhatsApp Business</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
+                <tr><td>🤖 OpenAI</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 10.12 Paramètres Interface -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🎨 10.12 — Paramètres Interface</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">☀️ Light</span>
+                <span class="ged-status" style="background:#F1F5F9;">🌙 Dark</span>
+                <span class="ged-status" style="background:#F1F5F9;">💻 System</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:8px;">
+                <input type="text" placeholder="Nom entreprise" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                <input type="color" value="#4F46E5" style="border:1px solid #E2E8F0; border-radius:8px; padding:4px; height:36px;">
+            </div>
+        </div>
+    </details>
+
+    <!-- 10.13 Notifications Globales -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔔 10.13 — Notifications Globales</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="ged-status" style="background:#D1FAE5; color:#047857;">📧 Email</span>
+            <span class="ged-status" style="background:#D1FAE5; color:#047857;">📱 Push</span>
+            <span class="ged-status" style="background:#F1F5F9;">💬 WhatsApp</span>
+            <span class="ged-status" style="background:#F1F5F9;">📲 SMS</span>
+        </div>
+    </details>
+
+    <!-- 10.14 Rapports Administratifs -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 10.14 — Rapports Administratifs</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px;">
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Utilisateurs</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Entreprises</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Abonnements</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Licences</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Devises</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Taux de Change</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Intégrations API</button>
+        </div>
+    </details>
+
+    <!-- Pèmisyon -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 Pèmisyon</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Super Admin</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrateur Entreprise</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Jere pwòp antrepriz li</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Utilisateur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Aksè limite</p></div>
+        </div>
+    </details>
+</section>
