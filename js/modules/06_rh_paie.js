@@ -1,46 +1,39 @@
 // js/modules/06_rh_paie.js
-import { getEmployees, getAttendance, getLeaves, getPayroll } from '../../services/hrService.js';
+import { getEmployees, getAttendance, getLeaves, getPayroll, createEmployee } from '../../services/hrService.js';
 import { formatCurrency } from '../../utils/currency.js';
 
 const COMPANY_ID = 'demo_company_001';
 
 export async function initRH() {
-    // 1. Chaje done yo
     const employees = await getEmployees(COMPANY_ID);
     const leaves = await getLeaves(COMPANY_ID);
     const payroll = await getPayroll(COMPANY_ID);
 
-    // 2. Kalkile metrik yo
     const totalEmployees = employees.length;
     const activeEmployees = employees.filter(e => e.status === 'Actif').length;
     const onLeaveEmployees = employees.filter(e => e.status === 'En congé').length;
 
-    // Pewòl mwa sa (filtre dapre dat)
     const today = new Date().toISOString().split('T')[0];
     const currentMonth = today.substring(0, 7);
     const monthlyPayroll = payroll
         .filter(p => p.period && p.period.startsWith(currentMonth))
         .reduce((sum, p) => sum + (p.netPay || 0), 0);
 
-    // Lè siplemantè (sipoze champ 'overtimeHours' egziste nan attendance)
     const attendance = await getAttendance(COMPANY_ID);
     const totalOvertime = attendance
         .filter(a => a.date && a.date.toDate().toISOString().split('T')[0].startsWith(currentMonth))
         .reduce((sum, a) => sum + (a.overtimeHours || 0), 0);
 
-    // 3. Mete ajou UI
     document.getElementById('totalEmployees').textContent = totalEmployees;
     document.getElementById('activeEmployees').textContent = activeEmployees;
     document.getElementById('onLeaveEmployees').textContent = onLeaveEmployees;
     document.getElementById('monthlyPayroll').textContent = formatCurrency(monthlyPayroll);
     document.getElementById('totalOvertime').textContent = totalOvertime + 'h';
 
-    // 4. Kreye graf yo
     createCharts(employees, payroll);
 }
 
 function createCharts(employees, payroll) {
-    // Graf 1: Depans Salè (Line Chart)
     const ctxSalary = document.getElementById('rhSalaryChart')?.getContext('2d');
     if (ctxSalary) {
         new Chart(ctxSalary, {
@@ -60,7 +53,6 @@ function createCharts(employees, payroll) {
         });
     }
 
-    // Graf 2: Distribisyon pa Depatman (Pie Chart)
     const ctxDept = document.getElementById('rhDeptChart')?.getContext('2d');
     if (ctxDept) {
         const deptCounts = {};
@@ -81,3 +73,45 @@ function createCharts(employees, payroll) {
         });
     }
 }
+
+// --- MODAL FONKSYON ---
+window.openEmployeeModal = function() {
+    document.getElementById('newEmployeeModal').style.display = 'flex';
+};
+
+window.closeEmployeeModal = function() {
+    document.getElementById('newEmployeeModal').style.display = 'none';
+};
+
+window.saveNewEmployee = async function() {
+    const name = document.getElementById('empName').value.trim();
+    const email = document.getElementById('empEmail').value.trim();
+    const department = document.getElementById('empDept').value;
+    const position = document.getElementById('empPosition').value.trim();
+    const salary = parseFloat(document.getElementById('empSalary').value);
+
+    if (!name || !email || !position || isNaN(salary) || salary <= 0) {
+        alert("Tanpri ranpli tout chan yo byen.");
+        return;
+    }
+
+    try {
+        // Kreye yon nouvo anplwaye nan Firestore
+        await createEmployee(COMPANY_ID, {
+            name: name,
+            email: email,
+            department: department,
+            position: position,
+            baseSalary: salary,
+            status: 'Actif'
+        });
+
+        alert("✅ Anplwaye anrejistre avèk siksè!");
+        closeEmployeeModal();
+        await initRH(); // Refè KPI yo otomatikman
+
+    } catch (error) {
+        console.error(error);
+        alert("❌ Erè pandan anrejistreman: " + error.message);
+    }
+};
