@@ -1,0 +1,217 @@
+<!-- ===================== 11. BUSINESS INTELLIGENCE & EXECUTIVE DASHBOARD ===================== -->
+<section id="bi" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">Business Intelligence & Executive Dashboard</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">KPI, analiz finansye, prediksyon & rapò estratejik</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📤 Export</button>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">📊 Nouvo Rapò</button>
+        </div>
+    </div>
+
+    <!-- 11.1 Dashboard Egzekitif -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">💰 Kès Disponib</div><div class="value">45 200 HTG</div></div>
+        <div class="kpi-card"><div class="label">📈 Revni Mwa a</div><div class="value">890 000 HTG</div><div class="change up">↑ 12%</div></div>
+        <div class="kpi-card"><div class="label">📉 Depans Mwa a</div><div class="value">645 000 HTG</div><div class="change down">↑ 4%</div></div>
+        <div class="kpi-card"><div class="label">🏆 Benefis Nèt</div><div class="value" style="color:var(--secondary);">245 000 HTG</div><div class="change up">↑ 8%</div></div>
+        <div class="kpi-card"><div class="label">👥 Kliyan Aktif</div><div class="value">312</div></div>
+        <div class="kpi-card"><div class="label">📦 Pwodwi Vann</div><div class="value">1 240</div></div>
+        <div class="kpi-card"><div class="label">🛒 Lavant Jodi a</div><div class="value">125 000 HTG</div></div>
+        <div class="kpi-card"><div class="label">🚚 Kòmand An Kour</div><div class="value">18</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Lavant pa Mwa</h3></div><div class="chart-container"><canvas id="biSalesTrendChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Benefis pa Mwa</h3></div><div class="chart-container"><canvas id="biProfitChart"></canvas></div></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Kwasans Revni</h3></div><div class="chart-container"><canvas id="biRevenueGrowthChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Evolisyon Kliyan (Radar)</h3></div><div class="chart-container"><canvas id="biDeptRadarChart"></canvas></div></div>
+    </div>
+
+    <!-- 11.2 Analyse Financière -->
+    <details class="chart-section" open style="padding:0;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 11.2 — Analyse Financière</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Endikatè</th><th>Mwa sa</th><th>Mwa Pase</th><th>Ane Pase</th></tr>
+                <tr><td>💵 Chiffre d'Affaires</td><td style="text-align:right;">890 000</td><td style="text-align:right;">795 000</td><td style="text-align:right;">680 000</td></tr>
+                <tr><td>📈 Marge Brute</td><td style="text-align:right;">42%</td><td style="text-align:right;">40%</td><td style="text-align:right;">38%</td></tr>
+                <tr><td>📊 Marge Nette</td><td style="text-align:right;">27,5%</td><td style="text-align:right;">25%</td><td style="text-align:right;">22%</td></tr>
+                <tr><td>🏦 Liquidité</td><td style="text-align:right;">1,8x</td><td style="text-align:right;">1,6x</td><td style="text-align:right;">1,4x</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 11.3 Prévisions de Trésorerie -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💰 11.3 — Prévisions de Trésorerie</summary>
+        <div style="padding:0 20px 20px;">
+            <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); margin-bottom:0;">
+                <div class="kpi-card"><div class="label">7 jou</div><div class="value" style="color:var(--secondary);">+52 000</div></div>
+                <div class="kpi-card"><div class="label">30 jou</div><div class="value" style="color:var(--secondary);">+185 000</div></div>
+                <div class="kpi-card"><div class="label">90 jou</div><div class="value" style="color:var(--secondary);">+540 000</div></div>
+                <div class="kpi-card"><div class="label">1 ane</div><div class="value" style="color:var(--secondary);">+2,1M</div></div>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:12px;">Baze sou: Lavant · Depans · Dèt kliyan · Dèt founisè · Pewòl</p>
+        </div>
+    </details>
+
+    <!-- 11.4 Analyse Stock + 11.5 Analyse Client -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 11.4 — Analyse Stock</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>📦 Valè Stòk</td><td style="text-align:right;">2 850 000 HTG</td></tr>
+                    <tr><td>⚠️ Stock Faible</td><td style="text-align:right; color:#B45309;">18</td></tr>
+                    <tr><td>🔄 Rotation Stock</td><td style="text-align:right;">4,2x/an</td></tr>
+                    <tr><td>🏆 Top Vente</td><td style="text-align:right;">Riz 25lb</td></tr>
+                    <tr><td>📉 Pa Deplase</td><td style="text-align:right; color:var(--danger);">6</td></tr>
+                </table>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 11.5 — Analyse Client</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>👥 Nouvo Kliyan</td><td style="text-align:right;">18</td></tr>
+                    <tr><td>🏆 Pi Bon Kliyan</td><td style="text-align:right;">Marie L.</td></tr>
+                    <tr><td>💰 Revni pa Kliyan</td><td style="text-align:right;">28 500 HTG</td></tr>
+                    <tr><td>📈 Frekans Acha</td><td style="text-align:right;">2,4x/mwa</td></tr>
+                </table>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+                    <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">VIP</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Régulier</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Occasionnel</span>
+                    <span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Inactif</span>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <!-- 11.6 Analyse Fournisseurs + 11.7 Analyse RH -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏭 11.6 — Analyse Fournisseurs</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>🏭 Founisè Aktif</td><td style="text-align:right;">18</td></tr>
+                    <tr><td>💰 Montan Acha</td><td style="text-align:right;">540 000 HTG</td></tr>
+                    <tr><td>📈 Delè Livrezon</td><td style="text-align:right;">4,2 jou</td></tr>
+                    <tr><td>⭐ Top Founisè</td><td style="text-align:right;">Distributeur National</td></tr>
+                </table>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👨‍💼 11.7 — Analyse RH</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>👥 Total Anplwaye</td><td style="text-align:right;">47</td></tr>
+                    <tr><td>💵 Kout Salè</td><td style="text-align:right;">1 850 000 HTG</td></tr>
+                    <tr><td>📊 Absans</td><td style="text-align:right; color:var(--danger);">3</td></tr>
+                    <tr><td>🏖 Konje</td><td style="text-align:right;">3</td></tr>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <!-- 11.8 Analyse Succursales -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏬 11.8 — Analyse Succursales</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>#</th><th>Succursale</th><th>Revni</th><th>Benefis</th></tr>
+                <tr><td>1</td><td>Delmas Branch</td><td style="text-align:right;">3 200 000 HTG</td><td style="text-align:right; color:var(--secondary);">780 000 HTG</td></tr>
+                <tr><td>2</td><td>Pétion-Ville Branch</td><td style="text-align:right;">2 450 000 HTG</td><td style="text-align:right; color:var(--secondary);">590 000 HTG</td></tr>
+                <tr><td>3</td><td>Cap-Haïtien Branch</td><td style="text-align:right;">1 850 000 HTG</td><td style="text-align:right; color:var(--secondary);">410 000 HTG</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 11.9 Tableaux de Bord Personnalisés -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧩 11.9 — Tableaux de Bord Personnalisés</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="ged-status" style="background:#F1F5F9;">📈 Graphiques</span>
+            <span class="ged-status" style="background:#F1F5F9;">📋 KPI Cards</span>
+            <span class="ged-status" style="background:#F1F5F9;">📊 Tables</span>
+            <span class="ged-status" style="background:#F1F5F9;">🗺 Cartes</span>
+            <span class="ged-status" style="background:#F1F5F9;">📅 Calendrier</span>
+        </div>
+    </details>
+
+    <!-- 11.10 Objectifs & Performance -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🎯 11.10 — Objectifs & Performance</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="font-size:13px; font-weight:600; margin-bottom:6px;">Lavant — Objektif: 1 000 000 HTG</p>
+            <div style="background:#F1F5F9; border-radius:8px; height:14px; overflow:hidden;">
+                <div style="background:var(--secondary); width:89%; height:100%;"></div>
+            </div>
+            <p style="text-align:right; font-size:12px; color:var(--text-muted); margin-top:4px;">🟢 890 000 HTG (89%) — An Pwogrè</p>
+        </div>
+    </details>
+
+    <!-- 11.11 Prévisions & Tendances -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔮 11.11 — Prévisions & Tendances</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📈 Lavant</span>
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📦 Stock</span>
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">💵 Trésorerie</span>
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">👥 Kliyan</span>
+        </div>
+    </details>
+
+    <!-- 11.12 Rapports BI -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📄 11.12 — Rapports BI</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:10px;">
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Executive Dashboard</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Analyse Financière</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Analyse Commerciale</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Analyse RH</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Analyse Stock</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Prévisions</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Performance Globale</button>
+        </div>
+    </details>
+
+    <!-- 11.13 Exportation -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📤 11.13 — Exportation</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                <span class="ged-status" style="background:#F1F5F9;">PDF</span>
+                <span class="ged-status" style="background:#F1F5F9;">Excel</span>
+                <span class="ged-status" style="background:#F1F5F9;">CSV</span>
+                <span class="ged-status" style="background:#F1F5F9;">PowerPoint</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted);">Planifikasyon: Chak jou · Chak semèn · Chak mwa</p>
+        </div>
+    </details>
+
+    <!-- 11.14 Alertes Intelligentes -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔔 11.14 — Alertes Intelligentes</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⚠️ Dèt kliyan ogmante 15% mwa sa</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#F1F5F9;"><span>📦 4 pwodwi nan estati stock kritik</span><span style="color:var(--text-muted); font-weight:600;">Enfo</span></div>
+        </div>
+    </details>
+
+    <!-- Pèmisyon -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 Pèmisyon</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>CEO / Direction</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout rapò</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Directeur Financier</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Rapò finansye</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Responsable Commercial</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Rapò lavant</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>RH</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Rapò RH sèlman</p></div>
+        </div>
+    </details>
+</section>
