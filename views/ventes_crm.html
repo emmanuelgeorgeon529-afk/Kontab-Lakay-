@@ -1,0 +1,254 @@
+<!-- ===================== 3. VENTES, CRM & RELATION CLIENT ===================== -->
+<section id="ventes" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">Ventes, CRM & Relation Client</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Lavant, kliyan, fakti, devis, promosyon & analiz komèsyal</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">🛒 POS</button>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">➕ Nouvo Vant</button>
+        </div>
+    </div>
+
+    <!-- 3.1 Dashboard Komèsyal -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">🛒 Lavant Jodi a</div><div class="value">125 000 HTG</div><div class="change up">↑ 15%</div></div>
+        <div class="kpi-card"><div class="label">📈 Lavant Mwa a</div><div class="value">3 450 000 HTG</div><div class="change up">↑ 8,5%</div></div>
+        <div class="kpi-card"><div class="label">👥 Nouvo Kliyan</div><div class="value">18</div><div class="change up">↑ 5</div></div>
+        <div class="kpi-card"><div class="label">💰 Chif Afè (CA)</div><div class="value">8 200 000 HTG</div><div class="change up">↑ 12%</div></div>
+        <div class="kpi-card"><div class="label">📋 Devis An Atant</div><div class="value" style="color:var(--primary);">24</div><div class="change up">↑ 3</div></div>
+        <div class="kpi-card"><div class="label">🔴 Dèt Kliyan</div><div class="value" style="color:var(--danger);">320 000 HTG</div></div>
+        <div class="kpi-card"><div class="label">⭐ Top Kliyan</div><div class="value" style="font-size:15px;">Marie L.</div></div>
+        <div class="kpi-card"><div class="label">🏆 Top Vandè</div><div class="value" style="font-size:15px;">Jean D.</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Lavant pa Jou</h3></div><div class="chart-container"><canvas id="salesChartDaily"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Lavant pa Mwa</h3></div><div class="chart-container"><canvas id="salesChartMonthly"></canvas></div></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Lavant pa Pwodwi</h3></div><div class="chart-container"><canvas id="salesChartProduct"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Lavant pa Vandè</h3></div><div class="chart-container"><canvas id="salesChartSeller"></canvas></div></div>
+    </div>
+
+    <!-- 3.2 Gestion Kliyan -->
+    <details class="chart-section" open style="padding:0; margin-top:8px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 3.2 — Gestion Kliyan (CRM)</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>ID</th><th>Non</th><th>Telefòn</th><th>Kategori</th><th>Dat Enskripsyon</th></tr>
+                <tr><td>KL-0001</td><td>Marie L.</td><td>+509 3456-7890</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">VIP</span></td><td>12/02/2025</td></tr>
+                <tr><td>KL-0002</td><td>Rose Distribution SA</td><td>+509 2233-4455</td><td><span class="ged-status" style="background:#F1F5F9;">Grande Entreprise</span></td><td>03/06/2024</td></tr>
+                <tr><td>KL-0003</td><td>Ti Boutik Delmas</td><td>+509 4411-2233</td><td><span class="ged-status" style="background:#F1F5F9;">PME</span></td><td>21/11/2024</td></tr>
+                <tr><td>KL-0004</td><td>Jean Pierre</td><td>+509 3311-8899</td><td><span class="ged-status" style="background:#F1F5F9;">Particulier</span></td><td>02/08/2026</td></tr>
+            </table>
+            <button style="margin-top:14px; background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajoute Kliyan</button>
+        </div>
+    </details>
+
+    <!-- 3.3 Fich Kliyan -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📇 3.3 — Fich Kliyan</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Kliyan: <strong>Marie L.</strong></p>
+            <table class="fin-table">
+                <tr><td>Total Acha</td><td style="text-align:right; font-weight:600;">1 240 000 HTG</td></tr>
+                <tr><td>Dèt Aktyèl</td><td style="text-align:right; color:var(--danger);">45 000 HTG</td></tr>
+                <tr><td>Dènye Peman</td><td style="text-align:right;">28/07/2026</td></tr>
+                <tr><td>Remak Ekip Lavant</td><td style="text-align:right; color:var(--text-muted);">Kliyan fidèl, peye alè</td></tr>
+                <tr><td>Dènye Aktivite</td><td style="text-align:right;">Fakti FT-000452</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 3.4 POS + 3.5 Panier -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🖥️ 3.4 — Point de Vente (POS)</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🛒 Scan Barcode</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📦 Rechèch Pwodwi</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">💳 Plizyè Mòd Peman</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🧾 Enpresyon Resi</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📱 POS Mobile</span>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧺 3.5 — Panier Intelligent</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><th>Pwodwi</th><th>Kantite</th><th>Total</th></tr>
+                    <tr><td>Riz 25lb</td><td style="text-align:right;">2</td><td style="text-align:right;">3 000 HTG</td></tr>
+                    <tr><td>Luil Kris</td><td style="text-align:right;">1</td><td style="text-align:right;">450 HTG</td></tr>
+                </table>
+                <p style="text-align:right; font-weight:700; margin-top:10px;">Total: 3 450 HTG</p>
+            </div>
+        </details>
+    </div>
+
+    <!-- 3.6 Facturation -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧾 3.6 — Facturation</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Nimewo</th><th>Dat</th><th>Kliyan</th><th>Total</th><th>Estati</th></tr>
+                <tr><td>FT-000452</td><td>02/08/2026</td><td>Marie L.</td><td style="text-align:right;">45 000 HTG</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Peye</span></td></tr>
+                <tr><td>FT-000451</td><td>01/08/2026</td><td>Ti Boutik Delmas</td><td style="text-align:right;">12 500 HTG</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Atant</span></td></tr>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Fakti</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📄 PDF</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📧 Email</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 3.7 Devis -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📝 3.7 — Devis</summary>
+        <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
+            <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Devis</div>
+            <div>⬇</div>
+            <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Validation Kliyan</div>
+            <div>⬇</div>
+            <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Konvèti an Fakti</div>
+        </div>
+    </details>
+
+    <!-- 3.8 Commandes Clients -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 3.8 — Commandes Clients</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="ged-status" style="background:#FEF3C7; color:#B45309;">🟡 Brouillon</span>
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🔵 Confirmée</span>
+            <span class="ged-status" style="background:#FFEDD5; color:#C2410C;">🟠 En Préparation</span>
+            <span class="ged-status" style="background:#DBEAFE; color:#1D4ED8;">🚚 Expédiée</span>
+            <span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Livrée</span>
+            <span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">🔴 Annulée</span>
+        </div>
+    </details>
+
+    <!-- 3.9 Crédit + 3.10 Recouvrement -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💳 3.9 — Gestion Crédit Client</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>Limite Kredi</td><td style="text-align:right;">100 000 HTG</td></tr>
+                    <tr><td>Solde Kliyan</td><td style="text-align:right; color:var(--danger);">45 000 HTG</td></tr>
+                    <tr><td>Échéance</td><td style="text-align:right;">15/08/2026</td></tr>
+                </table>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📞 3.10 — Recouvrement</summary>
+            <div style="padding:0 20px 20px;">
+                <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); margin-bottom:14px;">
+                    <div class="kpi-card"><div class="label">Dèt Total</div><div class="value" style="color:var(--danger);">320 000</div></div>
+                    <div class="kpi-card"><div class="label">Kliyan an Reta</div><div class="value">6</div></div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">📞 Rele</button>
+                    <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">📧 Email</button>
+                    <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600;">📱 WhatsApp</button>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <!-- 3.11 Catalogue + 3.12 Prix -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📚 3.11 — Catalogue Produits</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><th>SKU</th><th>Pwodwi</th><th>Pri</th><th>Stock</th></tr>
+                    <tr><td>SKU-001</td><td>Riz 25lb</td><td style="text-align:right;">1 500 HTG</td><td style="text-align:right;">45</td></tr>
+                    <tr><td>SKU-002</td><td>Luil Kris</td><td style="text-align:right;">450 HTG</td><td style="text-align:right;">120</td></tr>
+                </table>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏷️ 3.12 — Gestion Prix</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>Pri Detay</td><td style="text-align:right;">1 500 HTG</td></tr>
+                    <tr><td>Pri Gros</td><td style="text-align:right;">1 350 HTG</td></tr>
+                    <tr><td>Pri VIP</td><td style="text-align:right;">1 400 HTG</td></tr>
+                    <tr><td>Pri Revendeur</td><td style="text-align:right;">1 300 HTG</td></tr>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <!-- 3.13 Promotions + 3.14 Fidélité -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🎉 3.13 — Promotions & Remises</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#F1F5F9;">🏷️ Rabè %</span>
+                <span class="ged-status" style="background:#F1F5F9;">🎁 Buy 1 Get 1</span>
+                <span class="ged-status" style="background:#F1F5F9;">💵 Rabè Montan</span>
+                <span class="ged-status" style="background:#F1F5F9;">🎉 Promo Sezonye</span>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💎 3.14 — Cartes Fidélité</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><td>Pwen Akimile</td><td style="text-align:right;">1 240 pts</td></tr>
+                    <tr><td>Récompenses Disponib</td><td style="text-align:right;">3</td></tr>
+                    <tr><td>Cashback</td><td style="text-align:right;">2%</td></tr>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <!-- 3.15 Marketing -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📣 3.15 — Campagnes Marketing</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📧 Email</span>
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📱 SMS</span>
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">💬 WhatsApp</span>
+            <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🌐 Réseaux Sociaux</span>
+        </div>
+    </details>
+
+    <!-- 3.16 SAV + 3.17 Retours -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛠️ 3.16 — Service Après Vente</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#F1F5F9;">Réclamations</span>
+                <span class="ged-status" style="background:#F1F5F9;">Retours</span>
+                <span class="ged-status" style="background:#F1F5F9;">Échanges</span>
+                <span class="ged-status" style="background:#F1F5F9;">Garanties</span>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔄 3.17 — Gestion Retours</summary>
+            <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
+                <div style="background:#FEE2E2; color:#B91C1C; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Retour</div>
+                <div>⬇</div>
+                <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Inspection</div>
+                <div>⬇</div>
+                <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Remboursement / Échange</div>
+            </div>
+        </details>
+    </div>
+
+    <!-- 3.18 Analyse des Ventes -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 3.18 — Analyse des Ventes</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px;">
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📊 Pa Pwodwi</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📊 Pa Kliyan</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📊 Pa Vandè</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📊 Pa Rejyon</button>
+        </div>
+    </details>
+
+    <!-- 3.19 Objectifs Commerciaux -->
+    <details class="chart-section" open style="
