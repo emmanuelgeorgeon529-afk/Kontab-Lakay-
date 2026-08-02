@@ -1,0 +1,228 @@
+<!-- ===================== 8. GED, ARCHIVAGE & GESTION DOCUMENTAIRE ===================== -->
+<section id="ged" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">GED, Archivage & Gestion Documentaire</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Estoke, òganize, sekirize & achive tout dokiman antrepriz la</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">🔎 Rechèch Avanse</button>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">📤 Nouvo Dokiman</button>
+        </div>
+    </div>
+
+    <!-- 8.1 Dashboard GED -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">📁 Total Dokiman</div><div class="value" style="color:var(--primary);">1 245</div></div>
+        <div class="kpi-card"><div class="label">📄 Dokiman Mwa sa</div><div class="value">86</div><div class="change up">↑ 12</div></div>
+        <div class="kpi-card"><div class="label">☁️ Espas Itilize</div><div class="value">4.2 GB / 50 GB</div></div>
+        <div class="kpi-card"><div class="label">🔒 Konfidansyèl</div><div class="value">32</div></div>
+        <div class="kpi-card"><div class="label">📋 Kontra Aktif</div><div class="value" style="color:var(--secondary);">42</div></div>
+        <div class="kpi-card"><div class="label">📦 Achiv Anyèl</div><div class="value">318</div></div>
+        <div class="kpi-card"><div class="label">⚠️ Ekspire Byento</div><div class="value" style="color:var(--danger);">3</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Dokiman pa Kategori</h3></div><div class="chart-container"><canvas id="gedCategoryChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Upload pa Mwa</h3></div><div class="chart-container"><canvas id="gedEvolutionChart"></canvas></div></div>
+    </div>
+    <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Itilizasyon Espas Cloud</h3></div><div class="chart-container"><canvas id="gedStorageChart"></canvas></div></div>
+
+    <!-- 8.2 Bibliyotèk Dokiman -->
+    <details class="chart-section" open style="padding:0;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📂 8.2 — Bibliyotèk Dokiman</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📑 Fakti</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📋 Devis</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📜 Kontra</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">👥 RH</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🏦 Finans</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🚚 Logistique</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🏭 Production</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">⚖️ Juridique</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📁 Divers</span>
+            </div>
+            <table class="fin-table">
+                <tr><th>Dokiman</th><th>Kategori</th><th>Dat</th><th>Responsab</th><th>Estati</th></tr>
+                <tr><td>Kontra_Client_A.pdf</td><td>Kontra</td><td>28/07/2026</td><td>Jean D.</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
+                <tr><td>Facture_FT-000452.pdf</td><td>Fakti</td><td>02/08/2026</td><td>Marie L.</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Upload</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📤 Download</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">👁️ Preview</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔄 Versioning</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📤 Partage</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 8.3 Upload Dokiman -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📎 8.3 — Upload Dokiman</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin-bottom:14px;">
+                <input type="text" placeholder="Tit dokiman" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Kategori</option></select>
+                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Nivo Konfidansyalite</option></select>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Fichye sipòte: PDF · DOCX · XLSX · PPTX · JPG · PNG · ZIP</p>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">📤 Voye Dokiman</button>
+        </div>
+    </details>
+
+    <!-- 8.4 Rechèch Avanse -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔎 8.4 — Rechèch Avanse</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:8px;">
+                <input type="text" placeholder="Mot kle" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                <input type="date" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Kategori</option></select>
+                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Depatman</option></select>
+            </div>
+        </div>
+    </details>
+
+    <!-- 8.5 Versioning -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔄 8.5 — Versioning</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Kontra_Client_A.pdf</p>
+            <table class="fin-table">
+                <tr><th>Vèsyon</th><th>Dat</th><th>Modifye pa</th></tr>
+                <tr><td>Version 3</td><td>28/07/2026</td><td>Jean D.</td></tr>
+                <tr><td>Version 2</td><td>15/06/2026</td><td>Marie L.</td></tr>
+                <tr><td>Version 1</td><td>02/05/2026</td><td>Jean D.</td></tr>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">↩️ Retabli</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔍 Konpare</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 8.6 Nivo Aksè -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔒 8.6 — Nivo Aksè Dokiman</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px;">
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Public</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout moun ka wè</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Interne</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Anplwaye sèlman</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Confidentiel</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Manadjè sèlman</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Strictement Confidentiel</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Administratè sèlman</p></div>
+        </div>
+    </details>
+
+    <!-- 8.7 Signature + 8.8 Cloud Storage -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">✍️ 8.7 — Signature Électronique</summary>
+            <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
+                <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Création</div>
+                <div>⬇</div>
+                <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Validation</div>
+                <div>⬇</div>
+                <div style="background:#EEF2FF; color:var(--primary); border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Signature</div>
+                <div>⬇</div>
+                <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Archivage</div>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">☁️ 8.8 — Cloud Storage</summary>
+            <div style="padding:0 20px 20px;">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                    <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Firebase Storage</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Google Drive</span>
+                    <span class="ged-status" style="background:#F1F5F9;">AWS S3</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Azure Storage</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted);">Backup Otomatik · Compression · Chiffrement</p>
+            </div>
+        </details>
+    </div>
+
+    <!-- 8.9 Archivage Automatique + 8.10 Archivage Fiscal -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 8.9 — Archivage Automatique</summary>
+            <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
+                <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Exercice 2026</div>
+                <div>⬇</div>
+                <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Archivage</div>
+                <div>⬇</div>
+                <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Read Only</div>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Konfòmite légal · Audit fasil</p>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📚 8.10 — Archivage Fiscal</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#F1F5F9;">TVA</span>
+                <span class="ged-status" style="background:#F1F5F9;">TCA</span>
+                <span class="ged-status" style="background:#F1F5F9;">Déclarations Fiscales</span>
+                <span class="ged-status" style="background:#F1F5F9;">États Financiers</span>
+                <span class="ged-status" style="background:#F1F5F9;">Audit</span>
+            </div>
+        </details>
+    </div>
+
+    <!-- 8.11 Liaison Automatique ERP -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧾 8.11 — Liaison Automatique ERP</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Dokiman</th><th>Modil Konekte</th></tr>
+                <tr><td>Fakti</td><td>Finance</td></tr>
+                <tr><td>Bon Livraison</td><td>Logistique</td></tr>
+                <tr><td>Contrat Employé</td><td>RH</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 8.12 Alertes -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔔 8.12 — Alertes Documentaires</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>⚠️ Kontra Client A pral ekspire nan 12 jou</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⚠️ Garanti Kamyon T-2201 ap fini byento</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⚠️ Asirans T-2201 ap fini nan 20 jou</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
+        </div>
+    </details>
+
+    <!-- 8.13 Audit Trail -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 8.13 — Audit Trail</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Dat/Lè</th><th>Itilizatè</th><th>Aksyon</th><th>Dokiman</th></tr>
+                <tr><td>02/08, 09:14</td><td>Jean D.</td><td>Upload</td><td>Facture_FT-000452.pdf</td></tr>
+                <tr><td>28/07, 15:30</td><td>Marie L.</td><td>Modifye</td><td>Kontra_Client_A.pdf</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 8.14 Rapò GED -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📈 8.14 — Rapò GED</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:10px;">
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Dokiman pa Kategori</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Dokiman pa Depatman</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Istorik Downloads</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Kontra Aktif</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Kontra Ekspire Byento</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">☁️ Espas Cloud Itilize</button>
+        </div>
+    </details>
+
+    <!-- Pèmisyon -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 Pèmisyon</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrateur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Direction</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Lecture + Validation</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Responsable Département</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Gestion pwòp depatman</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Employé</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Upload + Consultation limite</p></div>
+        </div>
+    </details>
+</section>
