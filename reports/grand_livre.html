@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Livre — Kontab Lakay</title>
+    <style>
+        :root {
+            --primary: #4F46E5; --secondary: #10B981; --danger: #EF4444;
+            --text-dark: #0F172A; --text-muted: #64748B;
+            --bg-main: #F8FAFC; --border: #E2E8F0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', -apple-system, sans-serif; }
+        body { background:var(--bg-main); color:var(--text-dark); padding:24px; }
+
+        .report-container { max-width:900px; margin:0 auto; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(31,38,135,0.08); overflow:hidden; }
+
+        .report-header { padding:28px 32px; border-bottom:2px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
+        .company-info h1 { font-size:20px; font-weight:700; color:var(--primary); }
+        .company-info p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+        .report-meta { text-align:right; }
+        .report-meta h2 { font-size:18px; font-weight:600; }
+        .report-meta p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+        .report-actions { padding:12px 32px; background:#F1F5F9; display:flex; gap:8px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+        .account-selector { display:flex; align-items:center; gap:8px; }
+        .account-selector select { border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:13px; background:white; }
+        .actions-right { display:flex; gap:8px; }
+        .btn { border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-outline { background:white; border:1px solid var(--border); color:var(--text-dark); }
+
+        .report-body { padding:32px; }
+
+        .account-block { margin-bottom:28px; }
+        .account-title { display:flex; justify-content:space-between; align-items:center; padding-bottom:8px; border-bottom:2px solid var(--primary); margin-bottom:10px; }
+        .account-title h3 { font-size:15px; font-weight:700; color:var(--primary); }
+        .account-title .code { font-size:12px; color:var(--text-muted); }
+
+        table.gl-table { width:100%; border-collapse:collapse; font-size:13px; }
+        table.gl-table th { text-align:left; padding:6px; font-size:11px; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid var(--border); }
+        table.gl-table th.num, table.gl-table td.num { text-align:right; }
+        table.gl-table td { padding:6px; border-bottom:1px solid #F1F5F9; }
+        .gl-solde-row td { font-weight:700; border-top:1px solid var(--text-dark); border-bottom:none; padding-top:8px; }
+
+        .solde-badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+        .solde-badge.debiteur { background:#D1FAE5; color:#047857; }
+        .solde-badge.crediteur { background:#DBEAFE; color:#1D4ED8; }
+
+        .report-footer { padding:20px 32px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); flex-wrap:wrap; gap:8px; }
+
+        @media print {
+            body { background:white; padding:0; }
+            .report-actions { display:none; }
+            .report-container { box-shadow:none; border-radius:0; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-container">
+        <div class="report-header">
+            <div class="company-info">
+                <h1>LedgerFlow Market</h1>
+                <p>NIF: 0012-345-678 · Delmas 33, Port-au-Prince, Haïti</p>
+            </div>
+            <div class="report-meta">
+                <h2>📖 Grand Livre</h2>
+                <p>Période: 01 Juillet — 31 Juillet 2026</p>
+            </div>
+        </div>
+
+        <div class="report-actions">
+            <div class="account-selector">
+                <label style="font-size:12px; color:var(--text-muted);">Kont:</label>
+                <select>
+                    <option>Tout Kont</option>
+                    <option selected>1010 — Kès</option>
+                    <option>1020 — Bank</option>
+                    <option>4010 — Ventes</option>
+                </select>
+            </div>
+            <div class="actions-right">
+                <button class="btn btn-outline" onclick="window.print()">🖨️ Enprime</button>
+                <button class="btn btn-outline">📊 Export Excel</button>
+                <button class="btn btn-primary">📄 Export PDF</button>
+            </div>
+        </div>
+
+        <div class="report-body">
+
+            <!-- Kont Kès -->
+            <div class="account-block">
+                <div class="account-title">
+                    <h3>1010 — Kès</h3>
+                    <span class="code">Solde Initial: 0 HTG</span>
+                </div>
+                <table class="gl-table">
+                    <tr>
+                        <th>Dat</th><th>Libellé</th><th>Référence</th>
+                        <th class="num">Débit</th><th class="num">Crédit</th><th class="num">Solde</th>
+                    </tr>
+                    <tr><td>01/07</td><td>Vente kach</td><td>LV-000230</td><td class="num">5 000</td><td class="num">—</td><td class="num">5 000</td></tr>
+                    <tr><td>03/07</td><td>Vente kach</td><td>LV-000231</td><td class="num">8 200</td><td class="num">—</td><td class="num">13 200</td></tr>
+                    <tr><td>05/07</td><td>Achat fourniture bureau</td><td>DEP-000028</td><td class="num">—</td><td class="num">1 500</td><td class="num">11 700</td></tr>
+                    <tr><td>12/07</td><td>Vente kach</td><td>LV-000238</td><td class="num">12 500</td><td class="num">—</td><td class="num">24 200</td></tr>
+                    <tr><td>18/07</td><td>Paiement gaz véhicule</td><td>DEP-000031</td><td class="num">—</td><td class="num">2 000</td><td class="num">22 200</td></tr>
+                    <tr><td>25/07</td><td>Vente kach</td><td>LV-000244</td><td class="num">4 200</td><td class="num">—</td><td class="num">26 400</td></tr>
+                    <tr><td>28/07</td><td>Vente kach</td><td>LV-000245</td><td class="num">2 500</td><td class="num">—</td><td class="num">28 900</td></tr>
+                    <tr><td>29/07</td><td>Dépense téléphone</td><td>DEP-000032</td><td class="num">—</td><td class="num">1 500</td><td class="num">27 400</td></tr>
+                    <tr><td>31/07</td><td>Vente kach (multiple)</td><td>—</td><td class="num">17 800</td><td class="num">—</td><td class="num">45 200</td></tr>
+
+                    <tr class="gl-solde-row">
+                        <td colspan="3">Solde Final au 31/07</td>
+                        <td class="num">50 200</td>
+                        <td class="num">5 000</td>
+                        <td class="num"><span class="solde-badge debiteur">Débiteur — 45 200 HTG</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Kont Ventes (rezime) -->
+            <div class="account-block">
+                <div class="account-title">
+                    <h3>4010 — Ventes</h3>
+                    <span class="code">Solde Initial: 0 HTG</span>
+                </div>
+                <table class="gl-table">
+                    <tr>
+                        <th>Dat</th><th>Libellé</th><th>Référence</th>
+                        <th class="num">Débit</th><th class="num">Crédit</th><th class="num">Solde</th>
+                    </tr>
+                    <tr><td>01/07 — 31/07</td><td>Total Ventes du Mois (agrégé)</td><td>—</td><td class="num">—</td><td class="num">820 000</td><td class="num">820 000</td></tr>
+
+                    <tr class="gl-solde-row">
+                        <td colspan="3">Solde Final au 31/07</td>
+                        <td class="num">0</td>
+                        <td class="num">820 000</td>
+                        <td class="num"><span class="solde-badge crediteur">Créditeur — 820 000 HTG</span></td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="report-footer">
+            <span>Jenere pa Kontab Lakay · 02 Août 2026, 10:45</span>
+            <span>Solde = Débits Akimile − Crédits Akimile (kont actif/charge) oswa envès (kont passif/revni)</span>
+        </div>
+    </div>
+
+</body>
+</html>
