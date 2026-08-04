@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Générale — Kontab Lakay</title>
+    <style>
+        :root {
+            --primary: #4F46E5; --secondary: #10B981; --danger: #EF4444;
+            --text-dark: #0F172A; --text-muted: #64748B;
+            --bg-main: #F8FAFC; --border: #E2E8F0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', -apple-system, sans-serif; }
+        body { background:var(--bg-main); color:var(--text-dark); padding:24px; }
+
+        .report-container { max-width:900px; margin:0 auto; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(31,38,135,0.08); overflow:hidden; }
+
+        .report-header { padding:28px 32px; border-bottom:2px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
+        .company-info h1 { font-size:20px; font-weight:700; color:var(--primary); }
+        .company-info p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+        .report-meta { text-align:right; }
+        .report-meta h2 { font-size:18px; font-weight:600; }
+        .report-meta p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+        .report-actions { padding:12px 32px; background:#F1F5F9; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+        .btn { border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-outline { background:white; border:1px solid var(--border); color:var(--text-dark); }
+
+        .report-body { padding:32px; }
+
+        table.bal-table { width:100%; border-collapse:collapse; font-size:13px; }
+        table.bal-table th { text-align:left; padding:8px 6px; border-bottom:2px solid var(--text-dark); font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text-muted); }
+        table.bal-table th.num, table.bal-table td.num { text-align:right; }
+        table.bal-table td { padding:7px 6px; border-bottom:1px solid #F1F5F9; }
+        .bal-cat-row td { font-weight:700; color:var(--primary); background:#F8FAFC; padding-top:10px; }
+        .bal-code { color:var(--text-muted); font-size:12px; }
+
+        .bal-total-row td { font-weight:800; border-top:2px solid var(--text-dark); border-bottom:none; padding-top:12px; font-size:14px; }
+
+        .balance-check { margin-top:20px; padding:16px 20px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .balance-check.ok { background:#D1FAE5; }
+        .balance-check.error { background:#FEE2E2; }
+        .balance-check .label { font-weight:700; font-size:14px; }
+        .balance-check .value { font-weight:700; font-size:14px; }
+
+        .report-footer { padding:20px 32px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); flex-wrap:wrap; gap:8px; }
+
+        @media (max-width:640px) {
+            table.bal-table { font-size:12px; }
+            .bal-code { display:none; }
+        }
+        @media print {
+            body { background:white; padding:0; }
+            .report-actions { display:none; }
+            .report-container { box-shadow:none; border-radius:0; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-container">
+        <div class="report-header">
+            <div class="company-info">
+                <h1>LedgerFlow Market</h1>
+                <p>NIF: 0012-345-678 · Delmas 33, Port-au-Prince, Haïti</p>
+            </div>
+            <div class="report-meta">
+                <h2>📋 Balance Générale</h2>
+                <p>Période: 01 Juillet — 31 Juillet 2026</p>
+            </div>
+        </div>
+
+        <div class="report-actions">
+            <button class="btn btn-outline" onclick="window.print()">🖨️ Enprime</button>
+            <button class="btn btn-outline">📊 Export Excel</button>
+            <button class="btn btn-primary">📄 Export PDF</button>
+        </div>
+
+        <div class="report-body">
+            <table class="bal-table">
+                <tr>
+                    <th>Kont</th>
+                    <th class="num">Débit</th>
+                    <th class="num">Crédit</th>
+                </tr>
+
+                <tr class="bal-cat-row"><td colspan="3">Actifs (1000)</td></tr>
+                <tr><td><span class="bal-code">1010</span> Kès</td><td class="num">45 200</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">1020</span> Bank</td><td class="num">1 240 000</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">1030</span> Kliyan</td><td class="num">320 000</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">1040</span> Stock</td><td class="num">2 850 000</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">1050</span> Immobilisations</td><td class="num">8 450 000</td><td class="num">0</td></tr>
+
+                <tr class="bal-cat-row"><td colspan="3">Passifs (2000)</td></tr>
+                <tr><td><span class="bal-code">2010</span> Founisè</td><td class="num">0</td><td class="num">180 000</td></tr>
+                <tr><td><span class="bal-code">2020</span> Emprunts</td><td class="num">0</td><td class="num">1 500 000</td></tr>
+                <tr><td><span class="bal-code">2030</span> Salè pou Peye</td><td class="num">0</td><td class="num">320 000</td></tr>
+
+                <tr class="bal-cat-row"><td colspan="3">Capitaux Propres (3000)</td></tr>
+                <tr><td><span class="bal-code">3010</span> Capital Social</td><td class="num">0</td><td class="num">5 000 000</td></tr>
+                <tr><td><span class="bal-code">3020</span> Réserves</td><td class="num">0</td><td class="num">1 460 200</td></tr>
+
+                <tr class="bal-cat-row"><td colspan="3">Revenus (4000)</td></tr>
+                <tr><td><span class="bal-code">4010</span> Ventes</td><td class="num">0</td><td class="num">820 000</td></tr>
+                <tr><td><span class="bal-code">4020</span> Prestations de Services</td><td class="num">0</td><td class="num">50 000</td></tr>
+                <tr><td><span class="bal-code">4030</span> Revenus Divers</td><td class="num">0</td><td class="num">20 000</td></tr>
+
+                <tr class="bal-cat-row"><td colspan="3">Charges (6000)</td></tr>
+                <tr><td><span class="bal-code">6010</span> Loyer</td><td class="num">85 000</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">6020</span> Électricité</td><td class="num">32 000</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">6030</span> Internet</td><td class="num">8 500</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">6040</span> Salaires</td><td class="num">420 000</td><td class="num">0</td></tr>
+                <tr><td><span class="bal-code">6050</span> Transport</td><td class="num">55 000</td><td class="num">0</td></tr>
+
+                <tr class="bal-total-row">
+                    <td>Total</td>
+                    <td class="num">13 505 700</td>
+                    <td class="num">9 350 200</td>
+                </tr>
+            </table>
+
+            <div class="balance-check error" id="balanceCheck">
+                <span class="label">🔴 Verifikasyon Ekilib</span>
+                <span class="value">Débit (13 505 700) ≠ Crédit (9 350 200) — Diferans: 4 155 500 HTG</span>
+            </div>
+        </div>
+
+        <div class="report-footer">
+            <span>Jenere pa Kontab Lakay · 02 Août 2026, 10:45</span>
+            <span>Balance Générale dwe toujou ekilibre: Total Débit = Total Crédit</span>
+        </div>
+    </div>
+
+</body>
+</html>
