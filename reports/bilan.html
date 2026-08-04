@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilan — Kontab Lakay</title>
+    <style>
+        :root {
+            --primary: #4F46E5; --secondary: #10B981; --danger: #EF4444;
+            --text-dark: #0F172A; --text-muted: #64748B;
+            --bg-main: #F8FAFC; --border: #E2E8F0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', -apple-system, sans-serif; }
+        body { background:var(--bg-main); color:var(--text-dark); padding:24px; }
+
+        .report-container { max-width:900px; margin:0 auto; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(31,38,135,0.08); overflow:hidden; }
+
+        .report-header { padding:28px 32px; border-bottom:2px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
+        .company-info h1 { font-size:20px; font-weight:700; color:var(--primary); }
+        .company-info p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+        .report-meta { text-align:right; }
+        .report-meta h2 { font-size:18px; font-weight:600; }
+        .report-meta p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+        .report-actions { padding:12px 32px; background:#F1F5F9; display:flex; gap:8px; justify-content:flex-end; }
+        .btn { border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-outline { background:white; border:1px solid var(--border); color:var(--text-dark); }
+
+        .report-body { padding:32px; }
+        .bilan-columns { display:grid; grid-template-columns:1fr 1fr; gap:32px; }
+        @media (max-width:640px) { .bilan-columns { grid-template-columns:1fr; } }
+
+        .bilan-section h3 { font-size:14px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; padding-bottom:8px; border-bottom:2px solid var(--primary); margin-bottom:12px; }
+        .bilan-section.passif h3 { color:var(--secondary); border-color:var(--secondary); }
+
+        table.bilan-table { width:100%; border-collapse:collapse; font-size:13px; margin-bottom:20px; }
+        table.bilan-table td { padding:6px 0; border-bottom:1px solid #F1F5F9; }
+        table.bilan-table td:last-child { text-align:right; font-weight:500; }
+        .bilan-cat { font-weight:600; padding-top:12px !important; color:var(--text-dark); }
+        .bilan-sub { padding-left:16px !important; color:var(--text-muted); }
+        .bilan-total-row td { font-weight:700; border-top:2px solid var(--text-dark); border-bottom:none; padding-top:10px; }
+
+        .grand-total { margin-top:24px; padding:16px 20px; border-radius:12px; background:#EEF2FF; display:flex; justify-content:space-between; align-items:center; }
+        .grand-total.balanced { background:#D1FAE5; }
+        .grand-total.unbalanced { background:#FEE2E2; }
+        .grand-total .label { font-weight:600; font-size:14px; }
+        .grand-total .value { font-weight:700; font-size:16px; }
+
+        .report-footer { padding:20px 32px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); flex-wrap:wrap; gap:8px; }
+
+        @media print {
+            body { background:white; padding:0; }
+            .report-actions { display:none; }
+            .report-container { box-shadow:none; border-radius:0; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-container">
+        <div class="report-header">
+            <div class="company-info">
+                <h1>LedgerFlow Market</h1>
+                <p>NIF: 0012-345-678 · Delmas 33, Port-au-Prince, Haïti</p>
+            </div>
+            <div class="report-meta">
+                <h2>📊 Bilan</h2>
+                <p>Arrêté au 31 Juillet 2026</p>
+            </div>
+        </div>
+
+        <div class="report-actions">
+            <button class="btn btn-outline" onclick="window.print()">🖨️ Enprime</button>
+            <button class="btn btn-outline">📊 Export Excel</button>
+            <button class="btn btn-primary">📄 Export PDF</button>
+        </div>
+
+        <div class="report-body">
+            <div class="bilan-columns">
+
+                <!-- ACTIF -->
+                <div class="bilan-section actif">
+                    <h3>Actif</h3>
+                    <table class="bilan-table">
+                        <tr><td class="bilan-cat">Actifs Courants</td><td></td></tr>
+                        <tr><td class="bilan-sub">Kès</td><td>45 200 HTG</td></tr>
+                        <tr><td class="bilan-sub">Bank</td><td>1 240 000 HTG</td></tr>
+                        <tr><td class="bilan-sub">Kliyan (Comptes Clients)</td><td>320 000 HTG</td></tr>
+                        <tr><td class="bilan-sub">Stock</td><td>2 850 000 HTG</td></tr>
+
+                        <tr><td class="bilan-cat">Actifs Non-Courants</td><td></td></tr>
+                        <tr><td class="bilan-sub">Immobilisations Brutes</td><td>8 450 000 HTG</td></tr>
+                        <tr><td class="bilan-sub">(-) Amortisman Akimile</td><td>-3 200 000 HTG</td></tr>
+
+                        <tr class="bilan-total-row"><td>Total Actif</td><td>9 705 200 HTG</td></tr>
+                    </table>
+                </div>
+
+                <!-- PASSIF + CAPITAUX PROPRES -->
+                <div class="bilan-section passif">
+                    <h3>Passif & Capitaux Propres</h3>
+                    <table class="bilan-table">
+                        <tr><td class="bilan-cat">Passifs Courants</td><td></td></tr>
+                        <tr><td class="bilan-sub">Founisè (Comptes Fournisseurs)</td><td>180 000 HTG</td></tr>
+                        <tr><td class="bilan-sub">Salè pou Peye</td><td>320 000 HTG</td></tr>
+
+                        <tr><td class="bilan-cat">Passifs Non-Courants</td><td></td></tr>
+                        <tr><td class="bilan-sub">Emprunts</td><td>1 500 000 HTG</td></tr>
+
+                        <tr><td class="bilan-cat">Capitaux Propres</td><td></td></tr>
+                        <tr><td class="bilan-sub">Capital Social</td><td>5 000 000 HTG</td></tr>
+                        <tr><td class="bilan-sub">Réserves</td><td>1 460 200 HTG</td></tr>
+                        <tr><td class="bilan-sub">Résultat de l'Exercice</td><td>1 245 000 HTG</td></tr>
+
+                        <tr class="bilan-total-row"><td>Total Passif & Capitaux</td><td>9 705 200 HTG</td></tr>
+                    </table>
+                </div>
+
+            </div>
+
+            <div class="grand-total balanced" id="balanceCheck">
+                <span class="label">🟢 Verifikasyon Ekilib</span>
+                <span class="value">Actif (9 705 200) = Passif + Capitaux (9 705 200)</span>
+            </div>
+        </div>
+
+        <div class="report-footer">
+            <span>Jenere pa Kontab Lakay · 02 Août 2026, 10:45</span>
+            <span>Dokiman sa a kalkile otomatikman apati Plan de Comptes la</span>
+        </div>
+    </div>
+
+</body>
+</html>
