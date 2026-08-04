@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte de Résultat — Kontab Lakay</title>
+    <style>
+        :root {
+            --primary: #4F46E5; --secondary: #10B981; --danger: #EF4444;
+            --text-dark: #0F172A; --text-muted: #64748B;
+            --bg-main: #F8FAFC; --border: #E2E8F0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', -apple-system, sans-serif; }
+        body { background:var(--bg-main); color:var(--text-dark); padding:24px; }
+
+        .report-container { max-width:900px; margin:0 auto; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(31,38,135,0.08); overflow:hidden; }
+
+        .report-header { padding:28px 32px; border-bottom:2px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
+        .company-info h1 { font-size:20px; font-weight:700; color:var(--primary); }
+        .company-info p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+        .report-meta { text-align:right; }
+        .report-meta h2 { font-size:18px; font-weight:600; }
+        .report-meta p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+        .report-actions { padding:12px 32px; background:#F1F5F9; display:flex; gap:8px; justify-content:flex-end; }
+        .btn { border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-outline { background:white; border:1px solid var(--border); color:var(--text-dark); }
+
+        .report-body { padding:32px; }
+
+        table.pl-table { width:100%; border-collapse:collapse; font-size:13px; margin-bottom:8px; }
+        table.pl-table td { padding:7px 0; border-bottom:1px solid #F1F5F9; }
+        table.pl-table td:last-child { text-align:right; font-weight:500; }
+        .pl-cat { font-weight:700; padding-top:16px !important; color:var(--primary); text-transform:uppercase; font-size:12px; letter-spacing:0.5px; border-bottom:2px solid var(--primary) !important; }
+        .pl-cat.charges { color:var(--danger); border-color:var(--danger) !important; }
+        .pl-sub { padding-left:16px !important; color:var(--text-dark); }
+        .pl-subtotal-row td { font-weight:700; border-top:1px solid var(--text-dark); border-bottom:none !important; padding-top:8px; }
+
+        .kpi-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px; margin:24px 0; }
+        .kpi-box { background:#F8FAFC; border:1px solid var(--border); border-radius:12px; padding:14px; }
+        .kpi-box .label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; }
+        .kpi-box .value { font-size:18px; font-weight:700; margin-top:4px; }
+
+        .net-result { margin-top:16px; padding:18px 24px; border-radius:12px; background:#D1FAE5; display:flex; justify-content:space-between; align-items:center; }
+        .net-result.negative { background:#FEE2E2; }
+        .net-result .label { font-weight:700; font-size:15px; }
+        .net-result .value { font-weight:800; font-size:22px; color:var(--secondary); }
+        .net-result.negative .value { color:var(--danger); }
+
+        .report-footer { padding:20px 32px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); flex-wrap:wrap; gap:8px; }
+
+        @media print {
+            body { background:white; padding:0; }
+            .report-actions { display:none; }
+            .report-container { box-shadow:none; border-radius:0; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-container">
+        <div class="report-header">
+            <div class="company-info">
+                <h1>LedgerFlow Market</h1>
+                <p>NIF: 0012-345-678 · Delmas 33, Port-au-Prince, Haïti</p>
+            </div>
+            <div class="report-meta">
+                <h2>📈 Compte de Résultat</h2>
+                <p>Période: 01 Juillet — 31 Juillet 2026</p>
+            </div>
+        </div>
+
+        <div class="report-actions">
+            <button class="btn btn-outline" onclick="window.print()">🖨️ Enprime</button>
+            <button class="btn btn-outline">📊 Export Excel</button>
+            <button class="btn btn-primary">📄 Export PDF</button>
+        </div>
+
+        <div class="report-body">
+
+            <!-- KPI rapid -->
+            <div class="kpi-row">
+                <div class="kpi-box"><div class="label">Chiffre d'Affaires</div><div class="value">890 000 HTG</div></div>
+                <div class="kpi-box"><div class="label">Total Charges</div><div class="value" style="color:var(--danger);">645 000 HTG</div></div>
+                <div class="kpi-box"><div class="label">Marge Brute</div><div class="value" style="color:var(--secondary);">42%</div></div>
+                <div class="kpi-box"><div class="label">Marge Nette</div><div class="value" style="color:var(--secondary);">27,5%</div></div>
+            </div>
+
+            <table class="pl-table">
+                <tr><td class="pl-cat">Revenus</td><td></td></tr>
+                <tr><td class="pl-sub">Ventes de Produits</td><td>820 000 HTG</td></tr>
+                <tr><td class="pl-sub">Prestations de Services</td><td>50 000 HTG</td></tr>
+                <tr><td class="pl-sub">Revenus Divers</td><td>20 000 HTG</td></tr>
+                <tr class="pl-subtotal-row"><td>Total Revenus</td><td>890 000 HTG</td></tr>
+            </table>
+
+            <table class="pl-table">
+                <tr><td class="pl-cat charges">Charges</td><td></td></tr>
+                <tr><td class="pl-sub">Loyer</td><td>85 000 HTG</td></tr>
+                <tr><td class="pl-sub">Électricité</td><td>32 000 HTG</td></tr>
+                <tr><td class="pl-sub">Internet</td><td>8 500 HTG</td></tr>
+                <tr><td class="pl-sub">Salaires</td><td>420 000 HTG</td></tr>
+                <tr><td class="pl-sub">Transport</td><td>55 000 HTG</td></tr>
+                <tr><td class="pl-sub">Maintenance</td><td>18 000 HTG</td></tr>
+                <tr><td class="pl-sub">Amortissements</td><td>26 500 HTG</td></tr>
+                <tr class="pl-subtotal-row"><td>Total Charges</td><td>645 000 HTG</td></tr>
+            </table>
+
+            <div class="net-result" id="netResult">
+                <span class="label">💵 Résultat Net de l'Exercice</span>
+                <span class="value">+245 000 HTG</span>
+            </div>
+        </div>
+
+        <div class="report-footer">
+            <span>Jenere pa Kontab Lakay · 02 Août 2026, 10:45</span>
+            <span>Résultat Net = Total Revenus − Total Charges</span>
+        </div>
+    </div>
+
+</body>
+</html>
