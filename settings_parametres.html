@@ -1,0 +1,284 @@
+<!-- ===================== 14. SETTINGS / PARAMÈTRES GÉNÉRAUX ===================== -->
+<section id="settings" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">Paramètres Généraux</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Sant kontwòl Kontab Lakay — antrepriz, itilizatè, sekirite & personnalisation</p>
+        </div>
+        <button id="saveSettingsBtn" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">💾 Sove Paramèt</button>
+    </div>
+
+    <!-- 1. Informations de l'Entreprise -->
+    <details class="chart-section" open style="padding:0;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏢 1 — Informations de l'Entreprise</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin-bottom:14px;">
+                <input type="text" placeholder="Non antrepriz" class="settings-input" value="LedgerFlow Market">
+                <input type="text" placeholder="Slogan" class="settings-input">
+                <input type="text" placeholder="NIF" class="settings-input">
+                <input type="text" placeholder="RC" class="settings-input">
+                <input type="text" placeholder="Adrès" class="settings-input">
+                <input type="text" placeholder="Vil" class="settings-input">
+                <input type="text" placeholder="Peyi" class="settings-input" value="Haïti">
+                <input type="tel" placeholder="Telefòn" class="settings-input">
+                <input type="email" placeholder="Email" class="settings-input">
+                <input type="text" placeholder="Sit entènèt" class="settings-input">
+            </div>
+            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Paramèt Legal</p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px;">
+                <select class="settings-input"><option>Deviz Prensipal — HTG</option></select>
+                <select class="settings-input"><option>Lang Prensipal — Kreyòl</option></select>
+                <select class="settings-input"><option>Fuseau Horaire — America/Port-au-Prince</option></select>
+                <input type="date" class="settings-input" placeholder="Dat Kòmansman Egzèsis Fiskal">
+            </div>
+        </div>
+    </details>
+
+    <!-- 2. Utilisateurs & Rôles -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 2 — Utilisateurs & Rôles</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Non</th><th>Email</th><th>Wòl</th><th>Estati</th></tr>
+                <tr><td>Emmanuel</td><td>emmanuel@ledgerflow.ht</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">👑 Super Admin</span></td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
+                <tr><td>Jean D.</td><td>jean@ledgerflow.ht</td><td><span class="ged-status" style="background:#F1F5F9;">💰 Comptable</span></td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
+                <tr><td>Marie L.</td><td>marie@ledgerflow.ht</td><td><span class="ged-status" style="background:#F1F5F9;">🛒 Caissier</span></td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
+            </table>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin:14px 0;">
+                <span class="ged-status" style="background:#F1F5F9;">👑 Super Admin</span>
+                <span class="ged-status" style="background:#F1F5F9;">🏢 Administrateur</span>
+                <span class="ged-status" style="background:#F1F5F9;">💰 Comptable</span>
+                <span class="ged-status" style="background:#F1F5F9;">🛒 Caissier</span>
+                <span class="ged-status" style="background:#F1F5F9;">📦 Gestionnaire Stock</span>
+                <span class="ged-status" style="background:#F1F5F9;">👨‍💼 RH</span>
+                <span class="ged-status" style="background:#F1F5F9;">📊 Analyste</span>
+                <span class="ged-status" style="background:#F1F5F9;">👁 Lecture Seule</span>
+            </div>
+            <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye Itilizatè</button>
+        </div>
+    </details>
+
+    <!-- 3. Sécurité -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 3 — Sécurité</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin-bottom:14px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Longè Minimòm Modpas</label>
+                    <input type="number" class="settings-input" value="8">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Session Timeout (min)</label>
+                    <input type="number" class="settings-input" value="30">
+                </div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ 2FA Aktive</span>
+                <span class="ged-status" style="background:#F1F5F9;">🌐 Restriksyon IP</span>
+            </div>
+            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Journal de Sécurité</p>
+            <table class="fin-table">
+                <tr><th>Dat/Lè</th><th>Itilizatè</th><th>Aksyon</th></tr>
+                <tr><td>02/08, 08:02</td><td>Jean D.</td><td>Connexion</td></tr>
+                <tr><td>01/08, 22:14</td><td>Inconnu</td><td style="color:var(--danger);">Tentative Échouée</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 4. Langue & Localisation + 5. Deviz & Taux de Change -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🌍 4 — Langue & Localisation</summary>
+            <div style="padding:0 20px 20px;">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">🇭🇹 Kreyòl</span>
+                    <span class="ged-status" style="background:#F1F5F9;">🇫🇷 Français</span>
+                    <span class="ged-status" style="background:#F1F5F9;">🇺🇸 English</span>
+                    <span class="ged-status" style="background:#F1F5F9;">🇪🇸 Español</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <select class="settings-input"><option>Fòma Dat: JJ/MM/AAAA</option></select>
+                    <select class="settings-input"><option>Fòma Lè: 24h</option></select>
+                </div>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💱 5 — Deviz & Taux de Change</summary>
+            <div style="padding:0 20px 20px;">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                    <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">HTG</span>
+                    <span class="ged-status" style="background:#F1F5F9;">USD</span>
+                    <span class="ged-status" style="background:#F1F5F9;">EUR</span>
+                    <span class="ged-status" style="background:#F1F5F9;">CAD</span>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✍️ To Manyèl</button>
+                    <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚡ To Otomatik</button>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <!-- 6. Paramètres Comptables -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧾 6 — Paramètres Comptables</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#F1F5F9;">Kont Aktif</span>
+                <span class="ged-status" style="background:#F1F5F9;">Kont Pasif</span>
+                <span class="ged-status" style="background:#F1F5F9;">Kapital</span>
+                <span class="ged-status" style="background:#F1F5F9;">Revni</span>
+                <span class="ged-status" style="background:#F1F5F9;">Depans</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:8px;">
+                <select class="settings-input"><option>Exercice Fiscal — 2026</option></select>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px;">🔒 Clôture Comptable</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px;">🔓 Réouverture</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 7. Paramètres TVA/Taks -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💰 7 — Paramètres TVA / Taks</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Non Taks</th><th>Pousantaj</th><th>Kalite</th></tr>
+                <tr><td>TCA</td><td style="text-align:right;">10%</td><td>Exclusif</td></tr>
+                <tr><td>TVA</td><td style="text-align:right;">10%</td><td>Inclusif</td></tr>
+                <tr><td>VAT</td><td style="text-align:right;">20%</td><td>Inclusif</td></tr>
+                <tr><td>GST</td><td style="text-align:right;">5%</td><td>Exclusif</td></tr>
+            </table>
+            <button style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajoute Taks</button>
+        </div>
+    </details>
+
+    <!-- 8. Paramètres Stock + 9. Paramètres Vente -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 8 — Paramètres Stock</summary>
+            <div style="padding:0 20px 20px;">
+                <div style="margin-bottom:10px;">
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Stock Minimum (default)</label>
+                    <input type="number" class="settings-input" value="10">
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Alertes Stock</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Méthode Valorisation</p>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span class="ged-status" style="background:#F1F5F9;">FIFO</span>
+                    <span class="ged-status" style="background:#F1F5F9;">LIFO</span>
+                    <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">CMP</span>
+                </div>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛒 9 — Paramètres Vente</summary>
+            <div style="padding:0 20px 20px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+                    <input type="text" class="settings-input" placeholder="Prefix Numérotation" value="LV-">
+                    <input type="number" class="settings-input" placeholder="Rabè Maksimòm %" value="15">
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Vente à Crédit</span>
+                </div>
+                <div style="margin-top:10px;">
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Limite Crédit (default)</label>
+                    <input type="number" class="settings-input" value="50000">
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <!-- 10. Paramètres RH -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👨‍💼 10 — Paramètres RH</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:10px;">
+            <div>
+                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Heures Normales/Jou</label>
+                <input type="number" class="settings-input" value="8">
+            </div>
+            <div>
+                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Tarif Heures Supplémentaires</label>
+                <input type="number" class="settings-input" value="1.5">
+            </div>
+            <div>
+                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Jou Konje/An</label>
+                <input type="number" class="settings-input" value="15">
+            </div>
+        </div>
+    </details>
+
+    <!-- 11. Notifications -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📧 11 — Notifications</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Email</span>
+            <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ WhatsApp</span>
+            <span class="ged-status" style="background:#F1F5F9;">SMS</span>
+            <span class="ged-status" style="background:#F1F5F9;">Push</span>
+        </div>
+    </details>
+
+    <!-- 12. Apparence -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🎨 12 — Apparence</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">☀️ Light</span>
+                <span class="ged-status" style="background:#F1F5F9;">🌙 Dark</span>
+                <span class="ged-status" style="background:#F1F5F9;">💻 System</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:8px;">
+                <input type="color" value="#4F46E5" style="border:1px solid #E2E8F0; border-radius:8px; padding:4px; height:36px;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px;">📤 Chanje Logo</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px;">📤 Chanje Icône App</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 13. Sauvegardes -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔄 13 — Sauvegardes</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Quotidien</span>
+                <span class="ged-status" style="background:#F1F5F9;">Hebdomadaire</span>
+                <span class="ged-status" style="background:#F1F5F9;">Mensuel</span>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Télécharger Backup</button>
+                <button style="background:var(--danger); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">♻️ Restaurer Backup</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- 14. Intégrations -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔗 14 — Intégrations</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Sèvis</th><th>Estati</th><th></th></tr>
+                <tr><td>📧 Gmail</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--danger); font-weight:600;">Déconnecter</a></td></tr>
+                <tr><td>📂 Google Drive</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
+                <tr><td>💬 WhatsApp Business</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
+                <tr><td>🤖 OpenAI</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
+                <tr><td>🏦 Banque</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 15. Audit & Logs -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 15 — Audit & Logs</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Dat/Lè</th><th>Itilizatè</th><th>Aksyon</th><th>Modil</th></tr>
+                <tr><td>02/08, 09:14</td><td>Jean D.</td><td>Création</td><td>Finance</td></tr>
+                <tr><td>01/08, 15:30</td><td>Marie L.</td><td>Modification</td><td>Ventes</td></tr>
+                <tr><td>01/08, 08:05</td><td>Emmanuel</td><td>Connexion</td><td>—</td></tr>
+            </table>
+        </div>
+    </details>
+</section>

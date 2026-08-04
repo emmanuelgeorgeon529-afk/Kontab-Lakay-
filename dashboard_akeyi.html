@@ -1,0 +1,113 @@
+<!-- ===================== 0. AKEYI (DASHBOARD PRINCIPAL) ===================== -->
+<section id="dashboard" class="view-section active">
+    <!-- Mesaj Byenveni -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">Bonjou Emmanuel 👋</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Byenvini nan Kontab Lakay · Lendi 3 Out 2026</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📊 Rapò</button>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">🛒 Nouvo Vant</button>
+        </div>
+    </div>
+
+    <!-- KPI Prensipal -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">💰 Kès Disponib</div><div class="value" style="color:var(--primary);">125 000 HTG</div></div>
+        <div class="kpi-card"><div class="label">📈 Lavant Jodi a</div><div class="value">45 000 HTG</div><div class="change up">↑ 8%</div></div>
+        <div class="kpi-card"><div class="label">📉 Depans Jodi a</div><div class="value">8 500 HTG</div></div>
+        <div class="kpi-card"><div class="label">🏆 Benefis Jodi a</div><div class="value" style="color:var(--secondary);">36 500 HTG</div></div>
+        <div class="kpi-card"><div class="label">👥 Kliyan Aktif</div><div class="value">125</div></div>
+        <div class="kpi-card"><div class="label">📦 Pwodwi nan Stock</div><div class="value">1 240</div></div>
+    </div>
+
+    <!-- Grafik Lavant -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Lavant 7 Dènye Jou</h3></div><div class="chart-container"><canvas id="dashSalesWeekChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Benefis pa Mwa</h3></div><div class="chart-container"><canvas id="dashProfitMonthChart"></canvas></div></div>
+    </div>
+
+    <!-- Sant Alèt -->
+    <details class="chart-section" open style="padding:0;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">⚠️ Sant Alèt</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>🔴 5 pwodwi prèske fini</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FFEDD5;"><span>🟠 3 kliyan ki gen dèt</span><span style="color:#C2410C; font-weight:600;">Atansyon</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>🟡 2 depans ap tann apwobasyon</span><span style="color:#B45309; font-weight:600;">An Atant</span></div>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#DBEAFE;"><span>🔵 1 kontra ap ekspire</span><span style="color:#1D4ED8; font-weight:600;">Enfo</span></div>
+        </div>
+    </details>
+
+    <!-- Aktivite Resan -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" open style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛒 Dènye Lavant</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><th>Facture</th><th>Kliyan</th><th>Montan</th></tr>
+                    <tr><td>LV-000245</td><td>Jean Pierre</td><td style="text-align:right;">2 500 HTG</td></tr>
+                    <tr><td>LV-000244</td><td>Marie Louis</td><td style="text-align:right;">4 200 HTG</td></tr>
+                </table>
+            </div>
+        </details>
+        <details class="chart-section" open style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💵 Dènye Depans</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><th>Référence</th><th>Libellé</th><th>Montan</th></tr>
+                    <tr><td>DEP-000032</td><td>Gaz</td><td style="text-align:right;">1 500 HTG</td></tr>
+                    <tr><td>DEP-000031</td><td>Internet</td><td style="text-align:right;">2 000 HTG</td></tr>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <!-- Travay Jodi a -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📅 Travay Jodi a</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:10px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox"> Apwouve depans</label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox"> Verifye stock</label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox"> Swiv kliyan ki gen dèt</label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox"> Fè backup done yo</label>
+        </div>
+    </details>
+
+    <!-- Ekip la -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 Ekip la</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Itilizatè</th><th>Dènye Koneksyon</th><th>Estati</th></tr>
+                <tr><td>Jean D.</td><td>Jodi a, 08:02</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Konekte</span></td></tr>
+                <tr><td>Marie L.</td><td>Jodi a, 08:25</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Konekte</span></td></tr>
+                <tr><td>Pierre A.</td><td>Yè, 17:40</td><td><span class="ged-status" style="background:#F1F5F9; color:var(--text-muted);">⚪ Dekonekte</span></td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- Aksyon Rapid -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🚀 Aksyon Rapid</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:10px;">
+            <button style="background:var(--primary); color:white; border:none; padding:14px 10px; border-radius:12px; font-weight:600; text-align:center;">🛒<br>Nouvo Vant</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:14px 10px; border-radius:12px; font-weight:600; text-align:center;">📦<br>Nouvo Pwodwi</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:14px 10px; border-radius:12px; font-weight:600; text-align:center;">💰<br>Nouvo Depans</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:14px 10px; border-radius:12px; font-weight:600; text-align:center;">👥<br>Nouvo Kliyan</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:14px 10px; border-radius:12px; font-weight:600; text-align:center;">🏭<br>Nouvo Founisè</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:14px 10px; border-radius:12px; font-weight:600; text-align:center;">📊<br>Rapò</button>
+        </div>
+    </details>
+
+    <!-- Rezime IA -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🤖 Rezime IA</summary>
+        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px; font-size:13px;">
+            <p>📈 Lavant ogmante 12% konpare ak semèn pase.</p>
+            <p>🏆 Pwodwi "Savon Sourire Pur" se pwodwi ki pi vann.</p>
+            <p style="color:var(--danger);">⚠️ Stock savon ap fini nan 8 jou.</p>
+            <p>👥 3 kliyan reprezante 45% revni mwa sa.</p>
+        </div>
+    </details>
+</section>

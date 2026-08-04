@@ -1,0 +1,227 @@
+<!-- ===================== 13. E-COMMERCE & OMNICANAL COMMERCE ===================== -->
+<section id="ecommerce" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">E-Commerce & Omnicanal Commerce</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Boutik online, WhatsApp Commerce, marketplace & tout chanèl lavant ansanm</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📱 WhatsApp Commerce</button>
+            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">🛒 Nouvo Pwodwi</button>
+        </div>
+    </div>
+
+    <!-- 13.1 Dashboard Omnicanal -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">🛒 Kòmand Sou Entènèt</div><div class="value" style="color:var(--primary);">142</div></div>
+        <div class="kpi-card"><div class="label">💰 Revni E-Commerce</div><div class="value">1 850 000 HTG</div></div>
+        <div class="kpi-card"><div class="label">📈 Lavant Omnicanal</div><div class="value">3 200 000 HTG</div></div>
+        <div class="kpi-card"><div class="label">👥 Kliyan Sou Entènèt</div><div class="value">96</div></div>
+        <div class="kpi-card"><div class="label">📦 Pwodwi Aktif</div><div class="value">210</div></div>
+        <div class="kpi-card"><div class="label">🚚 Livrezon An Kour</div><div class="value">14</div></div>
+        <div class="kpi-card"><div class="label">⭐ Taux Conversion</div><div class="value" style="color:var(--secondary);">3,2%</div></div>
+        <div class="kpi-card"><div class="label">📱 Lavant WhatsApp</div><div class="value">420 000 HTG</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Lavant pa Chanèl</h3></div><div class="chart-container"><canvas id="ecomChannelChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Revni pa Mwa</h3></div><div class="chart-container"><canvas id="ecomSalesChart"></canvas></div></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Kòmand pa Jou</h3></div><div class="chart-container"><canvas id="ecomOrdersDailyChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Top Pwodwi</h3></div><div class="chart-container"><canvas id="ecomTopProductsChart"></canvas></div></div>
+    </div>
+
+    <!-- 13.2 Boutique En Ligne -->
+    <details class="chart-section" open style="padding:0;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🌐 13.2 — Boutique En Ligne</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#F1F5F9;">🏠 Accueil</span>
+                <span class="ged-status" style="background:#F1F5F9;">🛍 Catalogue</span>
+                <span class="ged-status" style="background:#F1F5F9;">📦 Produits</span>
+                <span class="ged-status" style="background:#F1F5F9;">🛒 Panier</span>
+                <span class="ged-status" style="background:#F1F5F9;">💳 Paiement</span>
+                <span class="ged-status" style="background:#F1F5F9;">📞 Contact</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Responsive Mobile</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ SEO</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Multi-lang</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Multi-deviz</span>
+            </div>
+        </div>
+    </details>
+
+    <!-- 13.3 Catalogue Produits -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 13.3 — Catalogue Produits</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>SKU</th><th>Non Pwodwi</th><th>Kategori</th><th>Pri</th><th>Stock</th><th>Estati</th></tr>
+                <tr><td>SKU-001</td><td>Riz 25lb</td><td>Alimentaire</td><td style="text-align:right;">1 500 HTG</td><td style="text-align:right;">45</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Disponib</span></td></tr>
+                <tr><td>SKU-002</td><td>Luil Kris</td><td>Alimentaire</td><td style="text-align:right;">450 HTG</td><td style="text-align:right;">12</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Vedette</span></td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 13.4 Gestion des Commandes -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛒 13.4 — Gestion des Commandes</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>N° Kòmand</th><th>Kliyan</th><th>Total</th><th>Estati</th></tr>
+                <tr><td>CMD-0142</td><td>Nadège R.</td><td style="text-align:right;">4 500 HTG</td><td><span class="ged-status" style="background:#FFEDD5; color:#C2410C;">🟠 Expédition</span></td></tr>
+                <tr><td>CMD-0141</td><td>Frantz M.</td><td style="text-align:right;">2 200 HTG</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Livrée</span></td></tr>
+            </table>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Commande → Paiement → Préparation → Expédition → Livraison → Terminé</p>
+        </div>
+    </details>
+
+    <!-- 13.6 WhatsApp Commerce -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📱 13.6 — WhatsApp Commerce</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+                <div style="background:#F1F5F9; border-radius:12px 12px 12px 4px; padding:10px 14px; max-width:80%; font-size:13px;">Bonjou, mwen bezwen 5 sak diri.</div>
+                <div style="background:#EEF2FF; color:var(--primary); border-radius:12px 12px 4px 12px; padding:10px 14px; max-width:80%; font-size:13px; align-self:flex-end;">Kòmand lan kreye otomatikman — CMD-0143.</div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#F1F5F9;">📦 Katalòg</span>
+                <span class="ged-status" style="background:#F1F5F9;">💬 Chat Kliyan</span>
+                <span class="ged-status" style="background:#F1F5F9;">🛒 Kòmand Dirèk</span>
+                <span class="ged-status" style="background:#F1F5F9;">📄 Fakti Otomatik</span>
+                <span class="ged-status" style="background:#F1F5F9;">📲 Suivi Kòmand</span>
+            </div>
+        </div>
+    </details>
+
+    <!-- 13.7 Facebook & Instagram + 13.8 Marketplace -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📘 13.7 — Facebook & Instagram Shop</summary>
+            <div style="padding:0 20px 20px;">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Auto Sync</span>
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Stock Centralisé</span>
+                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Commandes Intégrées</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted);">Synchronizasyon: Produits · Prix · Stock</p>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏪 13.8 — Marketplace Integration</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#F1F5F9;">Facebook Marketplace</span>
+                <span class="ged-status" style="background:#F1F5F9;">Shopify</span>
+                <span class="ged-status" style="background:#F1F5F9;">WooCommerce</span>
+                <span class="ged-status" style="background:#F1F5F9;">Amazon</span>
+                <span class="ged-status" style="background:#F1F5F9;">eBay</span>
+            </div>
+        </details>
+    </div>
+
+    <!-- 13.9 Compte Client + 13.10 Gestion Livraison -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 13.9 — Compte Client</summary>
+            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#F1F5F9;">📦 Swiv Kòmand</span>
+                <span class="ged-status" style="background:#F1F5F9;">📄 Telechaje Fakti</span>
+                <span class="ged-status" style="background:#F1F5F9;">💳 Wè Peman</span>
+                <span class="ged-status" style="background:#F1F5F9;">⭐ Evalyasyon</span>
+                <span class="ged-status" style="background:#F1F5F9;">❤️ Favoris</span>
+            </div>
+        </details>
+        <details class="chart-section" style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🚚 13.10 — Gestion Livraison</summary>
+            <div style="padding:0 20px 20px;">
+                <table class="fin-table">
+                    <tr><th>Kòmand</th><th>Livreur</th><th>Estati</th></tr>
+                    <tr><td>CMD-0142</td><td>Jean D.</td><td><span class="ged-status" style="background:#DBEAFE; color:#1D4ED8;">📍 An Wout</span></td></tr>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <!-- 13.11 Marketing & Promotions -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🎯 13.11 — Marketing & Promotions</summary>
+        <div style="padding:0 20px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                <span class="ged-status" style="background:#F1F5F9;">🏷 Coupons</span>
+                <span class="ged-status" style="background:#F1F5F9;">🎁 Réductions</span>
+                <span class="ged-status" style="background:#F1F5F9;">🎯 Campagnes</span>
+                <span class="ged-status" style="background:#F1F5F9;">📧 Email Marketing</span>
+                <span class="ged-status" style="background:#F1F5F9;">📱 WhatsApp Marketing</span>
+            </div>
+            <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); margin-bottom:0;">
+                <div class="kpi-card"><div class="label">ROI</div><div class="value" style="color:var(--secondary);">3,2x</div></div>
+                <div class="kpi-card"><div class="label">Conversion</div><div class="value">3,2%</div></div>
+                <div class="kpi-card"><div class="label">Engagement</div><div class="value">8,4%</div></div>
+            </div>
+        </div>
+    </details>
+
+    <!-- 13.12 Analyse E-Commerce -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 13.12 — Analyse E-Commerce</summary>
+        <div style="padding:0 20px 20px;">
+            <table class="fin-table">
+                <tr><th>Endikatè</th><th>Valè</th></tr>
+                <tr><td>🛒 Taux Conversion</td><td style="text-align:right;">3,2%</td></tr>
+                <tr><td>📈 Valeur Moyenne Panier</td><td style="text-align:right;">3 450 HTG</td></tr>
+                <tr><td>👥 Nouveaux Clients</td><td style="text-align:right;">18</td></tr>
+                <tr><td>💰 Revenus</td><td style="text-align:right;">1 850 000 HTG</td></tr>
+            </table>
+        </div>
+    </details>
+
+    <!-- 13.13 IA Commerce -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🤖 13.13 — IA Commerce</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Konekte ak Modil 12 (IA & Automatisation)</p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📦 Pwodwi Vedette</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🎯 Pwomosyon</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">💰 Prix Optimal</span>
+                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📈 Produits Tendance</span>
+            </div>
+        </div>
+    </details>
+
+    <!-- 13.14 Notifications Automatiques -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔔 13.14 — Notifications Automatiques</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div>
+                <p style="font-size:13px; font-weight:600; margin-bottom:8px;">📧 Email</p>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span class="ged-status" style="background:#F1F5F9;">Nouvelle Commande</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Paiement Reçu</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Livraison</span>
+                </div>
+            </div>
+            <div>
+                <p style="font-size:13px; font-weight:600; margin-bottom:8px;">📱 WhatsApp</p>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span class="ged-status" style="background:#F1F5F9;">Confirmation</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Suivi</span>
+                    <span class="ged-status" style="background:#F1F5F9;">Livraison</span>
+                </div>
+            </div>
+        </div>
+    </details>
+
+    <!-- Pèmisyon -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 Pèmisyon</summary>
+        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px;">
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrateur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Responsable E-Commerce</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Gestion boutik</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Livreur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Livraison sèlman</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Client</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Pwòp kòmand li sèlman</p></div>
+        </div>
+    </details>
+</section>
