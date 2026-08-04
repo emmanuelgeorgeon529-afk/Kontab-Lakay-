@@ -7,7 +7,7 @@
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">🛒 POS</button>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">➕ Nouvo Vant</button>
+            <button onclick="VentesUI.openNewSaleModal()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">➕ Nouvo Vant</button>
         </div>
     </div>
 
@@ -93,11 +93,12 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Nimewo</th><th>Dat</th><th>Kliyan</th><th>Total</th><th>Estati</th></tr>
-                <tr><td>FT-000452</td><td>02/08/2026</td><td>Marie L.</td><td style="text-align:right;">45 000 HTG</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Peye</span></td></tr>
-                <tr><td>FT-000451</td><td>01/08/2026</td><td>Ti Boutik Delmas</td><td style="text-align:right;">12 500 HTG</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Atant</span></td></tr>
+                <tbody id="ventesTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Fakti</button>
+                <button onclick="VentesUI.openNewSaleModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Fakti</button>
                 <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📄 PDF</button>
                 <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📧 Email</button>
             </div>
@@ -251,4 +252,5 @@
     </details>
 
     <!-- 3.19 Objectifs Commerciaux -->
-    <details class="chart-section" open style="
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🎯 3.19 — Objectifs Commerci
