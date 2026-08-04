@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Général — Kontab Lakay</title>
+    <style>
+        :root {
+            --primary: #4F46E5; --secondary: #10B981; --danger: #EF4444;
+            --text-dark: #0F172A; --text-muted: #64748B;
+            --bg-main: #F8FAFC; --border: #E2E8F0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', -apple-system, sans-serif; }
+        body { background:var(--bg-main); color:var(--text-dark); padding:24px; }
+
+        .report-container { max-width:900px; margin:0 auto; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(31,38,135,0.08); overflow:hidden; }
+
+        .report-header { padding:28px 32px; border-bottom:2px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
+        .company-info h1 { font-size:20px; font-weight:700; color:var(--primary); }
+        .company-info p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+        .report-meta { text-align:right; }
+        .report-meta h2 { font-size:18px; font-weight:600; }
+        .report-meta p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+        .report-actions { padding:12px 32px; background:#F1F5F9; display:flex; gap:8px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+        .filter-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .filter-row input, .filter-row select { border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:13px; background:white; }
+        .actions-right { display:flex; gap:8px; }
+        .btn { border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-outline { background:white; border:1px solid var(--border); color:var(--text-dark); }
+
+        .report-body { padding:32px; }
+
+        .journal-entry { margin-bottom:18px; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+        .entry-header { background:#F8FAFC; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:12px; }
+        .entry-header .entry-num { font-weight:700; color:var(--primary); }
+        .entry-header .entry-date { color:var(--text-muted); }
+        .entry-header .entry-source { background:#EEF2FF; color:var(--primary); padding:2px 8px; border-radius:12px; font-weight:600; font-size:11px; }
+        .entry-header .entry-source.manual { background:#FEF3C7; color:#B45309; }
+
+        table.je-table { width:100%; border-collapse:collapse; font-size:13px; }
+        table.je-table td { padding:6px 14px; }
+        table.je-table td.compte-debit { padding-left:14px; }
+        table.je-table td.compte-credit { padding-left:34px; color:var(--text-muted); }
+        table.je-table td.num { text-align:right; width:110px; }
+        table.je-table tr:last-child td { padding-bottom:10px; }
+        .entry-libelle { padding:4px 14px 8px; font-size:12px; color:var(--text-muted); font-style:italic; }
+
+        .journal-totals { margin-top:24px; padding:16px 20px; border-radius:12px; background:#D1FAE5; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .journal-totals .label { font-weight:700; font-size:14px; }
+        .journal-totals .value { font-weight:700; font-size:14px; }
+
+        .report-footer { padding:20px 32px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); flex-wrap:wrap; gap:8px; }
+
+        @media print {
+            body { background:white; padding:0; }
+            .report-actions { display:none; }
+            .report-container { box-shadow:none; border-radius:0; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-container">
+        <div class="report-header">
+            <div class="company-info">
+                <h1>LedgerFlow Market</h1>
+                <p>NIF: 0012-345-678 · Delmas 33, Port-au-Prince, Haïti</p>
+            </div>
+            <div class="report-meta">
+                <h2>📒 Journal Général</h2>
+                <p>Période: 01 Juillet — 31 Juillet 2026</p>
+            </div>
+        </div>
+
+        <div class="report-actions">
+            <div class="filter-row">
+                <input type="date" value="2026-07-01">
+                <span style="color:var(--text-muted); font-size:12px;">à</span>
+                <input type="date" value="2026-07-31">
+                <select>
+                    <option>Toutes Sources</option>
+                    <option>Automatique</option>
+                    <option>Manuel</option>
+                </select>
+            </div>
+            <div class="actions-right">
+                <button class="btn btn-outline" onclick="window.print()">🖨️ Enprime</button>
+                <button class="btn btn-outline">📊 Export Excel</button>
+                <button class="btn btn-primary">📄 Export PDF</button>
+            </div>
+        </div>
+
+        <div class="report-body">
+
+            <div class="journal-entry">
+                <div class="entry-header">
+                    <span class="entry-num">JE-2026-07-001</span>
+                    <span class="entry-date">01/07/2026</span>
+                    <span class="entry-source">Automatique</span>
+                </div>
+                <table class="je-table">
+                    <tr><td class="compte-debit">1010 — Kès</td><td class="num">5 000</td><td class="num"></td></tr>
+                    <tr><td class="compte-credit">4010 — Ventes</td><td class="num"></td><td class="num">5 000</td></tr>
+                </table>
+                <div class="entry-libelle">Vente kach — Fakti LV-000230</div>
+            </div>
+
+            <div class="journal-entry">
+                <div class="entry-header">
+                    <span class="entry-num">JE-2026-07-002</span>
+                    <span class="entry-date">05/07/2026</span>
+                    <span class="entry-source manual">Manuel</span>
+                </div>
+                <table class="je-table">
+                    <tr><td class="compte-debit">6050 — Transport</td><td class="num">1 500</td><td class="num"></td></tr>
+                    <tr><td class="compte-credit">1010 — Kès</td><td class="num"></td><td class="num">1 500</td></tr>
+                </table>
+                <div class="entry-libelle">Achat fourniture bureau — DEP-000028</div>
+            </div>
+
+            <div class="journal-entry">
+                <div class="entry-header">
+                    <span class="entry-num">JE-2026-07-003</span>
+                    <span class="entry-date">12/07/2026</span>
+                    <span class="entry-source">Automatique</span>
+                </div>
+                <table class="je-table">
+                    <tr><td class="compte-debit">1030 — Kliyan</td><td class="num">12 500</td><td class="num"></td></tr>
+                    <tr><td class="compte-credit">4010 — Ventes</td><td class="num"></td><td class="num">12 500</td></tr>
+                </table>
+                <div class="entry-libelle">Vente sou kredi — Fakti LV-000238 — Ti Boutik Delmas</div>
+            </div>
+
+            <div class="journal-entry">
+                <div class="entry-header">
+                    <span class="entry-num">JE-2026-07-004</span>
+                    <span class="entry-date">18/07/2026</span>
+                    <span class="entry-source manual">Manuel</span>
+                </div>
+                <table class="je-table">
+                    <tr><td class="compte-debit">6050 — Transport</td><td class="num">2 000</td><td class="num"></td></tr>
+                    <tr><td class="compte-credit">1010 — Kès</td><td class="num"></td><td class="num">2 000</td></tr>
+                </table>
+                <div class="entry-libelle">Paiement gaz véhicule T-2201</div>
+            </div>
+
+            <div class="journal-entry">
+                <div class="entry-header">
+                    <span class="entry-num">JE-2026-07-005</span>
+                    <span class="entry-date">28/07/2026</span>
+                    <span class="entry-source">Automatique</span>
+                </div>
+                <table class="je-table">
+                    <tr><td class="compte-debit">1010 — Kès</td><td class="num">2 500</td><td class="num"></td></tr>
+                    <tr><td class="compte-credit">4010 — Ventes</td><td class="num"></td><td class="num">2 500</td></tr>
+                </table>
+                <div class="entry-libelle">Vente kach — Fakti LV-000245 — Jean Pierre</div>
+            </div>
+
+            <div class="journal-totals">
+                <span class="label">🟢 Total Journal (Débit = Crédit)</span>
+                <span class="value">23 500 HTG = 23 500 HTG</span>
+            </div>
+        </div>
+
+        <div class="report-footer">
+            <span>Jenere pa Kontab Lakay · 02 Août 2026, 10:45</span>
+            <span>5 ekriti montre sou 47 total nan peryòd la — itilize filtè pou wè plis</span>
+        </div>
+    </div>
+
+</body>
+</html>
