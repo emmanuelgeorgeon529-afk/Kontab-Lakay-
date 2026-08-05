@@ -24,8 +24,8 @@ const SalesService = (() => {
     // ---------- KREYE VANT (CRUD PRENSIPAL) ----------
 
     /**
-     * Kreye yon nouvo vant. Fè baisse stock otomatikman epi
-     * kreye yon ekriti jounal double-entry (Kès/Kliyan -> Ventes).
+     * Kreye yon nouvo vant. Fè baisse stock otomatikman, verifye limit kredi
+     * si mòd peman se 'kredi', epi kreye yon ekriti jounal double-entry.
      *
      * @param {Object} saleData
      *   saleData.kliyanId    - ID kliyan (oswa null pou "kliyan divès")
@@ -41,6 +41,17 @@ const SalesService = (() => {
             // ---- 1. TOUT LEKTI DWE FÈT ANVAN NENPÒT EKRITI ----
             const productRefs = saleData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+
+            // Lekti dosye kliyan si vant lan se sou kredi (bezwen pou verifye limit)
+            let kliyanRef = null;
+            let kliyanDoc = null;
+            if (saleData.mòdPeman === 'kredi' && saleData.kliyanId) {
+                kliyanRef = bizRef.collection('kliyan').doc(saleData.kliyanId);
+                kliyanDoc = await transaction.get(kliyanRef);
+                if (!kliyanDoc.exists) {
+                    throw new Error("Kliyan sa a pa egziste.");
+                }
+            }
 
             // Verifye stock disponib AVAN nou ekri anyen
             let total = 0;
@@ -61,6 +72,23 @@ const SalesService = (() => {
                     nouvoKantite: data.kantiteStock - kantiteDemande
                 });
             });
+
+            // ---- VERIFYE LIMIT KREDI (si aplikab) ----
+            let dètAvan = 0;
+            let dètApre = 0;
+            if (kliyanDoc) {
+                dètAvan = kliyanDoc.data().dèt || 0;
+                dètApre = dètAvan + total;
+                const limitKredi = kliyanDoc.data().limitKredi || 0;
+                if (limitKredi > 0 && dètApre > limitKredi) {
+                    throw new Error(
+                        `Vant sa a depase limit kredi kliyan an. ` +
+                        `Limit: ${limitKredi.toLocaleString()} HTG, ` +
+                        `Dèt aktyèl: ${dètAvan.toLocaleString()} HTG, ` +
+                        `Dèt apre vant: ${dètApre.toLocaleString()} HTG.`
+                    );
+                }
+            }
 
             // ---- 2. NIMEWO FAKTI SEKANSYÈL (dwe fèt anvan lòt ekriti) ----
             const nimewoFakti = await getNextInvoiceNumber(transaction, bizRef);
@@ -100,12 +128,10 @@ const SalesService = (() => {
                 sous: 'automatique'
             });
 
-            // 3d. Si kredi, mete ajou dèt kliyan
-            if (saleData.mòdPeman === 'kredi' && saleData.kliyanId) {
-                const kliyanRef = bizRef.collection('kliyan').doc(saleData.kliyanId);
-                transaction.update(kliyanRef, {
-                    dèt: firebase.firestore.FieldValue.increment(total)
-                });
+            // 3d. Si kredi, mete ajou dèt kliyan (valè kalkile, PA increment,
+            //     paske nou deja li dosye a pi wo pou verifye limit lan)
+            if (kliyanRef) {
+                transaction.update(kliyanRef, { dèt: dètApre });
             }
 
             return { id: venteRef.id, nimewoFakti, total };
@@ -147,6 +173,14 @@ const SalesService = (() => {
             const productRefs = vente.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
 
+            // Si vant lan te kredi, li dosye kliyan an tou (pou retire dèt)
+            let kliyanRef = null;
+            let kliyanDoc = null;
+            if (vente.mòdPeman === 'kredi' && vente.kliyanId) {
+                kliyanRef = bizRef.collection('kliyan').doc(vente.kliyanId);
+                kliyanDoc = await transaction.get(kliyanRef);
+            }
+
             // Remèt stock
             productDocs.forEach((doc, i) => {
                 if (doc.exists) {
@@ -177,12 +211,11 @@ const SalesService = (() => {
                 rezon: rezon
             });
 
-            // Si te kredi, retire dèt kliyan
-            if (vente.mòdPeman === 'kredi' && vente.kliyanId) {
-                const kliyanRef = bizRef.collection('kliyan').doc(vente.kliyanId);
-                transaction.update(kliyanRef, {
-                    dèt: firebase.firestore.FieldValue.increment(-vente.total)
-                });
+            // Si te kredi, retire dèt kliyan (valè kalkile, pa increment)
+            if (kliyanRef && kliyanDoc && kliyanDoc.exists) {
+                const dètAktyèl = kliyanDoc.data().dèt || 0;
+                const nouvoDèt = Math.max(0, dètAktyèl - vente.total);
+                transaction.update(kliyanRef, { dèt: nouvoDèt });
             }
         });
     }
