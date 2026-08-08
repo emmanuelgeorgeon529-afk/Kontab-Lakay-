@@ -4,12 +4,25 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "docs/**",
+      "tests/**",
+      "backups/**",
+      "cloud-functions/**",
+      "mobile/**"
     ],
     "rewrites": [
       {
         "source": "**",
         "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/service-worker.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
       }
     ]
   },
