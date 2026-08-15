@@ -1,15 +1,14 @@
 // js/core/config.js
-// SÈL fichye ki inisyalize Firebase epi kreye window.db ak window.auth.
-// Okenn lòt fichye pa dwe fè "const db = firebase.firestore()" ankò.
-
 (function () {
     const firebaseConfig = {
-        apiKey: "REMPLASE_AK_KLE_OU",
-        authDomain: "REMPLASE.firebaseapp.com",
-        projectId: "REMPLASE",
-        storageBucket: "REMPLASE.appspot.com",
-        messagingSenderId: "REMPLASE",
-        appId: "REMPLASE"
+        apiKey: "AIzaSyCloroCtw8hrdVQH-Cj1aIbJpb-HG5UhMI",
+        authDomain: "kontab-lakay-5b169.firebaseapp.com",
+        databaseURL: "https://kontab-lakay-5b169-default-rtdb.firebaseio.com",
+        projectId: "kontab-lakay-5b169",
+        storageBucket: "kontab-lakay-5b169.firebasestorage.app",
+        messagingSenderId: "221994063902",
+        appId: "1:221994063902:web:5248558df3775341d6f60f",
+        measurementId: "G-CXH1G88X4D"
     };
 
     if (!firebase.apps.length) {
@@ -19,5 +18,5 @@
     window.db = firebase.firestore();
     window.auth = firebase.auth();
 
-    console.log('✅ config.js: window.db ak window.auth pare.');
+    console.log('config.js: window.db ak window.auth pare.');
 })();
