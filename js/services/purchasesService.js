@@ -1,0 +1,186 @@
+// js/services/purchasesService.js
+const PurchasesService = (() => {
+
+    function getBizRef() {
+        if (!window.currentCompanyId) throw new Error("Pa gen biznis aktif chwazi.");
+        return window.db.collection('biznis').doc(window.currentCompanyId);
+    }
+
+    async function getNextPurchaseNumber(transaction, bizRef) {
+        const counterRef = bizRef.collection('konte').doc('acha');
+        const counterDoc = await transaction.get(counterRef);
+        let nextNum = 1;
+        if (counterDoc.exists) {
+            nextNum = (counterDoc.data().dènyeNimewo || 0) + 1;
+        }
+        transaction.set(counterRef, { dènyeNimewo: nextNum }, { merge: true });
+        return 'ACH-' + String(nextNum).padStart(6, '0');
+    }
+
+    /**
+     * Kreye yon acha. Ogmante stock otomatikman, kreye ekriti jounal
+     * (Débit Stock, Crédit Kès/Founisè), e si kredi, ogmante dèt founisè.
+     *
+     * @param {Object} purchaseData
+     *   purchaseData.founisèId  - ID founisè (obligatwa)
+     *   purchaseData.founisèNon - non founisè pou afichaj rapid
+     *   purchaseData.mòdPeman   - 'kach' | 'kredi' | 'transfè'
+     *   purchaseData.atik       - [{ pwodwiId, non, kantite, priInite }]
+     */
+    async function createPurchase(purchaseData) {
+        if (!purchaseData.founisèId) {
+            throw new Error("Founisè a obligatwa pou yon acha.");
+        }
+
+        const bizRef = getBizRef();
+
+        return window.db.runTransaction(async (transaction) => {
+            // ---- 1. TOUT LEKTI ANVAN NENPÒT EKRITI ----
+            const productRefs = purchaseData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
+            const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+
+            const founisèRef = bizRef.collection('founisè').doc(purchaseData.founisèId);
+            const founisèDoc = await transaction.get(founisèRef);
+            if (!founisèDoc.exists) throw new Error("Founisè sa a pa egziste.");
+
+            let total = 0;
+            const stockUpdates = [];
+            productDocs.forEach((doc, i) => {
+                if (!doc.exists) {
+                    throw new Error(`Pwodwi "${purchaseData.atik[i].non}" pa egziste.`);
+                }
+                const data = doc.data();
+                const kantite = purchaseData.atik[i].kantite;
+                const sousTotal = kantite * purchaseData.atik[i].priInite;
+                total += sousTotal;
+                stockUpdates.push({
+                    ref: productRefs[i],
+                    nouvoKantite: (data.kantiteStock || 0) + kantite
+                });
+            });
+
+            // ---- 2. NIMEWO ACHA SEKANSYÈL ----
+            const nimewoAcha = await getNextPurchaseNumber(transaction, bizRef);
+
+            // ---- 3. EKRITI ----
+
+            // 3a. Ogmante stock pou chak pwodwi
+            stockUpdates.forEach(u => {
+                transaction.update(u.ref, { kantiteStock: u.nouvoKantite });
+            });
+
+            // 3b. Kreye dokiman acha a
+            const achatRef = bizRef.collection('acha').doc();
+            transaction.set(achatRef, {
+                nimewoAcha,
+                founisèId: purchaseData.founisèId,
+                founisèNon: purchaseData.founisèNon || founisèDoc.data().non,
+                mòdPeman: purchaseData.mòdPeman,
+                atik: purchaseData.atik,
+                total,
+                estati: 'aktif',
+                dat: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // 3c. Ekriti jounal: Débit Stock (1040), Crédit Kès(1010)/Founisè(2010)
+            const journalRef = bizRef.collection('jounal').doc();
+            const kontCredit = purchaseData.mòdPeman === 'kredi' ? '2010' : '1010';
+            transaction.set(journalRef, {
+                nimewoEkriti: nimewoAcha,
+                dat: firebase.firestore.FieldValue.serverTimestamp(),
+                liy: [
+                    { kont: '1040', débit: total, crédit: 0 },
+                    { kont: kontCredit, débit: 0, crédit: total }
+                ],
+                referans: achatRef.id,
+                sous: 'automatique'
+            });
+
+            // 3d. Si kredi, ogmante dèt founisè
+            if (purchaseData.mòdPeman === 'kredi') {
+                const dètAktyèl = founisèDoc.data().dèt || 0;
+                transaction.update(founisèRef, { dèt: dètAktyèl + total });
+            }
+
+            return { id: achatRef.id, nimewoAcha, total };
+        });
+    }
+
+    async function getPurchases(limitCount = 50) {
+        const bizRef = getBizRef();
+        const snapshot = await bizRef.collection('acha')
+            .orderBy('dat', 'desc')
+            .limit(limitCount)
+            .get();
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    async function getPurchaseById(purchaseId) {
+        const bizRef = getBizRef();
+        const doc = await bizRef.collection('acha').doc(purchaseId).get();
+        if (!doc.exists) throw new Error("Acha sa a pa egziste.");
+        return { id: doc.id, ...doc.data() };
+    }
+
+    async function cancelPurchase(purchaseId, rezon) {
+        const bizRef = getBizRef();
+
+        return window.db.runTransaction(async (transaction) => {
+            const achatRef = bizRef.collection('acha').doc(purchaseId);
+            const achatDoc = await transaction.get(achatRef);
+            if (!achatDoc.exists) throw new Error("Acha sa a pa egziste.");
+            const acha = achatDoc.data();
+            if (acha.estati === 'anile') throw new Error("Acha sa a deja anile.");
+
+            const productRefs = acha.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
+            const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+
+            let founisèRef = null;
+            let founisèDoc = null;
+            if (acha.mòdPeman === 'kredi') {
+                founisèRef = bizRef.collection('founisè').doc(acha.founisèId);
+                founisèDoc = await transaction.get(founisèRef);
+            }
+
+            productDocs.forEach((doc, i) => {
+                if (doc.exists) {
+                    const stockAktyèl = doc.data().kantiteStock || 0;
+                    const nouvoKantite = stockAktyèl - acha.atik[i].kantite;
+                    if (nouvoKantite < 0) {
+                        throw new Error(`Pa ka anile: stock "${acha.atik[i].non}" ta vin negatif (deja itilize/vann).`);
+                    }
+                    transaction.update(productRefs[i], { kantiteStock: nouvoKantite });
+                }
+            });
+
+            transaction.update(achatRef, {
+                estati: 'anile',
+                rezonAnilasyon: rezon,
+                datAnilasyon: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            const rvRef = bizRef.collection('jounal').doc();
+            const kontCredit = acha.mòdPeman === 'kredi' ? '2010' : '1010';
+            transaction.set(rvRef, {
+                nimewoEkriti: 'RV-' + acha.nimewoAcha.replace('ACH-', ''),
+                dat: firebase.firestore.FieldValue.serverTimestamp(),
+                liy: [
+                    { kont: kontCredit, débit: acha.total, crédit: 0 },
+                    { kont: '1040', débit: 0, crédit: acha.total }
+                ],
+                referans: purchaseId,
+                sous: 'anilasyon',
+                rezon
+            });
+
+            if (founisèRef && founisèDoc && founisèDoc.exists) {
+                const dètAktyèl = founisèDoc.data().dèt || 0;
+                const nouvoDèt = Math.max(0, dètAktyèl - acha.total);
+                transaction.update(founisèRef, { dèt: nouvoDèt });
+            }
+        });
+    }
+
+    return { createPurchase, getPurchases, getPurchaseById, cancelPurchase };
+})();
+window.PurchasesService = PurchasesService;
