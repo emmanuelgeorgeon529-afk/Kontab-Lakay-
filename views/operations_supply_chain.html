@@ -7,7 +7,7 @@
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📥 Import Excel</button>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">📦 Nouvo Pwodwi</button>
+            <button onclick="VentesUI.openNewProductModal()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">📦 Nouvo Pwodwi</button>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
                 <tr><td>SKU-003</td><td>Savon Charbon</td><td>Hygiène</td><td style="text-align:right;">45 HTG</td><td style="text-align:right;">75 HTG</td><td>Pièce</td></tr>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajouter</button>
+                <button onclick="VentesUI.openNewProductModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajouter</button>
                 <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✏️ Modifier</button>
                 <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🚫 Désactiver</button>
                 <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Import Excel</button>
@@ -123,39 +123,32 @@
     <!-- 4.5 Gestion des Achats -->
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛒 4.5 — Gestion des Achats</summary>
-        <div style="padding:0 20px 20px;">
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Demandes d'Achat</p>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>Produit</th><th>Quantité</th><th>Justification</th><th>Estati</th></tr>
-                <tr><td>Riz 25lb</td><td style="text-align:right;">100 sacs</td><td>Réappro stock faible</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Atant</span></td></tr>
+                <tr><th>N° Acha</th><th>Founisè</th><th>Total</th><th>Estati</th></tr>
+                <tbody id="achatTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
-            <button style="margin:10px 0 18px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">Soumettre</button>
-
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Bons de Commande</p>
-            <table class="fin-table">
-                <tr><th>N° BC</th><th>Founisè</th><th>Total</th><th>Estati</th></tr>
-                <tr><td>BC-0034</td><td>Distributeur National</td><td style="text-align:right;">150 000 HTG</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Envoyé</span></td></tr>
-            </table>
-            <button style="margin:10px 0 18px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">Envoyer au Founisè</button>
-
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Réception Marchandises</p>
-            <table class="fin-table">
-                <tr><th>N° BC</th><th>Quantité Reçue</th><th>Dat Réception</th></tr>
-                <tr><td>BC-0033</td><td style="text-align:right;">95 sacs</td><td>28/07/2026</td></tr>
-            </table>
-            <button style="margin-top:10px; background:var(--secondary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">Valider Réception</button>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.openNewPurchaseModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Acha</button>
+            </div>
         </div>
     </details>
 
     <!-- 4.6 Fournisseurs -->
-    <details class="chart-section" style="padding:0; margin-top:16px;">
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🚚 4.6 — Fournisseurs</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>Founisè</th><th>Pays</th><th>Solde Dû</th><th>Achats Totaux</th></tr>
-                <tr><td>Distributeur National</td><td>Haïti</td><td style="text-align:right; color:var(--danger);">85 000 HTG</td><td style="text-align:right;">1 240 000 HTG</td></tr>
-                <tr><td>Import Caraïbes SA</td><td>Rép. Dominicaine</td><td style="text-align:right;">0 HTG</td><td style="text-align:right;">560 000 HTG</td></tr>
+                <tr><th>Founisè</th><th>Telefòn</th><th>Solde Dû</th></tr>
+                <tbody id="founisèTableBody">
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.openNewSupplierModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Founisè</button>
+            </div>
         </div>
     </details>
 
@@ -183,79 +176,80 @@
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">⚙️ Production Réalisée</button>
         </div>
     </details>
-    
+
     <!-- ===================== MODAL: NOUVO FOUNISÈ ===================== -->
-<div id="newSupplierModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:white; border-radius:16px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; padding:24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <h3 style="font-size:18px; font-weight:700;">🚚 Nouvo Founisè</h3>
-            <span onclick="OperationsUI.closeNewSupplierModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
-        </div>
-        <div id="newSupplierError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Non *</label>
-        <input type="text" id="suppNon" class="settings-input" style="margin-bottom:12px;" placeholder="Non founisè oswa antrepriz">
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Telefòn</label>
-        <input type="tel" id="suppTelefòn" class="settings-input" style="margin-bottom:12px;" placeholder="+509 ....">
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Adrès</label>
-        <input type="text" id="suppAdrès" class="settings-input" style="margin-bottom:20px;">
-
-        <button id="suppSubmitBtn" onclick="OperationsUI.submitNewSupplier()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Kreye Founisè</button>
-    </div>
-</div>
-
-<!-- ===================== MODAL: NOUVO ACHA ===================== -->
-<div id="newPurchaseModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:white; border-radius:16px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto; padding:24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <h3 style="font-size:18px; font-weight:700;">📦 Nouvo Acha</h3>
-            <span onclick="OperationsUI.closeNewPurchaseModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
-        </div>
-        <div id="newPurchaseError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Founisè</label>
-        <select id="achatFounisèSelect" class="settings-input" style="margin-bottom:4px;">
-            <option value="">— Chwazi founisè —</option>
-        </select>
-        <a onclick="OperationsUI.openNewSupplierModal()" style="font-size:12px; color:var(--primary); cursor:pointer; display:inline-block; margin-bottom:14px;">➕ Nouvo Founisè</a>
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pwodwi</label>
-        <select id="achatPwodwiSelect" class="settings-input" style="margin-bottom:14px;">
-            <option value="">— Chwazi pwodwi —</option>
-        </select>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-            <div>
-                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kantite</label>
-                <input type="number" id="achatKantite" class="settings-input" value="1" min="1">
+    <div id="newSupplierModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">🚚 Nouvo Founisè</h3>
+                <span onclick="OperationsUI.closeNewSupplierModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
             </div>
-            <div>
-                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pri Inite (HTG)</label>
-                <input type="number" id="achatPriInite" class="settings-input" value="0" min="0">
-            </div>
+            <div id="newSupplierError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Non *</label>
+            <input type="text" id="suppNon" class="settings-input" style="margin-bottom:12px;" placeholder="Non founisè oswa antrepriz">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Telefòn</label>
+            <input type="tel" id="suppTelefòn" class="settings-input" style="margin-bottom:12px;" placeholder="+509 ....">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Adrès</label>
+            <input type="text" id="suppAdrès" class="settings-input" style="margin-bottom:20px;">
+
+            <button id="suppSubmitBtn" onclick="OperationsUI.submitNewSupplier()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Kreye Founisè</button>
         </div>
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Rabais (%) — opsyonèl</label>
-        <input type="number" id="achatRabaisPousantaj" class="settings-input" value="0" min="0" max="100" style="margin-bottom:14px;">
-
-        <button onclick="OperationsUI.addItemToPurchaseCart()" style="width:100%; background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px; margin-bottom:14px;">➕ Ajoute nan Panye</button>
-
-        <div id="achatPanyeList" style="margin-bottom:14px; font-size:13px;"></div>
-        <div style="text-align:right; font-weight:700; margin-bottom:14px;">Total: <span id="achatPanyeTotal">0</span> HTG</div>
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Frè Accessoires (transpò, dwàn — opsyonèl)</label>
-        <input type="number" id="achatFraisAccessoires" class="settings-input" value="0" min="0" style="margin-bottom:14px;">
-
-        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Mòd Peman</label>
-        <select id="achatMòdPeman" class="settings-input" style="margin-bottom:20px;">
-            <option value="kach">Kach</option>
-            <option value="transfè">Transfè Bank</option>
-            <option value="kredi">Kredi (Dèt Founisè)</option>
-        </select>
-
-        <button id="achatSubmitBtn" onclick="OperationsUI.submitNewPurchase()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Konfime Acha</button>
     </div>
-</div>
+
+    <!-- ===================== MODAL: NOUVO ACHA ===================== -->
+    <div id="newPurchaseModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">📦 Nouvo Acha</h3>
+                <span onclick="OperationsUI.closeNewPurchaseModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="newPurchaseError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Founisè</label>
+            <select id="achatFounisèSelect" class="settings-input" style="margin-bottom:4px;">
+                <option value="">— Chwazi founisè —</option>
+            </select>
+            <a onclick="OperationsUI.openNewSupplierModal()" style="font-size:12px; color:var(--primary); cursor:pointer; display:inline-block; margin-bottom:14px;">➕ Nouvo Founisè</a>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pwodwi</label>
+            <select id="achatPwodwiSelect" class="settings-input" style="margin-bottom:4px;">
+                <option value="">— Chwazi pwodwi —</option>
+            </select>
+            <a onclick="VentesUI.openNewProductModal()" style="font-size:12px; color:var(--primary); cursor:pointer; display:inline-block; margin-bottom:14px;">➕ Nouvo Pwodwi</a>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kantite</label>
+                    <input type="number" id="achatKantite" class="settings-input" value="1" min="1">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pri Inite (HTG)</label>
+                    <input type="number" id="achatPriInite" class="settings-input" value="0" min="0">
+                </div>
+            </div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Rabais (%) — opsyonèl</label>
+            <input type="number" id="achatRabaisPousantaj" class="settings-input" value="0" min="0" max="100" style="margin-bottom:14px;">
+
+            <button onclick="OperationsUI.addItemToPurchaseCart()" style="width:100%; background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px; margin-bottom:14px;">➕ Ajoute nan Panye</button>
+
+            <div id="achatPanyeList" style="margin-bottom:14px; font-size:13px;"></div>
+            <div style="text-align:right; font-weight:700; margin-bottom:14px;">Total: <span id="achatPanyeTotal">0</span> HTG</div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Frè Accessoires (transpò, dwàn — opsyonèl)</label>
+            <input type="number" id="achatFraisAccessoires" class="settings-input" value="0" min="0" style="margin-bottom:14px;">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Mòd Peman</label>
+            <select id="achatMòdPeman" class="settings-input" style="margin-bottom:20px;">
+                <option value="kach">Kach</option>
+                <option value="transfè">Transfè Bank</option>
+                <option value="kredi">Kredi (Dèt Founisè)</option>
+            </select>
+
+            <button id="achatSubmitBtn" onclick="OperationsUI.submitNewPurchase()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Konfime Acha</button>
+        </div>
+    </div>
 </section>
