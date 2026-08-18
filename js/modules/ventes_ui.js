@@ -154,6 +154,7 @@ const VentesUI = (() => {
 
             closeNewSaleModal();
             await loadSalesTable();
+            await loadDashboardStats();
             alert(`✅ Vant kreye avèk siksè! Nimewo Fakti: ${result.nimewoFakti}`);
         } catch (err) {
             showError('newSaleError', err.message || 'Yon erè rive pandan kreyasyon vant lan.');
@@ -196,6 +197,7 @@ const VentesUI = (() => {
             const kliyanSelect = document.getElementById('saleKliyanSelect');
             if (kliyanSelect) kliyanSelect.value = result.id;
             await loadClientsTable();
+            await loadDashboardStats();
             alert(`✅ Kliyan "${non}" kreye avèk siksè!`);
         } catch (err) {
             showError('newCustomerError', err.message || 'Erè pandan kreyasyon kliyan an.');
@@ -264,6 +266,7 @@ const VentesUI = (() => {
         try {
             await window.SalesService.cancelSale(saleId, rezon.trim());
             await loadSalesTable();
+            await loadDashboardStats();
             alert(`✅ Fakti ${nimewoFakti} anile.`);
         } catch (err) {
             alert(`❌ Erè: ${err.message}`);
@@ -303,6 +306,7 @@ const VentesUI = (() => {
             await window.CustomersService.recordPayment(kliyanPemanId, montan, mòdPeman);
             closePaymentModal();
             await loadClientsTable();
+            await loadDashboardStats();
             alert('✅ Peman anrejistre avèk siksè!');
         } catch (err) {
             showError('paymentError', err.message || 'Erè pandan anrejistreman peman an.');
@@ -378,6 +382,76 @@ const VentesUI = (() => {
         }
     }
 
+    async function loadDashboardStats() {
+        try {
+            const [sales, clients] = await Promise.all([
+                window.SalesService.getSales(500),
+                window.CustomersService.getCustomers(true)
+            ]);
+
+            const salesActives = sales.filter(s => s.estati !== 'anile');
+            const jodiA = new Date();
+            jodiA.setHours(0, 0, 0, 0);
+            const kòmansmanMwa = new Date(jodiA.getFullYear(), jodiA.getMonth(), 1);
+
+            let totalJodiA = 0, totalMwa = 0, totalGeneral = 0;
+            const venteParKliyan = {};
+            const venteParVandè = {};
+
+            salesActives.forEach(s => {
+                const dat = s.dat?.toDate ? s.dat.toDate() : null;
+                const total = s.total || 0;
+                totalGeneral += total;
+
+                if (dat && dat >= jodiA) totalJodiA += total;
+                if (dat && dat >= kòmansmanMwa) totalMwa += total;
+
+                const kliyanKey = s.kliyanNon || 'Kliyan Divès';
+                venteParKliyan[kliyanKey] = (venteParKliyan[kliyanKey] || 0) + total;
+
+                const vandèKey = s.vandèId || 'Enkoni';
+                venteParVandè[vandèKey] = (venteParVandè[vandèKey] || 0) + total;
+            });
+
+            const totalDèt = clients.reduce((sum, k) => sum + (k.dèt || 0), 0);
+
+            const topKliyanList = Object.entries(venteParKliyan).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const topVandèList = Object.entries(venteParVandè).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            const setHTML = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+            setText('kpiLavantJodi', totalJodiA.toLocaleString() + ' HTG');
+            setText('kpiLavantMwa', totalMwa.toLocaleString() + ' HTG');
+            setText('kpiNouvoKliyan', clients.length);
+            setText('kpiChifAfè', totalGeneral.toLocaleString() + ' HTG');
+            setText('kpiDètKliyan', totalDèt.toLocaleString() + ' HTG');
+
+            setText('kpiTopKliyan', topKliyanList.length ? topKliyanList[0][0] : '—');
+            setHTML('topKliyanList', topKliyanList.length
+                ? topKliyanList.map(([non, total], i) => `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span>${i + 1}. ${non}</span><span>${total.toLocaleString()} HTG</span></div>`).join('')
+                : '<span style="color:var(--text-muted);">Pa gen done</span>');
+
+            setText('kpiTopVandè', topVandèList.length ? topVandèList[0][0] : '—');
+            setHTML('topVandèList', topVandèList.length
+                ? topVandèList.map(([non, total], i) => `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span>${i + 1}. ${non}</span><span>${total.toLocaleString()} HTG</span></div>`).join('')
+                : '<span style="color:var(--text-muted);">Pa gen done</span>');
+
+        } catch (err) {
+            console.error('Erè kalkil dashboard:', err);
+        }
+    }
+
+    function toggleTopList(elId) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        const arrowId = elId === 'topKliyanList' ? 'topKliyanArrow' : 'topVandèArrow';
+        const arrow = document.getElementById(arrowId);
+        const isOuvri = el.style.display !== 'none';
+        el.style.display = isOuvri ? 'none' : 'block';
+        if (arrow) arrow.textContent = isOuvri ? '▾' : '▴';
+    }
+
     return {
         openNewSaleModal, closeNewSaleModal,
         addItemToCart, removeItemFromCart, submitNewSale,
@@ -385,7 +459,7 @@ const VentesUI = (() => {
         openNewProductModal, closeNewProductModal, submitNewProduct,
         anileVant,
         openPaymentModal, closePaymentModal, submitPayment,
-        loadSalesTable, loadClientsTable
+        loadSalesTable, loadClientsTable, loadDashboardStats, toggleTopList
     };
 })();
 
@@ -397,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ventesNavItem.addEventListener('click', () => {
             VentesUI.loadSalesTable();
             VentesUI.loadClientsTable();
+            VentesUI.loadDashboardStats();
         });
     }
 });
