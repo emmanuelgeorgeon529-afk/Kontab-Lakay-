@@ -1,5 +1,5 @@
 // js/services/salesService.js
-// Depann de window.db, window.currentCompanyId, window.DiscountEngine
+// Depann de window.db, window.currentCompanyId, window.DiscountEngine, window.AdminService
 
 const SalesService = (() => {
 
@@ -33,7 +33,7 @@ const SalesService = (() => {
     async function createSale(saleData) {
         const bizRef = getBizRef();
 
-        return window.db.runTransaction(async (transaction) => {
+        const rezilta = await window.db.runTransaction(async (transaction) => {
             // ---- 1. TOUT LEKTI ANVAN NENPÒT EKRITI ----
             const productRefs = saleData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
@@ -163,6 +163,19 @@ const SalesService = (() => {
 
             return { id: venteRef.id, nimewoFakti, total, kalkil: kalkil.totaux };
         });
+
+        // ---- 6. AUDIT LOG (apre transaksyon an konfime, san blòke vant si sa echwe) ----
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Ventes',
+                'Kreye Vant',
+                '—',
+                `${rezilta.nimewoFakti} (${rezilta.total.toLocaleString()} HTG)`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
+
+        return rezilta;
     }
 
     async function getSales(limitCount = 50) {
@@ -184,7 +197,7 @@ const SalesService = (() => {
     async function cancelSale(saleId, rezon) {
         const bizRef = getBizRef();
 
-        return window.db.runTransaction(async (transaction) => {
+        const vanteAnile = await window.db.runTransaction(async (transaction) => {
             const venteRef = bizRef.collection('lavant').doc(saleId);
             const venteDoc = await transaction.get(venteRef);
             if (!venteDoc.exists) throw new Error("Vant sa a pa egziste.");
@@ -237,7 +250,20 @@ const SalesService = (() => {
                 const nouvoDèt = Math.max(0, dètAktyèl - vente.total);
                 transaction.update(kliyanRef, { dèt: nouvoDèt });
             }
+
+            return { nimewoFakti: vente.nimewoFakti, total: vente.total };
         });
+
+        // ---- AUDIT LOG ----
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Ventes',
+                'Anile Vant',
+                vanteAnile.nimewoFakti,
+                `RV — rezon: ${rezon}`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     return { createSale, getSales, getSaleById, cancelSale };
