@@ -1,5 +1,5 @@
 // js/services/customersService.js
-// Depann de window.db (inisyalize nan config.js) ak window.currentCompanyId
+// Depann de window.db (inisyalize nan config.js) ak window.currentCompanyId, window.AdminService
 
 const CustomersService = (() => {
 
@@ -39,6 +39,16 @@ const CustomersService = (() => {
             dat: firebase.firestore.FieldValue.serverTimestamp()
         });
 
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Ventes',
+                'Kreye Kliyan',
+                '—',
+                data.non.trim()
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
+
         return { id: kliyanRef.id };
     }
 
@@ -74,6 +84,16 @@ const CustomersService = (() => {
             throw new Error("Pa gen chan valid pou modifye.");
         }
         await bizRef.collection('kliyan').doc(customerId).update(cleanUpdates);
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Ventes',
+                'Modifye Kliyan',
+                customerId,
+                JSON.stringify(cleanUpdates)
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     // ---------- VERIFYE LIMIT KREDI (itilize pa salesService anvan yon vant kredi) ----------
@@ -101,7 +121,7 @@ const CustomersService = (() => {
 
         const bizRef = getBizRef();
 
-        return window.db.runTransaction(async (transaction) => {
+        const rezilta = await window.db.runTransaction(async (transaction) => {
             const kliyanRef = bizRef.collection('kliyan').doc(customerId);
             const kliyanDoc = await transaction.get(kliyanRef);
             if (!kliyanDoc.exists) throw new Error("Kliyan sa a pa egziste.");
@@ -136,8 +156,20 @@ const CustomersService = (() => {
                 dat: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            return { dètAvan: dètAktyèl, dètApre: nouvoDèt };
+            return { dètAvan: dètAktyèl, dètApre: nouvoDèt, kliyanNon: kliyanDoc.data().non };
         });
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Ventes',
+                'Peman Kliyan (Recouvrement)',
+                `${rezilta.kliyanNon} — dèt ${rezilta.dètAvan.toLocaleString()} HTG`,
+                `dèt ${rezilta.dètApre.toLocaleString()} HTG (peye ${montan.toLocaleString()} HTG, ${mòdPeman})`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
+
+        return { dètAvan: rezilta.dètAvan, dètApre: rezilta.dètApre };
     }
 
     // ---------- DEZAKTIVE (JAMAIS DELETE) ----------
@@ -145,11 +177,31 @@ const CustomersService = (() => {
     async function deactivateCustomer(customerId) {
         const bizRef = getBizRef();
         await bizRef.collection('kliyan').doc(customerId).update({ aktif: false });
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Ventes',
+                'Dezaktive Kliyan',
+                'aktif',
+                'dezaktive'
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     async function reactivateCustomer(customerId) {
         const bizRef = getBizRef();
         await bizRef.collection('kliyan').doc(customerId).update({ aktif: true });
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Ventes',
+                'Reaktive Kliyan',
+                'dezaktive',
+                'aktif'
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     // ---------- KLIYAN KI GEN DÈT (pou rapò Recouvrement) ----------
