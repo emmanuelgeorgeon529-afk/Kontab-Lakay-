@@ -1,5 +1,5 @@
 // js/services/accountingService.js
-// Depann de window.db ak window.currentCompanyId
+// Depann de window.db ak window.currentCompanyId, window.AdminService
 
 const AccountingService = (() => {
 
@@ -42,6 +42,17 @@ const AccountingService = (() => {
             dat: firebase.firestore.FieldValue.serverTimestamp(),
             itilizatèId: window.auth?.currentUser?.uid || null
         });
+
+        // ---- AUDIT LOG (apre ekriti konfime, pa blòke si l echwe) ----
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Kontabilite',
+                'Ekriti Jounal Manyèl',
+                '—',
+                `${entryData.libellé || 'San libellé'} (${totalDébit.toLocaleString()} HTG)`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
 
         return { id: journalRef.id };
     }
