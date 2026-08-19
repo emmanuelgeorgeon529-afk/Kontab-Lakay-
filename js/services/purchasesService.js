@@ -34,7 +34,7 @@ const PurchasesService = (() => {
 
         const bizRef = getBizRef();
 
-        return window.db.runTransaction(async (transaction) => {
+        const rezilta = await window.db.runTransaction(async (transaction) => {
             // ---- 1. TOUT LEKTI ANVAN NENPÒT EKRITI ----
             const productRefs = purchaseData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
@@ -104,6 +104,19 @@ const PurchasesService = (() => {
 
             return { id: achatRef.id, nimewoAcha, total };
         });
+
+        // ---- AUDIT LOG (apre transaksyon konfime, pa blòke acha si l echwe) ----
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Achat',
+                'Kreye Acha',
+                '—',
+                `${rezilta.nimewoAcha} (${rezilta.total.toLocaleString()} HTG)`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
+
+        return rezilta;
     }
 
     async function getPurchases(limitCount = 50) {
@@ -125,7 +138,7 @@ const PurchasesService = (() => {
     async function cancelPurchase(purchaseId, rezon) {
         const bizRef = getBizRef();
 
-        return window.db.runTransaction(async (transaction) => {
+        const achaAnile = await window.db.runTransaction(async (transaction) => {
             const achatRef = bizRef.collection('acha').doc(purchaseId);
             const achatDoc = await transaction.get(achatRef);
             if (!achatDoc.exists) throw new Error("Acha sa a pa egziste.");
@@ -178,7 +191,20 @@ const PurchasesService = (() => {
                 const nouvoDèt = Math.max(0, dètAktyèl - acha.total);
                 transaction.update(founisèRef, { dèt: nouvoDèt });
             }
+
+            return { nimewoAcha: acha.nimewoAcha, total: acha.total };
         });
+
+        // ---- AUDIT LOG ----
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Achat',
+                'Anile Acha',
+                achaAnile.nimewoAcha,
+                `RV — rezon: ${rezon}`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     return { createPurchase, getPurchases, getPurchaseById, cancelPurchase };
