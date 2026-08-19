@@ -1,5 +1,5 @@
 // js/services/productsService.js
-// Depann de window.db (inisyalize nan config.js) ak window.currentCompanyId
+// Depann de window.db (inisyalize nan config.js) ak window.currentCompanyId, window.AdminService
 
 const ProductsService = (() => {
 
@@ -47,6 +47,16 @@ const ProductsService = (() => {
             dat: firebase.firestore.FieldValue.serverTimestamp()
         });
 
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Pwodwi',
+                'Kreye Pwodwi',
+                '—',
+                `${data.non.trim()} (${data.priVente} HTG)`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
+
         return { id: pwodwiRef.id };
     }
 
@@ -82,6 +92,16 @@ const ProductsService = (() => {
             throw new Error("Pa gen chan valid pou modifye.");
         }
         await bizRef.collection('pwodwi').doc(productId).update(cleanUpdates);
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Pwodwi',
+                'Modifye Pwodwi',
+                productId,
+                JSON.stringify(cleanUpdates)
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     // ---------- AJISTMAN STOCK MANYÈL (transaksyon separe de vant) ----------
@@ -101,7 +121,7 @@ const ProductsService = (() => {
 
         const bizRef = getBizRef();
 
-        return window.db.runTransaction(async (transaction) => {
+        const rezilta = await window.db.runTransaction(async (transaction) => {
             const pwodwiRef = bizRef.collection('pwodwi').doc(productId);
             const pwodwiDoc = await transaction.get(pwodwiRef);
             if (!pwodwiDoc.exists) throw new Error("Pwodwi sa a pa egziste.");
@@ -127,8 +147,20 @@ const ProductsService = (() => {
                 itilizatèId: window.auth?.currentUser?.uid || null
             });
 
-            return { stockAvan: stockAktyèl, stockApre: nouvoStock };
+            return { stockAvan: stockAktyèl, stockApre: nouvoStock, pwodwiNon: pwodwiDoc.data().non };
         });
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Pwodwi',
+                `Ajistman Stock (${rezon.trim()})`,
+                `${rezilta.pwodwiNon}: ${rezilta.stockAvan}`,
+                `${rezilta.stockApre}`
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
+
+        return { stockAvan: rezilta.stockAvan, stockApre: rezilta.stockApre };
     }
 
     // ---------- DEZAKTIVE (JAMAIS DELETE) ----------
@@ -136,11 +168,31 @@ const ProductsService = (() => {
     async function deactivateProduct(productId) {
         const bizRef = getBizRef();
         await bizRef.collection('pwodwi').doc(productId).update({ aktif: false });
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Pwodwi',
+                'Dezaktive Pwodwi',
+                'aktif',
+                'dezaktive'
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     async function reactivateProduct(productId) {
         const bizRef = getBizRef();
         await bizRef.collection('pwodwi').doc(productId).update({ aktif: true });
+
+        if (window.AdminService?.anrejistreLog) {
+            window.AdminService.anrejistreLog(
+                window.currentCompanyId,
+                'Pwodwi',
+                'Reaktive Pwodwi',
+                'dezaktive',
+                'aktif'
+            ).catch(err => console.warn('Audit log echwe:', err));
+        }
     }
 
     // ---------- PWODWI AK STOCK BA (pou alèt) ----------
