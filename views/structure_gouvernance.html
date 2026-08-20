@@ -7,19 +7,19 @@
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">🏢 Chanje Biznis</button>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">➕ Nouvo Itilizatè</button>
+            <button id="btn-nouvo-itilizatè" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">➕ Nouvo Itilizatè</button>
         </div>
     </div>
 
     <!-- 1.13 Tableau de Bord Administratif -->
     <div class="kpi-grid">
-        <div class="kpi-card"><div class="label">👥 Total Itilizatè</div><div class="value" style="color:var(--primary);">12</div><div class="change up">↑ 2</div></div>
-        <div class="kpi-card"><div class="label">🏢 Total Biznis</div><div class="value">3</div><div class="change up">↑ 1</div></div>
-        <div class="kpi-card"><div class="label">🏬 Total Succursales</div><div class="value">5</div><div class="change up">↑ 1</div></div>
-        <div class="kpi-card"><div class="label">🟢 Itilizatè Aktif</div><div class="value" style="color:var(--secondary);">9</div></div>
-        <div class="kpi-card"><div class="label">🔴 Itilizatè Inaktif</div><div class="value" style="color:var(--text-muted);">3</div></div>
-        <div class="kpi-card"><div class="label">📋 Dènye Aktivite</div><div class="value" style="font-size:15px;">Il y a 4 min</div></div>
-        <div class="kpi-card"><div class="label">⚠️ Alèt Sekirite</div><div class="value" style="color:var(--danger);">2</div><div class="change down">Aksyon nesesè</div></div>
+        <div class="kpi-card" id="kpi-total-itilizatè"><div class="label">👥 Total Itilizatè</div><div class="value" style="color:var(--primary);">—</div></div>
+        <div class="kpi-card"><div class="label">🏢 Total Biznis</div><div class="value">—</div></div>
+        <div class="kpi-card"><div class="label">🏬 Total Succursales</div><div class="value">—</div></div>
+        <div class="kpi-card" id="kpi-itilizatè-aktif"><div class="label">🟢 Itilizatè Aktif</div><div class="value" style="color:var(--secondary);">—</div></div>
+        <div class="kpi-card" id="kpi-itilizatè-inaktif"><div class="label">🔴 Itilizatè Inaktif</div><div class="value" style="color:var(--text-muted);">—</div></div>
+        <div class="kpi-card"><div class="label">📋 Dènye Aktivite</div><div class="value" style="font-size:15px;">—</div></div>
+        <div class="kpi-card"><div class="label">⚠️ Alèt Sekirite</div><div class="value" style="color:var(--danger);">—</div></div>
     </div>
 
     <!-- 1.1 Profil Antrepriz -->
@@ -30,7 +30,7 @@
                 <div>
                     <h4 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; margin-bottom:10px;">Enfòmasyon Jeneral</h4>
                     <table class="fin-table">
-                        <tr><td>Non Antrepriz</td><td style="text-align:right; font-weight:600;">LedgerFlow Market</td></tr>
+                        <tr><td>Non Antrepriz</td><td id="profil-antrepriz-non" style="text-align:right; font-weight:600;">—</td></tr>
                         <tr><td>Logo</td><td style="text-align:right;">📷 logo.png</td></tr>
                         <tr><td>Slogan</td><td style="text-align:right;">Kontabilite senp pou tout moun</td></tr>
                         <tr><td>Deskripsyon</td><td style="text-align:right; color:var(--text-muted);">Distribisyon & vant detay</td></tr>
@@ -50,8 +50,8 @@
                     <h4 style="font-size:13px; color:var(--text-muted); text-transform:uppercase; margin-bottom:10px;">Kontak</h4>
                     <table class="fin-table">
                         <tr><td>Telefòn</td><td style="text-align:right;">+509 3456-7890</td></tr>
-                        <tr><td>Imèl</td><td style="text-align:right;">contact@ledgerflow.ht</td></tr>
-                        <tr><td>Sit entènèt</td><td style="text-align:right;">www.ledgerflow.ht</td></tr>
+                        <tr><td>Imèl</td><td style="text-align:right;">contact@kontablakay.ht</td></tr>
+                        <tr><td>Sit entènèt</td><td style="text-align:right;">www.kontablakay.ht</td></tr>
                         <tr><td>Adrès</td><td style="text-align:right;">Delmas 33, Port-au-Prince</td></tr>
                     </table>
                 </div>
@@ -71,12 +71,11 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏢 1.2 — Multi-Biznis</summary>
         <div style="padding:0 20px 20px;">
-            <table class="fin-table">
+            <table class="fin-table" id="tablo-multi-biznis">
                 <tr><th>Non Biznis</th><th>Estati</th><th></th></tr>
-                <tr><td>LedgerFlow Holding</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
-                <tr><td>LedgerFlow Market</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
-                <tr><td>LedgerFlow Distribution</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
-                <tr><td>LedgerFlow Manufacturing</td><td><span class="ged-status" style="background:#F1F5F9; color:var(--text-muted);">Dezaktive</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
+                <tbody>
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
             <button style="margin-top:14px; background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye Nouvo Biznis</button>
         </div>
@@ -86,11 +85,11 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏬 1.3 — Multi-Succursales</summary>
         <div style="padding:0 20px 20px;">
-            <table class="fin-table">
-                <tr><th>Succursale</th><th>Biznis Paran</th><th>Estati</th></tr>
-                <tr><td>Delmas Branch</td><td>LedgerFlow Market</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
-                <tr><td>Pétion-Ville Branch</td><td>LedgerFlow Market</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
-                <tr><td>Cap-Haïtien Branch</td><td>LedgerFlow Distribution</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
+            <table class="fin-table" id="tablo-succursale">
+                <tr><th>Succursale</th><th>Adrès</th><th>Estati</th></tr>
+                <tbody>
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
                 <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye Succursale</button>
@@ -135,13 +134,13 @@
             <details class="chart-section" style="padding:0;">
                 <summary style="padding:16px 20px; cursor:pointer; font-weight:600; list-style:none;">🪪 1.6 — Postes</summary>
                 <div style="padding:0 20px 16px; display:flex; flex-wrap:wrap; gap:8px;">
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Directeur Général</span>
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Comptable</span>
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Caissier</span>
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Responsable Stock</span>
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Commercial</span>
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Chauffeur</span>
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">RH Manager</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Direktè Jeneral</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Kontablè</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Kesye</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Responsab Estòk</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Vandè</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Chofè</span>
+                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Manadjè RH</span>
                 </div>
             </details>
         </div>
@@ -151,24 +150,11 @@
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 1.7 — Gestion Utilisateurs</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
-            <table class="fin-table">
-                <tr><th>Non</th><th>Imèl</th><th>Depatman</th><th>Poste</th><th>Estati</th></tr>
-                <tr>
-                    <td>Jean D.</td><td>jean@ledgerflow.ht</td><td>Finans</td><td>Comptable</td>
-                    <td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Actif</span></td>
-                </tr>
-                <tr>
-                    <td>Marie L.</td><td>marie@ledgerflow.ht</td><td>Komèsyal</td><td>Caissier</td>
-                    <td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Actif</span></td>
-                </tr>
-                <tr>
-                    <td>Pierre A.</td><td>pierre@ledgerflow.ht</td><td>Lojistik</td><td>Responsable Stock</td>
-                    <td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">Suspendu</span></td>
-                </tr>
-                <tr>
-                    <td>Rose M.</td><td>rose@ledgerflow.ht</td><td>RH</td><td>RH Manager</td>
-                    <td><span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Désactivé</span></td>
-                </tr>
+            <table class="fin-table" id="tablo-itilizatè">
+                <tr><th>Non</th><th>Imèl</th><th>Depatman</th><th>Wòl</th><th>Estati</th></tr>
+                <tbody>
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
         </div>
     </details>
@@ -176,29 +162,16 @@
     <!-- 1.8 Rôles & Permissions -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 1.8 — Rôles & Permissions (RBAC)</summary>
-        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrateur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Aksè total.</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Directeur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Aksè rapò ak validation.</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Comptable</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Kontabilite sèlman.</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Caissier</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">POS sèlman.</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Responsable Stock</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Stock sèlman.</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>RH</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">RH sèlman.</p></div>
+        <div id="kad-wòl-pèmisyon" style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
+            <p style="color:var(--text-muted); font-size:13px;">⏳ Chajman...</p>
         </div>
     </details>
 
     <!-- 1.9 Workflow d'Approbation -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔄 1.9 — Workflow d'Approbation</summary>
-        <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
-            <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Depans &gt; 50 000 HTG</div>
-            <div>⬇</div>
-            <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Soumèt</div>
-            <div>⬇</div>
-            <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Apwobasyon Manadjè</div>
-            <div>⬇</div>
-            <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Apwobasyon Direktè</div>
-            <div>⬇</div>
-            <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:220px;">Egzekisyon</div>
+        <div id="lis-demand-apwobasyon" style="padding:0 20px 20px;">
+            <p style="color:var(--text-muted); font-size:13px;">⏳ Chajman...</p>
         </div>
     </details>
 
@@ -206,10 +179,11 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💻 1.10 — Sessions Actives</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
-            <table class="fin-table">
-                <tr><th>Itilizatè</th><th>Aparèy</th><th>Navigatè</th><th>Koneksyon</th><th>IP</th><th>Lokalizasyon</th></tr>
-                <tr><td>Jean D.</td><td>📱 Mobile</td><td>Chrome</td><td>Jodi a, 09:12</td><td>192.168.1.24</td><td>Port-au-Prince</td></tr>
-                <tr><td>Marie L.</td><td>💻 Desktop</td><td>Safari</td><td>Jodi a, 08:47</td><td>192.168.1.8</td><td>Delmas</td></tr>
+            <table class="fin-table" id="tablo-sessions">
+                <tr><th>Itilizatè</th><th>Aparèy</th><th>Navigatè</th><th>Koneksyon</th></tr>
+                <tbody>
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
         </div>
     </details>
@@ -218,11 +192,11 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📜 1.11 — Audit Logs</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
-            <table class="fin-table">
+            <table class="fin-table" id="tablo-audit-log">
                 <tr><th>Itilizatè</th><th>Dat/Lè</th><th>Modil</th><th>Aksyon</th><th>Ansyen Valè</th><th>Nouvo Valè</th></tr>
-                <tr><td>Jean D.</td><td>02 Aoû, 09:14</td><td>Finans</td><td>Kreye Fakti</td><td>—</td><td>FT-000452</td></tr>
-                <tr><td>Marie L.</td><td>02 Aoû, 08:50</td><td>Ventes</td><td>Modifye Pri</td><td>500 HTG</td><td>550 HTG</td></tr>
-                <tr><td>Pierre A.</td><td>01 Aoû, 17:22</td><td>RH</td><td>Kreye Depans</td><td>—</td><td>12 000 HTG</td></tr>
+                <tbody>
+                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
         </div>
     </details>
@@ -230,10 +204,8 @@
     <!-- 1.12 Notifications Administratives -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔔 1.12 — Notifications Administratives</summary>
-        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>⚠️ Lisans ekspire nan 15 jou</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>📄 Kontra Founisè X ekspire byento</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>🔒 Itilizatè Pierre A. bloke apre 5 tantativ</span><span style="color:var(--danger); font-weight:600;">Sekirite</span></div>
+        <div id="lis-notifikasyon-admin" style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
+            <p style="color:var(--text-muted); font-size:13px;">⏳ Chajman...</p>
         </div>
     </details>
-  </section>
+    </section>
