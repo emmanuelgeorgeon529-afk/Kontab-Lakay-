@@ -1,5 +1,7 @@
 // js/modules/ventes_ui.js
-// Konekte UI Ventes ak SalesService, ProductsService, CustomersService, DiscountEngine
+// Konekte UI Ventes ak SalesService, ProductsService, CustomersService, DiscountEngine,
+// QuotesService, CommandesService, PromotionsService, FidéliteService, MarketingService,
+// SavService, ObjectifsService
 
 const VentesUI = (() => {
 
@@ -368,12 +370,12 @@ const VentesUI = (() => {
                 const aksyonBtn = dèt > 0
                     ? `<span onclick="VentesUI.openPaymentModal('${k.id}', '${k.non.replace(/'/g, "\\'")}', ${dèt})" style="color:var(--primary); cursor:pointer; font-size:12px; font-weight:600;">💳 Peye</span>`
                     : '—';
-                return `<tr>
+                return `<tr onclick="VentesUI.ouvriFichKliyan('${k.id}')" style="cursor:pointer;">
                     <td>${k.non}</td>
                     <td>${k.telefòn || '—'}</td>
                     <td><span class="ged-status" style="background:#F1F5F9;">${k.kategori}</span></td>
                     <td style="text-align:right; ${dèt > 0 ? 'color:var(--danger);' : ''}">${dèt.toLocaleString()} HTG</td>
-                    <td style="text-align:center;">${aksyonBtn}</td>
+                    <td style="text-align:center;" onclick="event.stopPropagation();">${aksyonBtn}</td>
                 </tr>`;
             }).join('');
         } catch (err) {
@@ -452,6 +454,317 @@ const VentesUI = (() => {
         if (arrow) arrow.textContent = isOuvri ? '▾' : '▴';
     }
 
+    // ================= 3.3 FICH KLIYAN =================
+
+    async function ouvriFichKliyan(kliyanId) {
+        try {
+            const kliyan = await window.CustomersService.getCustomerById(kliyanId);
+            const toutVant = await window.SalesService.getSales(500);
+            const vantKliyan = toutVant.filter(v => v.kliyanId === kliyanId && v.estati !== 'anile');
+            const totalAcha = vantKliyan.reduce((s, v) => s + (v.total || 0), 0);
+            const dènyeVant = vantKliyan.sort((a, b) => (b.dat?.toMillis?.() || 0) - (a.dat?.toMillis?.() || 0))[0];
+
+            const el = document.getElementById('fichKliyanKontenè');
+            if (!el) return;
+            el.innerHTML = `
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Kliyan: <strong>${kliyan.non}</strong></p>
+                <table class="fin-table">
+                    <tr><td>Total Acha</td><td style="text-align:right; font-weight:600;">${totalAcha.toLocaleString()} HTG</td></tr>
+                    <tr><td>Dèt Aktyèl</td><td style="text-align:right; color:var(--danger);">${(kliyan.dèt || 0).toLocaleString()} HTG</td></tr>
+                    <tr><td>Limit Kredi</td><td style="text-align:right;">${(kliyan.limitKredi || 0).toLocaleString()} HTG</td></tr>
+                    <tr><td>Dènye Fakti</td><td style="text-align:right;">${dènyeVant ? dènyeVant.nimewoFakti : '—'}</td></tr>
+                    <tr><td>Kategori</td><td style="text-align:right;">${kliyan.kategori}</td></tr>
+                </table>`;
+
+            await loadFidéliteInfo(kliyanId);
+        } catch (err) {
+            console.error('Erè chajman fich kliyan:', err);
+        }
+    }
+
+    // ================= 3.11 CATALOGUE PWODWI =================
+
+    async function loadCatalogueTable() {
+        const tbody = document.getElementById('catalogueTableBody');
+        if (!tbody) return;
+        try {
+            const pwodwiYo = await window.ProductsService.getProducts(true);
+            if (pwodwiYo.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">Pa gen pwodwi ankò</td></tr>';
+                return;
+            }
+            tbody.innerHTML = pwodwiYo.map(p => `
+                <tr>
+                    <td>${p.sku || '—'}</td>
+                    <td>${p.non}</td>
+                    <td style="text-align:right;">${(p.priVente || 0).toLocaleString()} HTG</td>
+                    <td style="text-align:right; ${(p.kantiteStock || 0) <= (p.stockMinimum || 5) ? 'color:var(--danger);' : ''}">${p.kantiteStock ?? 0}</td>
+                </tr>`).join('');
+        } catch (err) {
+            console.error('Erè chajman katalòg:', err);
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger); padding:20px;">❌ Erè chajman done</td></tr>';
+        }
+    }
+
+    // ================= 3.18 ANALIZ VANT =================
+
+    async function analizVantPa(kritè) {
+        // kritè: 'pwodwi' | 'kliyan' | 'vandè'
+        try {
+            const sales = await window.SalesService.getSales(500);
+            const salesActives = sales.filter(s => s.estati !== 'anile');
+            const gwoup = {};
+
+            salesActives.forEach(s => {
+                if (kritè === 'kliyan') {
+                    const key = s.kliyanNon || 'Kliyan Divès';
+                    gwoup[key] = (gwoup[key] || 0) + (s.total || 0);
+                } else if (kritè === 'vandè') {
+                    const key = s.vandèId || 'Enkoni';
+                    gwoup[key] = (gwoup[key] || 0) + (s.total || 0);
+                } else if (kritè === 'pwodwi') {
+                    (s.atik || []).forEach(a => {
+                        gwoup[a.non] = (gwoup[a.non] || 0) + (a.kantite * a.priInite);
+                    });
+                }
+            });
+
+            const triye = Object.entries(gwoup).sort((a, b) => b[1] - a[1]);
+            const el = document.getElementById('analizVantRezilta');
+            if (!el) return;
+            el.innerHTML = triye.length
+                ? triye.map(([non, total]) => `
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #F1F5F9;">
+                        <span>${non}</span><span style="font-weight:600;">${total.toLocaleString()} HTG</span>
+                    </div>`).join('')
+                : '<p style="color:var(--text-muted); font-size:13px;">Pa gen done pou analiz sa a.</p>';
+        } catch (err) {
+            console.error('Erè analiz vant:', err);
+        }
+    }
+
+    // ================= 3.7 DEVIS =================
+
+    async function loadQuotesTable() {
+        const tbody = document.getElementById('devisTableBody');
+        if (!tbody) return;
+        try {
+            const devisYo = await window.QuotesService.getQuotes(30);
+            tbody.innerHTML = devisYo.length === 0
+                ? '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">Pa gen devis ankò</td></tr>'
+                : devisYo.map(d => `
+                    <tr>
+                        <td>${d.nimewoDevis}</td>
+                        <td>${d.kliyanNon}</td>
+                        <td style="text-align:right;">${(d.total || 0).toLocaleString()} HTG</td>
+                        <td><span class="ged-status" style="background:#F1F5F9;">${d.estati}</span></td>
+                        <td style="text-align:center;">
+                            ${d.estati === 'brouillon' ? `<span onclick="VentesUI.updateQuoteStatus('${d.id}','envoyé')" style="color:var(--primary); cursor:pointer; font-size:12px;">Voye</span>` : ''}
+                            ${d.estati === 'envoyé' ? `<span onclick="VentesUI.updateQuoteStatus('${d.id}','accepté')" style="color:#047857; cursor:pointer; font-size:12px;">Aksepte</span> · <span onclick="VentesUI.updateQuoteStatus('${d.id}','refusé')" style="color:var(--danger); cursor:pointer; font-size:12px;">Rejte</span>` : ''}
+                            ${d.estati === 'accepté' ? `<span onclick="VentesUI.convertQuote('${d.id}')" style="color:#047857; cursor:pointer; font-size:12px; font-weight:600;">Konvèti→Vant</span>` : ''}
+                        </td>
+                    </tr>`).join('');
+        } catch (err) { console.error('Erè chajman devis:', err); }
+    }
+
+    async function updateQuoteStatus(quoteId, estati) {
+        try {
+            await window.QuotesService.updateQuoteStatus(quoteId, estati);
+            await loadQuotesTable();
+        } catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    async function convertQuote(quoteId) {
+        const mòdPeman = prompt('Mòd peman (kach/kredi/moncash/kat):', 'kach');
+        if (!mòdPeman) return;
+        try {
+            const vant = await window.QuotesService.convertQuoteToSale(quoteId, mòdPeman.trim());
+            await loadQuotesTable();
+            await loadSalesTable();
+            alert(`✅ Devi konvèti! Fakti: ${vant.nimewoFakti}`);
+        } catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    // ================= 3.8 COMMANDES CLIENTS =================
+
+    async function loadCommandesTable() {
+        const kontenè = document.getElementById('commandesKontenè');
+        if (!kontenè) return;
+        try {
+            const cmdYo = await window.CommandesService.getOrders(30);
+            const badges = {
+                brouillon: ['#FEF3C7', '#B45309', '🟡'], confirmée: ['#EEF2FF', 'var(--primary)', '🔵'],
+                en_préparation: ['#FFEDD5', '#C2410C', '🟠'], expédiée: ['#DBEAFE', '#1D4ED8', '🚚'],
+                livrée: ['#D1FAE5', '#047857', '🟢'], annulée: ['#FEE2E2', '#B91C1C', '🔴']
+            };
+            kontenè.innerHTML = cmdYo.length === 0
+                ? '<p style="color:var(--text-muted); font-size:13px;">Pa gen kòmand ankò</p>'
+                : cmdYo.map(c => {
+                    const [bg, koulè, ikòn] = badges[c.estati] || ['#F1F5F9', 'var(--text-dark)', ''];
+                    let aksyon = '';
+                    if (!['livrée', 'annulée'].includes(c.estati)) {
+                        aksyon = `<span onclick="VentesUI.advanceOrder('${c.id}')" style="color:var(--primary); cursor:pointer; font-size:12px; font-weight:600;">Avanse →</span> · <span onclick="VentesUI.cancelOrder('${c.id}')" style="color:var(--danger); cursor:pointer; font-size:12px;">Anile</span>`;
+                    } else if (c.estati === 'livrée' && !c.venteId) {
+                        aksyon = `<span onclick="VentesUI.convertOrder('${c.id}')" style="color:#047857; cursor:pointer; font-size:12px; font-weight:600;">Konvèti→Vant</span>`;
+                    }
+                    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #E2E8F0; border-radius:10px; margin-bottom:8px;">
+                        <div><strong>${c.nimewoCommande}</strong> — ${c.kliyanNon}<div style="font-size:12px; color:var(--text-muted);">${(c.total || 0).toLocaleString()} HTG</div></div>
+                        <div style="display:flex; align-items:center; gap:10px;"><span class="ged-status" style="background:${bg}; color:${koulè};">${ikòn} ${c.estati}</span>${aksyon}</div>
+                    </div>`;
+                }).join('');
+        } catch (err) { console.error('Erè chajman kòmand:', err); }
+    }
+
+    async function advanceOrder(orderId) {
+        try { await window.CommandesService.advanceOrderStatus(orderId); await loadCommandesTable(); }
+        catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    async function cancelOrder(orderId) {
+        const rezon = prompt('Rezon anilasyon:');
+        if (rezon === null || !rezon.trim()) return;
+        try { await window.CommandesService.cancelOrder(orderId, rezon.trim()); await loadCommandesTable(); }
+        catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    async function convertOrder(orderId) {
+        const mòdPeman = prompt('Mòd peman:', 'kach');
+        if (!mòdPeman) return;
+        try {
+            const vant = await window.CommandesService.convertOrderToSale(orderId, mòdPeman.trim());
+            await loadCommandesTable(); await loadSalesTable();
+            alert(`✅ Kòmand konvèti! Fakti: ${vant.nimewoFakti}`);
+        } catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    // ================= 3.13 PROMOTIONS =================
+
+    async function loadPromotionsTable() {
+        const kontenè = document.getElementById('promotionsKontenè');
+        if (!kontenè) return;
+        try {
+            const promoYo = await window.PromotionsService.getPromotions(true);
+            kontenè.innerHTML = promoYo.length === 0
+                ? '<p style="color:var(--text-muted); font-size:13px;">Pa gen promosyon aktif</p>'
+                : promoYo.map(p => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #E2E8F0; border-radius:10px; margin-bottom:8px;">
+                        <div><strong>${p.kòd}</strong><div style="font-size:12px; color:var(--text-muted);">${p.tip} — ${p.valè}</div></div>
+                        <span onclick="VentesUI.deactivatePromo('${p.id}')" style="color:var(--danger); cursor:pointer; font-size:12px;">Dezaktive</span>
+                    </div>`).join('');
+        } catch (err) { console.error('Erè chajman promo:', err); }
+    }
+
+    async function deactivatePromo(promoId) {
+        try { await window.PromotionsService.deactivatePromotion(promoId); await loadPromotionsTable(); }
+        catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    // ================= 3.14 FIDÉLITÉ =================
+
+    async function loadFidéliteInfo(kliyanId) {
+        const el = document.getElementById('fidéliteKontenè');
+        if (!el || !kliyanId) return;
+        try {
+            const fidèl = await window.FidéliteService.getFidéliteByCustomer(kliyanId);
+            el.innerHTML = `
+                <table class="fin-table">
+                    <tr><td>Pwen Akimile</td><td style="text-align:right;">${fidèl.pwenAkimile || 0} pts</td></tr>
+                    <tr><td>Cashback Disponib</td><td style="text-align:right;">${(fidèl.cashbackAkimile || 0).toLocaleString()} HTG</td></tr>
+                </table>`;
+        } catch (err) { console.error('Erè chajman fidélité:', err); }
+    }
+
+    // ================= 3.15 MARKETING =================
+
+    async function loadCampaignsTable() {
+        const kontenè = document.getElementById('kanpayKontenè');
+        if (!kontenè) return;
+        try {
+            const kanpayYo = await window.MarketingService.getCampaigns(20);
+            kontenè.innerHTML = kanpayYo.length === 0
+                ? '<p style="color:var(--text-muted); font-size:13px;">Pa gen kanpay ankò</p>'
+                : kanpayYo.map(k => `
+                    <div style="padding:10px; border:1px solid #E2E8F0; border-radius:10px; margin-bottom:8px;">
+                        <strong>${k.non}</strong> — ${k.kanal}
+                        <div style="font-size:12px; color:var(--text-muted);">${k.estati} · Segman: ${k.sègman}</div>
+                    </div>`).join('');
+        } catch (err) { console.error('Erè chajman kanpay:', err); }
+    }
+
+    // ================= 3.16-3.17 SAV & RETOURS =================
+
+    async function loadSavTable() {
+        const kontenè = document.getElementById('savKontenè');
+        if (!kontenè) return;
+        try {
+            const tikèYo = await window.SavService.getTickets(30);
+            kontenè.innerHTML = tikèYo.length === 0
+                ? '<p style="color:var(--text-muted); font-size:13px;">Pa gen tikè SAV</p>'
+                : tikèYo.map(t => {
+                    let aksyon = '';
+                    if (t.tip === 'retour' && !['remboursement', 'échange_effectué', 'rejeté'].includes(t.estati)) {
+                        const pwochen = { retour_demandé: 'inspection', inspection: 'remboursement' }[t.estati];
+                        if (pwochen) aksyon = `<span onclick="VentesUI.advanceReturn('${t.id}','${pwochen}')" style="color:var(--primary); cursor:pointer; font-size:12px; font-weight:600;">Avanse: ${pwochen}</span>`;
+                    } else if (t.estati === 'ouvert') {
+                        aksyon = `<span onclick="VentesUI.closeSavTicket('${t.id}')" style="color:#047857; cursor:pointer; font-size:12px; font-weight:600;">Fèmen</span>`;
+                    }
+                    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #E2E8F0; border-radius:10px; margin-bottom:8px;">
+                        <div><strong>${t.nimewoTikè}</strong> (${t.tip}) — ${t.kliyanNon}<div style="font-size:12px; color:var(--text-muted);">${t.deskripsyon}</div></div>
+                        <div style="display:flex; align-items:center; gap:10px;"><span class="ged-status" style="background:#F1F5F9;">${t.estati}</span>${aksyon}</div>
+                    </div>`;
+                }).join('');
+        } catch (err) { console.error('Erè chajman SAV:', err); }
+    }
+
+    async function advanceReturn(ticketId, nouvoEstati) {
+        try { await window.SavService.advanceReturnStatus(ticketId, nouvoEstati); await loadSavTable(); }
+        catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    async function closeSavTicket(ticketId) {
+        const rezolisyon = prompt('Rezolisyon:');
+        if (rezolisyon === null) return;
+        try { await window.SavService.closeTicket(ticketId, rezolisyon); await loadSavTable(); }
+        catch (err) { alert('Erè: ' + err.message); }
+    }
+
+    // ================= 3.19 OBJECTIFS COMMERCIAUX =================
+
+    async function loadObjectivesProgress() {
+        const kontenè = document.getElementById('objectifsKontenè');
+        if (!kontenè) return;
+        try {
+            const progress = await window.ObjectifsService.getAllProgress();
+            kontenè.innerHTML = progress.length === 0
+                ? '<p style="color:var(--text-muted); font-size:13px;">Pa gen objektif defini</p>'
+                : progress.map(p => `
+                    <div style="margin-bottom:16px;">
+                        <p style="font-size:13px; font-weight:600; margin-bottom:6px;">${p.vandèNon} — Objektif: ${p.montanObjektif.toLocaleString()} HTG</p>
+                        <div style="background:#F1F5F9; border-radius:8px; height:14px; overflow:hidden;">
+                            <div style="background:var(--secondary); width:${p.pousantaj}%; height:100%;"></div>
+                        </div>
+                        <p style="text-align:right; font-size:12px; color:var(--text-muted); margin-top:4px;">Reyalizasyon: ${p.totalReyalize.toLocaleString()} HTG (${p.pousantaj}%)</p>
+                    </div>`).join('');
+        } catch (err) { console.error('Erè chajman objektif:', err); }
+    }
+
+    // ================= CHAJMAN TOUT SEKSYON KOUNYE VENTES OUVÈ =================
+
+    async function loadAllVentesSections() {
+        await Promise.all([
+            loadSalesTable(),
+            loadClientsTable(),
+            loadDashboardStats(),
+            loadCatalogueTable(),
+            loadQuotesTable(),
+            loadCommandesTable(),
+            loadPromotionsTable(),
+            loadCampaignsTable(),
+            loadSavTable(),
+            loadObjectivesProgress()
+        ]);
+    }
+
     return {
         openNewSaleModal, closeNewSaleModal,
         addItemToCart, removeItemFromCart, submitNewSale,
@@ -459,7 +772,16 @@ const VentesUI = (() => {
         openNewProductModal, closeNewProductModal, submitNewProduct,
         anileVant,
         openPaymentModal, closePaymentModal, submitPayment,
-        loadSalesTable, loadClientsTable, loadDashboardStats, toggleTopList
+        loadSalesTable, loadClientsTable, loadDashboardStats, toggleTopList,
+        ouvriFichKliyan, loadCatalogueTable, analizVantPa,
+        loadQuotesTable, updateQuoteStatus, convertQuote,
+        loadCommandesTable, advanceOrder, cancelOrder, convertOrder,
+        loadPromotionsTable, deactivatePromo,
+        loadFidéliteInfo,
+        loadCampaignsTable,
+        loadSavTable, advanceReturn, closeSavTicket,
+        loadObjectivesProgress,
+        loadAllVentesSections
     };
 })();
 
@@ -469,9 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ventesNavItem = document.querySelector('[data-target="ventes"]');
     if (ventesNavItem) {
         ventesNavItem.addEventListener('click', () => {
-            VentesUI.loadSalesTable();
-            VentesUI.loadClientsTable();
-            VentesUI.loadDashboardStats();
+            VentesUI.loadAllVentesSections();
         });
     }
 });
