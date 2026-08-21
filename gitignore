@@ -1,0 +1,17 @@
+# Environment
+.env
+.env.local
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# Backups lokal
+backups/daily/*
+backups/weekly/*
+backups/monthly/*
+!backups/**/.gitkeep
+
+# Node (si itilize pita)
+node_modules/
