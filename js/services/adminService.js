@@ -2,6 +2,7 @@
 // Sèvis pou jesyon Itilizatè, Wòl/Pèmisyon (RBAC), Workflow Apwobasyon,
 // Multi-Biznis/Succursales, Depatman/Pòs, Sessions, Audit Log, ak Notifikasyon
 // NÒT: tout non koleksyon/chan ASCII-safe (san aksan) pou konpatibilite ak Firestore Rules
+// NÒT: rasin koleksyon an rele "biznis" (matche salesService.js/purchasesService.js/etc.)
 // Depann de window.db ak window.auth (defini nan config.js)
 
 (function () {
@@ -47,12 +48,12 @@
     }
 
     const itilizateRef = db
-      .collection('businesses').doc(bizId)
+      .collection('biznis').doc(bizId)
       .collection('itilizate').doc();
 
     await db.runTransaction(async (tx) => {
       const kIm = await tx.get(
-        db.collection('businesses').doc(bizId)
+        db.collection('biznis').doc(bizId)
           .collection('itilizate')
           .where('imèl', '==', itilizateData.imèl)
       );
@@ -81,7 +82,7 @@
     if (!estatiValid.includes(nouvoEstati)) {
       throw new Error('Estati pa valid');
     }
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('itilizate').doc(itilizateId);
 
     await db.runTransaction(async (tx) => {
@@ -99,7 +100,7 @@
     if (!WOL_VALID.includes(nouvoWol)) {
       throw new Error(`Wol "${nouvoWol}" pa valid`);
     }
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('itilizate').doc(itilizateId);
 
     await db.runTransaction(async (tx) => {
@@ -114,7 +115,7 @@
   }
 
   function abònmanItilizate(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('itilizate')
       .orderBy('dateKreyasyon', 'desc')
       .onSnapshot((snap) => {
@@ -137,7 +138,7 @@
   // ---------- PÈMISYON PÈSONALIZE PA BIZNIS ----------
 
   async function jwennPèmisyonBiznis(bizId) {
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('paramet').doc('pèmisyon');
     const snap = await ref.get();
     if (snap.exists) return snap.data();
@@ -147,7 +148,7 @@
   async function aktyaliizePèmisyonWol(bizId, wol, pèmisyonObj) {
     if (!WOL_VALID.includes(wol)) throw new Error(`Wol "${wol}" pa valid`);
 
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('paramet').doc('pèmisyon');
 
     await db.runTransaction(async (tx) => {
@@ -157,7 +158,7 @@
       tx.set(ref, done, { merge: true });
     });
 
-    const itilizateSnap = await db.collection('businesses').doc(bizId)
+    const itilizateSnap = await db.collection('biznis').doc(bizId)
       .collection('itilizate').where('wol', '==', wol).get();
 
     const batch = db.batch();
@@ -168,7 +169,7 @@
   }
 
   function abònmanPèmisyon(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('paramet').doc('pèmisyon')
       .onSnapshot((snap) => {
         callback(snap.exists ? snap.data() : { ...PEMISYON_PA_WOL });
@@ -182,7 +183,7 @@
       throw new Error('Done demand enkonplè (tip, montan, refDokiman obligatwa)');
     }
 
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('demandApwobasyon').doc();
 
     await db.runTransaction(async (tx) => {
@@ -206,7 +207,7 @@
   }
 
   async function apwouveDemand(bizId, demandId, etapAktyèl) {
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('demandApwobasyon').doc(demandId);
 
     const pwochenEtap = {
@@ -240,7 +241,7 @@
   }
 
   async function rejteDemand(bizId, demandId, rezon) {
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('demandApwobasyon').doc(demandId);
 
     await db.runTransaction(async (tx) => {
@@ -264,7 +265,7 @@
   }
 
   async function egzekiteDemand(bizId, demandId) {
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('demandApwobasyon').doc(demandId);
 
     await db.runTransaction(async (tx) => {
@@ -286,7 +287,7 @@
   }
 
   function abònmanDemandApwobasyon(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('demandApwobasyon')
       .orderBy('dateSoumèt', 'desc')
       .onSnapshot((snap) => {
@@ -297,12 +298,12 @@
   // ---------- 1.1 PROFIL ANTREPRIZ ----------
 
   function abònmanProfilAntrepriz(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .onSnapshot(snap => callback(snap.exists ? snap.data() : {}));
   }
 
   async function aktyalizeProfilAntrepriz(bizId, done) {
-    await db.collection('businesses').doc(bizId).set(done, { merge: true });
+    await db.collection('biznis').doc(bizId).set(done, { merge: true });
     await anrejistreLog(bizId, 'Administrasyon', 'Modifye Profil Antrepriz', '—', done.nonAntrepriz || '');
   }
 
@@ -310,7 +311,7 @@
 
   async function kreyeBiznis(pwopriyetèId, bizData) {
     if (!bizData?.nonAntrepriz) throw new Error('Non antrepriz obligatwa');
-    const ref = db.collection('businesses').doc();
+    const ref = db.collection('biznis').doc();
     await ref.set({
       nonAntrepriz: bizData.nonAntrepriz,
       pwopriyetèId,
@@ -321,7 +322,7 @@
   }
 
   function abònmanBiznisPa(pwopriyetèId, callback) {
-    return db.collection('businesses')
+    return db.collection('biznis')
       .where('pwopriyetèId', '==', pwopriyetèId)
       .onSnapshot(snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
   }
@@ -329,14 +330,14 @@
   async function chanjeEstatiBiznis(bizId, nouvoEstati) {
     const valid = ['aktif', 'dezaktive'];
     if (!valid.includes(nouvoEstati)) throw new Error('Estati pa valid');
-    await db.collection('businesses').doc(bizId).update({ estati: nouvoEstati });
+    await db.collection('biznis').doc(bizId).update({ estati: nouvoEstati });
   }
 
   // ---------- 1.3 MULTI-SUCCURSALES ----------
 
   async function kreyeSuccursale(bizId, succData) {
     if (!succData?.non) throw new Error('Non succursale obligatwa');
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('succursale').doc();
     await ref.set({
       non: succData.non,
@@ -348,7 +349,7 @@
   }
 
   function abònmanSuccursale(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('succursale')
       .onSnapshot(snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
   }
@@ -358,7 +359,7 @@
   async function kreyeDepatman(bizId, depatmanData) {
     if (!depatmanData?.non) throw new Error('Non depatman an obligatwa.');
 
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('depatman').doc();
 
     await ref.set({
@@ -373,14 +374,14 @@
   }
 
   function abònmanDepatman(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('depatman')
       .where('aktif', '==', true)
       .onSnapshot(snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
   }
 
   async function dezaktiveDepatman(bizId, depatmanId) {
-    await db.collection('businesses').doc(bizId)
+    await db.collection('biznis').doc(bizId)
       .collection('depatman').doc(depatmanId)
       .update({ aktif: false });
     await anrejistreLog(bizId, 'Administrasyon', 'Dezaktive Depatman', 'aktif', 'dezaktive');
@@ -391,7 +392,7 @@
   async function kreyePos(bizId, posData) {
     if (!posData?.non) throw new Error('Non pòs la obligatwa.');
 
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('pos').doc();
 
     await ref.set({
@@ -406,14 +407,14 @@
   }
 
   function abònmanPos(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('pos')
       .where('aktif', '==', true)
       .onSnapshot(snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
   }
 
   async function dezaktivePos(bizId, posId) {
-    await db.collection('businesses').doc(bizId)
+    await db.collection('biznis').doc(bizId)
       .collection('pos').doc(posId)
       .update({ aktif: false });
     await anrejistreLog(bizId, 'Administrasyon', 'Dezaktive Pòs', 'aktif', 'dezaktive');
@@ -422,7 +423,7 @@
   // ---------- 1.10 SESSIONS AKTIF ----------
 
   async function anrejistreSession(bizId, itilizateId, sessionInfo) {
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('sessions').doc();
     await ref.set({
       itilizateId,
@@ -436,13 +437,13 @@
   }
 
   async function fèmenSession(bizId, sessionId) {
-    await db.collection('businesses').doc(bizId)
+    await db.collection('biznis').doc(bizId)
       .collection('sessions').doc(sessionId)
       .update({ aktif: false, dateFèmen: firebase.firestore.FieldValue.serverTimestamp() });
   }
 
   function abònmanSessionsAktif(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('sessions')
       .where('aktif', '==', true)
       .onSnapshot(snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
@@ -451,7 +452,7 @@
   // ---------- 1.11 AUDIT LOGS ----------
 
   async function anrejistreLog(bizId, modil, aksyon, ansyenValè, nouvoValè) {
-    const ref = db.collection('businesses').doc(bizId)
+    const ref = db.collection('biznis').doc(bizId)
       .collection('auditLog').doc();
     await ref.set({
       itilizateId: window.auth?.currentUser?.uid || null,
@@ -465,7 +466,7 @@
   }
 
   function abònmanAuditLog(bizId, callback, limit = 50) {
-    return db.collection('businesses').doc(bizId)
+    return db.collection('biznis').doc(bizId)
       .collection('auditLog')
       .orderBy('dat', 'desc')
       .limit(limit)
@@ -474,12 +475,24 @@
 
   // ---------- 1.12 NOTIFIKASYON ADMINISTRATIF ----------
 
+  /**
+   * @param {string} bizId
+   * @param {Object} notifData
+   *   notifData.mesaj (obligatwa)
+   *   notifData.destinataireId (OBLIGATWA — UID itilizatè ki resevwa notifikasyon an,
+   *     egzije pa firestore.rules pou izole lekti pa itilizatè)
+   *   notifData.severite ('ijan' | 'atansyon' | 'enfo', default 'atansyon')
+   */
   async function kreyeNotifikasyon(bizId, notifData) {
-    const ref = db.collection('businesses').doc(bizId)
+    if (!notifData?.destinataireId) {
+      throw new Error('destinataireId obligatwa pou kreye yon notifikasyon (egzije pa règ sekirite).');
+    }
+    const ref = db.collection('biznis').doc(bizId)
       .collection('notifikasyon').doc();
     await ref.set({
       mesaj: notifData.mesaj,
       severite: notifData.severite || 'atansyon',
+      destinataireId: notifData.destinataireId,
       rezoud: false,
       dateKreyasyon: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -487,14 +500,21 @@
   }
 
   async function rezoudNotifikasyon(bizId, notifId) {
-    await db.collection('businesses').doc(bizId)
+    await db.collection('biznis').doc(bizId)
       .collection('notifikasyon').doc(notifId)
       .update({ rezoud: true, dateRezoud: firebase.firestore.FieldValue.serverTimestamp() });
   }
 
+  // NÒT: kounye a limite a notifikasyon PWOP itilizatè konekte a (matche règ sekirite)
   function abònmanNotifikasyon(bizId, callback) {
-    return db.collection('businesses').doc(bizId)
+    const uid = window.auth?.currentUser?.uid;
+    if (!uid) {
+      console.warn('abònmanNotifikasyon: pa gen itilizatè konekte');
+      return () => {};
+    }
+    return db.collection('biznis').doc(bizId)
       .collection('notifikasyon')
+      .where('destinataireId', '==', uid)
       .where('rezoud', '==', false)
       .onSnapshot(snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
   }
