@@ -1,29 +1,30 @@
 // js/services/adminService.js
 // Sèvis pou jesyon Itilizatè, Wòl/Pèmisyon (RBAC), Workflow Apwobasyon,
 // Multi-Biznis/Succursales, Depatman/Pòs, Sessions, Audit Log, ak Notifikasyon
+// NÒT: tout non koleksyon/chan ASCII-safe (san aksan) pou konpatibilite ak Firestore Rules
 // Depann de window.db ak window.auth (defini nan config.js)
 
 (function () {
   const db = window.db;
 
   const WOL_VALID = [
-    'Propriyetè',
-    'Administratè',
-    'Direktè',
-    'Kontablè',
-    'Vandè',
+    'Propriyete',
+    'Administrate',
+    'Direkte',
+    'Kontable',
+    'Vande',
     'Magasinier',
-    'Kòmis'
+    'Komis'
   ];
 
   const PEMISYON_PA_WOL = {
-    'Propriyetè':    { tout: true },
-    'Administratè':  { tout: true },
-    'Direktè':       { rapò: true, aprouve: true, vant: 'li', acha: 'li' },
-    'Kontablè':      { kontabilite: true, rapò: true, kès: true },
-    'Vandè':         { vant: 'ekri', kliyan: 'ekri' },
+    'Propriyete':    { tout: true },
+    'Administrate':  { tout: true },
+    'Direkte':       { rapò: true, aprouve: true, vant: 'li', acha: 'li' },
+    'Kontable':      { kontabilite: true, rapò: true, kès: true },
+    'Vande':         { vant: 'ekri', kliyan: 'ekri' },
     'Magasinier':    { enventè: 'ekri', pwodwi: 'li' },
-    'Kòmis':         { vant: 'li' }
+    'Komis':         { vant: 'li' }
   };
 
   const MODIL_LIS = [
@@ -35,57 +36,57 @@
 
   const ETAP_WORKFLOW = ['an_atant', 'apwouve_manadjè', 'apwouve_direktè', 'egzekite', 'rejte'];
 
-  // ---------- ITILIZATÈ ----------
+  // ---------- ITILIZATE ----------
 
-  async function kreyeItilizatè(bizId, itilizatèData) {
-    if (!bizId || !itilizatèData?.imèl || !itilizatèData?.wòl) {
-      throw new Error('Done itilizatè yo enkonplè (bizId, imèl, wòl obligatwa)');
+  async function kreyeItilizate(bizId, itilizateData) {
+    if (!bizId || !itilizateData?.imèl || !itilizateData?.wol) {
+      throw new Error('Done itilizate yo enkonplè (bizId, imèl, wol obligatwa)');
     }
-    if (!WOL_VALID.includes(itilizatèData.wòl)) {
-      throw new Error(`Wòl "${itilizatèData.wòl}" pa valid`);
+    if (!WOL_VALID.includes(itilizateData.wol)) {
+      throw new Error(`Wol "${itilizateData.wol}" pa valid`);
     }
 
-    const itilizatèRef = db
+    const itilizateRef = db
       .collection('businesses').doc(bizId)
-      .collection('itilizatè').doc();
+      .collection('itilizate').doc();
 
     await db.runTransaction(async (tx) => {
       const kIm = await tx.get(
         db.collection('businesses').doc(bizId)
-          .collection('itilizatè')
-          .where('imèl', '==', itilizatèData.imèl)
+          .collection('itilizate')
+          .where('imèl', '==', itilizateData.imèl)
       );
       if (!kIm.empty) {
-        throw new Error('Yon itilizatè ak imèl sa a deja egziste');
+        throw new Error('Yon itilizate ak imèl sa a deja egziste');
       }
 
-      tx.set(itilizatèRef, {
-        non: itilizatèData.non,
-        imèl: itilizatèData.imèl,
-        depatman: itilizatèData.depatman || null,
-        pòs: itilizatèData.pòs || null,
-        wòl: itilizatèData.wòl,
-        pèmisyon: PEMISYON_PA_WOL[itilizatèData.wòl] || {},
+      tx.set(itilizateRef, {
+        non: itilizateData.non,
+        imèl: itilizateData.imèl,
+        depatman: itilizateData.depatman || null,
+        pos: itilizateData.pos || null,
+        wol: itilizateData.wol,
+        pèmisyon: PEMISYON_PA_WOL[itilizateData.wol] || {},
         estati: 'aktif',
         dateKreyasyon: firebase.firestore.FieldValue.serverTimestamp(),
         kreyePa: window.auth?.currentUser?.uid || null
       });
     });
 
-    return itilizatèRef.id;
+    return itilizateRef.id;
   }
 
-  async function chanjeEstatiItilizatè(bizId, itilizatèId, nouvoEstati) {
+  async function chanjeEstatiItilizate(bizId, itilizateId, nouvoEstati) {
     const estatiValid = ['aktif', 'sispann', 'dezaktive'];
     if (!estatiValid.includes(nouvoEstati)) {
       throw new Error('Estati pa valid');
     }
     const ref = db.collection('businesses').doc(bizId)
-      .collection('itilizatè').doc(itilizatèId);
+      .collection('itilizate').doc(itilizateId);
 
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
-      if (!snap.exists) throw new Error('Itilizatè pa jwenn');
+      if (!snap.exists) throw new Error('Itilizate pa jwenn');
       tx.update(ref, {
         estati: nouvoEstati,
         dateModifikasyon: firebase.firestore.FieldValue.serverTimestamp(),
@@ -94,27 +95,27 @@
     });
   }
 
-  async function chanjeWòlItilizatè(bizId, itilizatèId, nouvoWòl) {
-    if (!WOL_VALID.includes(nouvoWòl)) {
-      throw new Error(`Wòl "${nouvoWòl}" pa valid`);
+  async function chanjeWolItilizate(bizId, itilizateId, nouvoWol) {
+    if (!WOL_VALID.includes(nouvoWol)) {
+      throw new Error(`Wol "${nouvoWol}" pa valid`);
     }
     const ref = db.collection('businesses').doc(bizId)
-      .collection('itilizatè').doc(itilizatèId);
+      .collection('itilizate').doc(itilizateId);
 
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
-      if (!snap.exists) throw new Error('Itilizatè pa jwenn');
+      if (!snap.exists) throw new Error('Itilizate pa jwenn');
       tx.update(ref, {
-        wòl: nouvoWòl,
-        pèmisyon: PEMISYON_PA_WOL[nouvoWòl] || {},
+        wol: nouvoWol,
+        pèmisyon: PEMISYON_PA_WOL[nouvoWol] || {},
         dateModifikasyon: firebase.firestore.FieldValue.serverTimestamp()
       });
     });
   }
 
-  function abònmanItilizatè(bizId, callback) {
+  function abònmanItilizate(bizId, callback) {
     return db.collection('businesses').doc(bizId)
-      .collection('itilizatè')
+      .collection('itilizate')
       .orderBy('dateKreyasyon', 'desc')
       .onSnapshot((snap) => {
         const lis = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -122,9 +123,9 @@
       });
   }
 
-  function genPèmisyon(itilizatè, modil, nivo) {
-    if (!itilizatè || itilizatè.estati !== 'aktif') return false;
-    const p = itilizatè.pèmisyon || {};
+  function genPèmisyon(itilizate, modil, nivo) {
+    if (!itilizate || itilizate.estati !== 'aktif') return false;
+    const p = itilizate.pèmisyon || {};
     if (p.tout) return true;
     if (!(modil in p)) return false;
     if (p[modil] === true) return true;
@@ -137,30 +138,30 @@
 
   async function jwennPèmisyonBiznis(bizId) {
     const ref = db.collection('businesses').doc(bizId)
-      .collection('paramèt').doc('pèmisyon');
+      .collection('paramet').doc('pèmisyon');
     const snap = await ref.get();
     if (snap.exists) return snap.data();
     return { ...PEMISYON_PA_WOL };
   }
 
-  async function aktyaliizePèmisyonWòl(bizId, wòl, pèmisyonObj) {
-    if (!WOL_VALID.includes(wòl)) throw new Error(`Wòl "${wòl}" pa valid`);
+  async function aktyaliizePèmisyonWol(bizId, wol, pèmisyonObj) {
+    if (!WOL_VALID.includes(wol)) throw new Error(`Wol "${wol}" pa valid`);
 
     const ref = db.collection('businesses').doc(bizId)
-      .collection('paramèt').doc('pèmisyon');
+      .collection('paramet').doc('pèmisyon');
 
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
       const done = snap.exists ? snap.data() : { ...PEMISYON_PA_WOL };
-      done[wòl] = pèmisyonObj;
+      done[wol] = pèmisyonObj;
       tx.set(ref, done, { merge: true });
     });
 
-    const itilizatèSnap = await db.collection('businesses').doc(bizId)
-      .collection('itilizatè').where('wòl', '==', wòl).get();
+    const itilizateSnap = await db.collection('businesses').doc(bizId)
+      .collection('itilizate').where('wol', '==', wol).get();
 
     const batch = db.batch();
-    itilizatèSnap.docs.forEach(d => {
+    itilizateSnap.docs.forEach(d => {
       batch.update(d.ref, { pèmisyon: pèmisyonObj });
     });
     await batch.commit();
@@ -168,7 +169,7 @@
 
   function abònmanPèmisyon(bizId, callback) {
     return db.collection('businesses').doc(bizId)
-      .collection('paramèt').doc('pèmisyon')
+      .collection('paramet').doc('pèmisyon')
       .onSnapshot((snap) => {
         callback(snap.exists ? snap.data() : { ...PEMISYON_PA_WOL });
       });
@@ -385,47 +386,47 @@
     await anrejistreLog(bizId, 'Administrasyon', 'Dezaktive Depatman', 'aktif', 'dezaktive');
   }
 
-  // ---------- 1.6 POSTES ----------
+  // ---------- 1.6 POS (Postes) ----------
 
-  async function kreyePòs(bizId, pòsData) {
-    if (!pòsData?.non) throw new Error('Non pòs la obligatwa.');
+  async function kreyePos(bizId, posData) {
+    if (!posData?.non) throw new Error('Non pòs la obligatwa.');
 
     const ref = db.collection('businesses').doc(bizId)
-      .collection('pòs').doc();
+      .collection('pos').doc();
 
     await ref.set({
-      non: pòsData.non.trim(),
-      depatmanId: pòsData.depatmanId || null,
+      non: posData.non.trim(),
+      depatmanId: posData.depatmanId || null,
       aktif: true,
       dateKreyasyon: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    await anrejistreLog(bizId, 'Administrasyon', 'Kreye Pòs', '—', pòsData.non.trim());
+    await anrejistreLog(bizId, 'Administrasyon', 'Kreye Pòs', '—', posData.non.trim());
     return ref.id;
   }
 
-  function abònmanPòs(bizId, callback) {
+  function abònmanPos(bizId, callback) {
     return db.collection('businesses').doc(bizId)
-      .collection('pòs')
+      .collection('pos')
       .where('aktif', '==', true)
       .onSnapshot(snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
   }
 
-  async function dezaktivePòs(bizId, pòsId) {
+  async function dezaktivePos(bizId, posId) {
     await db.collection('businesses').doc(bizId)
-      .collection('pòs').doc(pòsId)
+      .collection('pos').doc(posId)
       .update({ aktif: false });
     await anrejistreLog(bizId, 'Administrasyon', 'Dezaktive Pòs', 'aktif', 'dezaktive');
   }
 
   // ---------- 1.10 SESSIONS AKTIF ----------
 
-  async function anrejistreSession(bizId, itilizatèId, sessionInfo) {
+  async function anrejistreSession(bizId, itilizateId, sessionInfo) {
     const ref = db.collection('businesses').doc(bizId)
       .collection('sessions').doc();
     await ref.set({
-      itilizatèId,
-      itilizatèNon: sessionInfo.non || '',
+      itilizateId,
+      itilizateNon: sessionInfo.non || '',
       aparèy: sessionInfo.aparèy || 'Enkoni',
       navigatè: sessionInfo.navigatè || 'Enkoni',
       dateKoneksyon: firebase.firestore.FieldValue.serverTimestamp(),
@@ -453,8 +454,8 @@
     const ref = db.collection('businesses').doc(bizId)
       .collection('auditLog').doc();
     await ref.set({
-      itilizatèId: window.auth?.currentUser?.uid || null,
-      itilizatèNon: window.auth?.currentUser?.displayName || 'Sistèm',
+      itilizateId: window.auth?.currentUser?.uid || null,
+      itilizateNon: window.auth?.currentUser?.displayName || 'Sistèm',
       modil,
       aksyon,
       ansyenValè: String(ansyenValè ?? '—'),
@@ -502,14 +503,14 @@
 
   window.AdminService = {
     WOL_VALID, MODIL_LIS, SÈY_APWOBASYON, ETAP_WORKFLOW,
-    kreyeItilizatè, chanjeEstatiItilizatè, chanjeWòlItilizatè, abònmanItilizatè, genPèmisyon,
-    jwennPèmisyonBiznis, aktyaliizePèmisyonWòl, abònmanPèmisyon,
+    kreyeItilizate, chanjeEstatiItilizate, chanjeWolItilizate, abònmanItilizate, genPèmisyon,
+    jwennPèmisyonBiznis, aktyaliizePèmisyonWol, abònmanPèmisyon,
     soumèTDemandApwobasyon, apwouveDemand, rejteDemand, egzekiteDemand, abònmanDemandApwobasyon,
     abònmanProfilAntrepriz, aktyalizeProfilAntrepriz,
     kreyeBiznis, abònmanBiznisPa, chanjeEstatiBiznis,
     kreyeSuccursale, abònmanSuccursale,
     kreyeDepatman, abònmanDepatman, dezaktiveDepatman,
-    kreyePòs, abònmanPòs, dezaktivePòs,
+    kreyePos, abònmanPos, dezaktivePos,
     anrejistreSession, fèmenSession, abònmanSessionsAktif,
     anrejistreLog, abònmanAuditLog,
     kreyeNotifikasyon, rezoudNotifikasyon, abònmanNotifikasyon
