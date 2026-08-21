@@ -17,31 +17,20 @@ const PurchasesService = (() => {
         return 'ACH-' + String(nextNum).padStart(6, '0');
     }
 
-    /**
-     * Kreye yon acha. Ogmante stock otomatikman, kreye ekriti jounal
-     * (Débit Stock, Crédit Kès/Founisè), e si kredi, ogmante dèt founisè.
-     *
-     * @param {Object} purchaseData
-     *   purchaseData.founisèId  - ID founisè (obligatwa)
-     *   purchaseData.founisèNon - non founisè pou afichaj rapid
-     *   purchaseData.mòdPeman   - 'kach' | 'kredi' | 'transfè'
-     *   purchaseData.atik       - [{ pwodwiId, non, kantite, priInite }]
-     */
     async function createPurchase(purchaseData) {
-        if (!purchaseData.founisèId) {
+        if (!purchaseData.founiseId) {
             throw new Error("Founisè a obligatwa pou yon acha.");
         }
 
         const bizRef = getBizRef();
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
-            // ---- 1. TOUT LEKTI ANVAN NENPÒT EKRITI ----
             const productRefs = purchaseData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
 
-            const founisèRef = bizRef.collection('founisè').doc(purchaseData.founisèId);
-            const founisèDoc = await transaction.get(founisèRef);
-            if (!founisèDoc.exists) throw new Error("Founisè sa a pa egziste.");
+            const founiseRef = bizRef.collection('founise').doc(purchaseData.founiseId);
+            const founiseDoc = await transaction.get(founiseRef);
+            if (!founiseDoc.exists) throw new Error("Founisè sa a pa egziste.");
 
             let total = 0;
             const stockUpdates = [];
@@ -59,22 +48,17 @@ const PurchasesService = (() => {
                 });
             });
 
-            // ---- 2. NIMEWO ACHA SEKANSYÈL ----
             const nimewoAcha = await getNextPurchaseNumber(transaction, bizRef);
 
-            // ---- 3. EKRITI ----
-
-            // 3a. Ogmante stock pou chak pwodwi
             stockUpdates.forEach(u => {
                 transaction.update(u.ref, { kantiteStock: u.nouvoKantite });
             });
 
-            // 3b. Kreye dokiman acha a
             const achatRef = bizRef.collection('acha').doc();
             transaction.set(achatRef, {
                 nimewoAcha,
-                founisèId: purchaseData.founisèId,
-                founisèNon: purchaseData.founisèNon || founisèDoc.data().non,
+                founiseId: purchaseData.founiseId,
+                founiseNon: purchaseData.founiseNon || founiseDoc.data().non,
                 mòdPeman: purchaseData.mòdPeman,
                 atik: purchaseData.atik,
                 total,
@@ -82,7 +66,6 @@ const PurchasesService = (() => {
                 dat: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // 3c. Ekriti jounal: Débit Stock (1040), Crédit Kès(1010)/Founisè(2010)
             const journalRef = bizRef.collection('jounal').doc();
             const kontCredit = purchaseData.mòdPeman === 'kredi' ? '2010' : '1010';
             transaction.set(journalRef, {
@@ -96,16 +79,14 @@ const PurchasesService = (() => {
                 sous: 'automatique'
             });
 
-            // 3d. Si kredi, ogmante dèt founisè
             if (purchaseData.mòdPeman === 'kredi') {
-                const dètAktyèl = founisèDoc.data().dèt || 0;
-                transaction.update(founisèRef, { dèt: dètAktyèl + total });
+                const dètAktyèl = founiseDoc.data().dèt || 0;
+                transaction.update(founiseRef, { dèt: dètAktyèl + total });
             }
 
             return { id: achatRef.id, nimewoAcha, total };
         });
 
-        // ---- AUDIT LOG (apre transaksyon konfime, pa blòke acha si l echwe) ----
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
                 window.currentCompanyId,
@@ -148,11 +129,11 @@ const PurchasesService = (() => {
             const productRefs = acha.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
 
-            let founisèRef = null;
-            let founisèDoc = null;
+            let founiseRef = null;
+            let founiseDoc = null;
             if (acha.mòdPeman === 'kredi') {
-                founisèRef = bizRef.collection('founisè').doc(acha.founisèId);
-                founisèDoc = await transaction.get(founisèRef);
+                founiseRef = bizRef.collection('founise').doc(acha.founiseId);
+                founiseDoc = await transaction.get(founiseRef);
             }
 
             productDocs.forEach((doc, i) => {
@@ -186,16 +167,15 @@ const PurchasesService = (() => {
                 rezon
             });
 
-            if (founisèRef && founisèDoc && founisèDoc.exists) {
-                const dètAktyèl = founisèDoc.data().dèt || 0;
+            if (founiseRef && founiseDoc && founiseDoc.exists) {
+                const dètAktyèl = founiseDoc.data().dèt || 0;
                 const nouvoDèt = Math.max(0, dètAktyèl - acha.total);
-                transaction.update(founisèRef, { dèt: nouvoDèt });
+                transaction.update(founiseRef, { dèt: nouvoDèt });
             }
 
             return { nimewoAcha: acha.nimewoAcha, total: acha.total };
         });
 
-        // ---- AUDIT LOG ----
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
                 window.currentCompanyId,
