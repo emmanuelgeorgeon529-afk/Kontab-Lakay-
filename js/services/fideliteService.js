@@ -1,28 +1,26 @@
-// js/services/fidéliteService.js
+// js/services/fideliteService.js
 // Depann de window.db, window.currentCompanyId, window.AdminService
 
-const FidéliteService = (() => {
+const FideliteService = (() => {
 
     function getBizRef() {
         if (!window.currentCompanyId) throw new Error("Pa gen biznis aktif chwazi.");
         return window.db.collection('biznis').doc(window.currentCompanyId);
     }
 
-    const TAUX_PWEN = 1;        // 1 pwen pou chak 100 HTG depanse
-    const VALÈ_PWEN_HTG = 1;    // 1 pwen = 1 HTG lè kliyan sèvi ak li
-    const TAUX_CASHBACK = 0.02; // 2% cashback otomatik
-
-    // ---------- AJOUTE PWEN APRE YON VANT (rele pa salesService/ventes_ui) ----------
+    const TAUX_PWEN = 1;
+    const VALÈ_PWEN_HTG = 1;
+    const TAUX_CASHBACK = 0.02;
 
     async function ajoutePwenApreVant(kliyanId, montanVant) {
-        if (!kliyanId) return; // Kliyan Divès pa gen kont fidélité
+        if (!kliyanId) return;
 
         const pwenGanye = Math.floor((montanVant / 100) * TAUX_PWEN);
         const cashback = montanVant * TAUX_CASHBACK;
         if (pwenGanye === 0 && cashback === 0) return;
 
         const bizRef = getBizRef();
-        const fidèlRef = bizRef.collection('fidélité').doc(kliyanId);
+        const fidèlRef = bizRef.collection('fidelite').doc(kliyanId);
 
         await window.db.runTransaction(async (transaction) => {
             const doc = await transaction.get(fidèlRef);
@@ -37,20 +35,18 @@ const FidéliteService = (() => {
         });
     }
 
-    async function getFidéliteByCustomer(kliyanId) {
+    async function getFideliteByCustomer(kliyanId) {
         const bizRef = getBizRef();
-        const doc = await bizRef.collection('fidélité').doc(kliyanId).get();
+        const doc = await bizRef.collection('fidelite').doc(kliyanId).get();
         if (!doc.exists) return { pwenAkimile: 0, cashbackAkimile: 0 };
         return doc.data();
     }
-
-    // ---------- SÈVI AK PWEN (rediksyon sou pwochen vant) ----------
 
     async function itilizePwen(kliyanId, nòmbPwen) {
         if (!nòmbPwen || nòmbPwen <= 0) throw new Error("Nòmb pwen dwe pi gran pase 0.");
 
         const bizRef = getBizRef();
-        const fidèlRef = bizRef.collection('fidélité').doc(kliyanId);
+        const fidèlRef = bizRef.collection('fidelite').doc(kliyanId);
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
             const doc = await transaction.get(fidèlRef);
@@ -75,14 +71,12 @@ const FidéliteService = (() => {
             ).catch(err => console.warn('Audit log echwe:', err));
         }
 
-        return rezilta; // ventes_ui aplike valèItilize kòm yon remise sou fakti a
+        return rezilta;
     }
-
-    // ---------- RETIRE CASHBACK (kliyan mande peman cashback li) ----------
 
     async function retireCashback(kliyanId) {
         const bizRef = getBizRef();
-        const fidèlRef = bizRef.collection('fidélité').doc(kliyanId);
+        const fidèlRef = bizRef.collection('fidelite').doc(kliyanId);
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
             const doc = await transaction.get(fidèlRef);
@@ -105,8 +99,8 @@ const FidéliteService = (() => {
 
     return {
         TAUX_PWEN, VALÈ_PWEN_HTG, TAUX_CASHBACK,
-        ajoutePwenApreVant, getFidéliteByCustomer, itilizePwen, retireCashback
+        ajoutePwenApreVant, getFideliteByCustomer, itilizePwen, retireCashback
     };
 })();
 
-window.FidéliteService = FidéliteService;
+window.FideliteService = FideliteService;
