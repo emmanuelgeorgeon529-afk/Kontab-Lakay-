@@ -1,0 +1,27 @@
+/* ============================================
+   KONTAB LAKAY - theme-dark.css
+   Aktive avèk: <body data-theme="dark">
+   ============================================ */
+
+[data-theme="dark"] {
+    --primary: #6366F1; --primary-dark: #4F46E5;
+    --secondary: #34D399; --danger: #F87171;
+    --bg-main: #0F172A; --bg-white: #1E293B;
+    --text-dark: #F1F5F9; --text-muted: #94A3B8;
+    --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sidebar { border-right: 1px solid #334155; }
+[data-theme="dark"] .topbar { border-bottom: 1px solid #334155; }
+[data-theme="dark"] .nav-item:hover { background: #334155; }
+[data-theme="dark"] .nav-item.active { background: rgba(99, 102, 241, 0.15); }
+[data-theme="dark"] .search-box { background: #334155; }
+[data-theme="dark"] .search-box:focus-within { background: #1E293B; }
+[data-theme="dark"] .kpi-card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); }
+[data-theme="dark"] .chart-section { border: 1px solid #334155; }
+[data-theme="dark"] .fin-table th { border-bottom: 2px solid #334155; }
+[data-theme="dark"] .fin-table td { border-bottom: 1px solid #334155; }
+[data-theme="dark"] .bank-card { background: #0F172A; border: 1px solid #334155; }
+[data-theme="dark"] .settings-input { background: #0F172A; border: 1px solid #334155; color: var(--text-dark); }
+[data-theme="dark"] .login-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); }
+[data-theme="dark"] .login-card .form-group input { background: #0F172A; border: 1px solid #334155; color: var(--text-dark); }
