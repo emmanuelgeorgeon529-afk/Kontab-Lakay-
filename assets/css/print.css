@@ -1,0 +1,44 @@
+/* ============================================
+   KONTAB LAKAY - print.css
+   ============================================ */
+
+@media print {
+    .sidebar, .topbar, #hamburgerBtn, #mobileSearchBtn,
+    #mobileSearchOverlay, .btn-primary, .nav-item,
+    button, .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .view-container {
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    .chart-section, .kpi-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        break-inside: avoid;
+    }
+
+    .fin-table {
+        font-size: 11px;
+    }
+    .fin-table th, .fin-table td {
+        border-bottom: 1px solid #999 !important;
+    }
+
+    a[href]::after {
+        content: none !important;
+    }
+
+    @page {
+        margin: 1.5cm;
+    }
+}
