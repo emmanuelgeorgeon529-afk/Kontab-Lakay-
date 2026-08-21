@@ -9,7 +9,7 @@ const ObjectifsService = (() => {
     }
 
     /**
-     * Kreye yon objektif komèsyal pou yon vandè, sou yon peryòd bay.
+     * Kreye yon objektif komèsyal pou yon vande, sou yon peryòd bay.
      * @param {Object} data
      *   data.vandèId, vandèNon
      *   data.montanObjektif
@@ -55,7 +55,7 @@ const ObjectifsService = (() => {
 
     async function getObjectiveProgress(objectiveId) {
         const bizRef = getBizRef();
-        const doc = await bizRef.collection('objectif_vandè').doc(objectiveId).get();
+        const doc = await bizRef.collection('objectif_vande').doc(objectiveId).get();
         if (!doc.exists) throw new Error("Objektif sa a pa egziste.");
         const obj = doc.data();
 
