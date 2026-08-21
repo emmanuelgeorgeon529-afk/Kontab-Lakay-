@@ -1,0 +1,12 @@
+<!-- MODAL SHELL JENERIK (rezèvasyon pou tout modal nan app la) -->
+<div id="genericModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:white; border-radius:16px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto; padding:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 id="genericModalTitle" style="font-size:18px; font-weight:700;"></h3>
+            <span onclick="ModalService.close()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+        </div>
+        <div id="genericModalError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+        <div id="genericModalBody"></div>
+        <div id="genericModalFooter" style="margin-top:20px;"></div>
+    </div>
+</div>
