@@ -1,0 +1,215 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function konekte() {
+      return request.auth != null;
+    }
+
+    // Koleksyon itilizate a rele "itilizate" (SAN aksan), chan wol la rele "wol"
+    function manmBiznis(bizId) {
+      return konekte()
+        && exists(
+          /databases/$(database)/documents/businesses/$(bizId)/itilizate/$(request.auth.uid)
+        );
+    }
+
+    function wolItilizate(bizId) {
+      return get(
+        /databases/$(database)/documents/businesses/$(bizId)/itilizate/$(request.auth.uid)
+      ).data.wol;
+    }
+
+    function genWol(bizId, wolOtorize) {
+      return manmBiznis(bizId)
+        && wolItilizate(bizId) in wolOtorize;
+    }
+
+    function seAdministrate(bizId) {
+      return genWol(bizId, ['Propriyete', 'Administrate']);
+    }
+
+    function seKontablOswaAdmin(bizId) {
+      return genWol(bizId, ['Propriyete', 'Administrate', 'Kontable', 'Direkte']);
+    }
+
+    function seVandeOswaAdmin(bizId) {
+      return genWol(bizId, ['Propriyete', 'Administrate', 'Vande', 'Kontable']);
+    }
+
+    function seMagasinierOswaAdmin(bizId) {
+      return genWol(bizId, ['Propriyete', 'Administrate', 'Magasinier']);
+    }
+
+    match /businesses/{bizId} {
+
+      allow read: if manmBiznis(bizId);
+      allow write: if seAdministrate(bizId);
+
+      // ---------- 1. STRUCTURE, GOUVERNANCE & ADMINISTRATION ----------
+
+      match /itilizate/{userId} {
+        allow read: if manmBiznis(bizId)
+          && (request.auth.uid == userId || seAdministrate(bizId));
+        allow create, update: if seAdministrate(bizId);
+        allow delete: if false;
+      }
+
+      match /paramet/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seAdministrate(bizId);
+      }
+
+      match /demandApwobasyon/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if manmBiznis(bizId);
+        allow update: if genWol(bizId, ['Propriyete', 'Administrate', 'Direkte']);
+        allow delete: if false;
+      }
+
+      match /succursale/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seAdministrate(bizId);
+      }
+
+      match /depatman/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seAdministrate(bizId);
+      }
+
+      match /pos/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seAdministrate(bizId);
+      }
+
+      match /sessions/{docId} {
+        allow read: if seAdministrate(bizId);
+        allow create: if manmBiznis(bizId);
+        allow update: if manmBiznis(bizId);
+        allow delete: if false;
+      }
+
+      match /auditLog/{docId} {
+        allow read: if seAdministrate(bizId);
+        allow create: if manmBiznis(bizId);
+        allow update, delete: if false;
+      }
+
+      match /notifikasyon/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if manmBiznis(bizId);
+        allow update: if manmBiznis(bizId);
+        allow delete: if false;
+      }
+
+      // ---------- 3. VENTES, CRM & RELATION CLIENT ----------
+
+      match /pwodwi/{pwodwiId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seMagasinierOswaAdmin(bizId) || seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /ajistman_stock/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if seMagasinierOswaAdmin(bizId);
+        allow update, delete: if false;
+      }
+
+      match /kliyan/{kliyanId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /peman_kliyan/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if seVandeOswaAdmin(bizId);
+        allow update, delete: if false;
+      }
+
+      match /founise/{founiseId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seKontablOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /peman_founise/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if seKontablOswaAdmin(bizId);
+        allow update, delete: if false;
+      }
+
+      match /lavant/{venteId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /acha/{achatId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seKontablOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /devis/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /commande/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /promotion/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /fidelite/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seVandeOswaAdmin(bizId);
+      }
+
+      match /kanpay_maketing/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /sav/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /objectif_vande/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seAdministrate(bizId);
+      }
+
+      // ---------- KONTABILITE (kominan pou plizyè modil) ----------
+
+      match /konte/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seVandeOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
+      }
+
+      match /jounal/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if manmBiznis(bizId);
+        allow update, delete: if false;
+      }
+
+      match /plan_comptes/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow write: if seKontablOswaAdmin(bizId);
+      }
+    }
+  }
+}
