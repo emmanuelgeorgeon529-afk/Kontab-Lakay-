@@ -1,0 +1,27 @@
+/* ============================================
+   KONTAB LAKAY - theme-light.css
+   Aktive avèk: <body data-theme="light"> (oswa okenn atribi, se defo)
+   ============================================ */
+
+[data-theme="light"], :root {
+    --primary: #4F46E5; --primary-dark: #4338CA;
+    --secondary: #10B981; --danger: #EF4444;
+    --bg-main: #F8FAFC; --bg-white: #FFFFFF;
+    --text-dark: #0F172A; --text-muted: #64748B;
+    --shadow-card: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+}
+
+[data-theme="light"] .sidebar { border-right: 1px solid #E2E8F0; }
+[data-theme="light"] .topbar { border-bottom: 1px solid #E2E8F0; }
+[data-theme="light"] .nav-item:hover { background: #F1F5F9; }
+[data-theme="light"] .nav-item.active { background: #EEF2FF; }
+[data-theme="light"] .search-box { background: #F1F5F9; }
+[data-theme="light"] .search-box:focus-within { background: white; }
+[data-theme="light"] .kpi-card { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3); }
+[data-theme="light"] .chart-section { border: 1px solid #E2E8F0; }
+[data-theme="light"] .fin-table th { border-bottom: 2px solid #E2E8F0; }
+[data-theme="light"] .fin-table td { border-bottom: 1px solid #f1f5f9; }
+[data-theme="light"] .bank-card { background: #F8FAFC; border: 1px solid #E2E8F0; }
+[data-theme="light"] .settings-input { background: white; border: 1px solid #E2E8F0; color: var(--text-dark); }
+[data-theme="light"] .login-card { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3); }
+[data-theme="light"] .login-card .form-group input { background: white; border: 1px solid #E2E8F0; color: var(--text-dark); }
