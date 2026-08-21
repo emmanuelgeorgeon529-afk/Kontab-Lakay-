@@ -1,14 +1,15 @@
 // js/modules/admin_ui.js
 // Konekte seksyon "Structure, Gouvernance & Administration" ak AdminService
+// NÒT: itilizate/wol/pos san aksan pou match ak firestore.rules
 // Depann de window.AdminService (adminService.js) ak yon bizId global
 
 (function () {
-  let unsubItilizatè = null;
-  let itilizatèKouranLis = [];
+  let unsubItilizate = null;
+  let itilizateKouranLis = [];
   let unsubPèmisyon = null;
   let unsubDemand = null;
   let unsubProfil, unsubBiznis, unsubSucc, unsubSessions, unsubAuditLog, unsubNotif;
-  let unsubDepatman, unsubPòs;
+  let unsubDepatman, unsubPos;
   let depatmanCache = [];
 
   function getBizId() {
@@ -33,12 +34,12 @@
 
   // ---------- 1.7 GESTION UTILISATEURS ----------
 
-  function rannTabloItilizatè(lis) {
+  function rannTabloItilizate(lis) {
     const tbody = document.querySelector('#tablo-itilizatè tbody');
     if (!tbody) return;
 
     if (lis.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Pa gen itilizatè ankò</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Pa gen itilizate ankò</td></tr>`;
       return;
     }
 
@@ -49,10 +50,10 @@
           <td>${escHtml(u.non || '—')}</td>
           <td>${escHtml(u.imèl || '—')}</td>
           <td>${escHtml(u.depatman || '—')}</td>
-          <td>${escHtml(u.wòl || '—')}</td>
+          <td>${escHtml(u.wol || '—')}</td>
           <td>${badge}
             <div style="display:flex; gap:6px; margin-top:6px;">
-              <button class="btn-chanje-wòl" data-id="${u.id}" style="font-size:11px; padding:4px 8px; border-radius:6px; border:1px solid #E2E8F0; background:var(--bg-white);">Chanje Wòl</button>
+              <button class="btn-chanje-wol" data-id="${u.id}" style="font-size:11px; padding:4px 8px; border-radius:6px; border:1px solid #E2E8F0; background:var(--bg-white);">Chanje Wòl</button>
               ${u.estati === 'aktif'
                 ? `<button class="btn-sispann" data-id="${u.id}" style="font-size:11px; padding:4px 8px; border-radius:6px; border:none; background:#FEF3C7; color:#B45309;">Sispann</button>`
                 : `<button class="btn-reaktive" data-id="${u.id}" style="font-size:11px; padding:4px 8px; border-radius:6px; border:none; background:#D1FAE5; color:#047857;">Reaktive</button>`}
@@ -81,34 +82,34 @@
     document.querySelectorAll('.btn-reaktive').forEach(btn => {
       btn.onclick = () => aksyonEstati(btn.dataset.id, 'aktif');
     });
-    document.querySelectorAll('.btn-chanje-wòl').forEach(btn => {
-      btn.onclick = () => ouvriModalWòl(btn.dataset.id);
+    document.querySelectorAll('.btn-chanje-wol').forEach(btn => {
+      btn.onclick = () => ouvriModalWol(btn.dataset.id);
     });
   }
 
-  async function aksyonEstati(itilizatèId, nouvoEstati) {
+  async function aksyonEstati(itilizateId, nouvoEstati) {
     try {
-      await window.AdminService.chanjeEstatiItilizatè(getBizId(), itilizatèId, nouvoEstati);
+      await window.AdminService.chanjeEstatiItilizate(getBizId(), itilizateId, nouvoEstati);
     } catch (e) {
       alert('Erè: ' + e.message);
     }
   }
 
-  function ouvriModalWòl(itilizatèId) {
-    const itilizatè = itilizatèKouranLis.find(u => u.id === itilizatèId);
-    if (!itilizatè) return;
+  function ouvriModalWol(itilizateId) {
+    const itilizate = itilizateKouranLis.find(u => u.id === itilizateId);
+    if (!itilizate) return;
 
-    const wòlChwazi = prompt(
-      `Nouvo wòl pou ${itilizatè.non} (opsyon: ${window.AdminService.WOL_VALID.join(', ')})`,
-      itilizatè.wòl
+    const wolChwazi = prompt(
+      `Nouvo wòl pou ${itilizate.non} (opsyon: ${window.AdminService.WOL_VALID.join(', ')})`,
+      itilizate.wol
     );
-    if (!wòlChwazi) return;
+    if (!wolChwazi) return;
 
-    window.AdminService.chanjeWòlItilizatè(getBizId(), itilizatèId, wòlChwazi.trim())
+    window.AdminService.chanjeWolItilizate(getBizId(), itilizateId, wolChwazi.trim())
       .catch(e => alert('Erè: ' + e.message));
   }
 
-  function branchBotonNouvoItilizatè() {
+  function branchBotonNouvoItilizate() {
     const btn = document.querySelector('#btn-nouvo-itilizatè');
     if (!btn) return;
     btn.onclick = async () => {
@@ -116,11 +117,11 @@
       if (!non) return;
       const imèl = prompt('Imèl:');
       if (!imèl) return;
-      const wòl = prompt(`Wòl (${window.AdminService.WOL_VALID.join(', ')}):`, 'Vandè');
-      if (!wòl) return;
+      const wol = prompt(`Wòl (${window.AdminService.WOL_VALID.join(', ')}):`, 'Vande');
+      if (!wol) return;
 
       try {
-        await window.AdminService.kreyeItilizatè(getBizId(), { non, imèl, wòl: wòl.trim() });
+        await window.AdminService.kreyeItilizate(getBizId(), { non, imèl, wol: wol.trim() });
       } catch (e) {
         alert('Erè: ' + e.message);
       }
@@ -129,47 +130,47 @@
 
   // ---------- 1.8 WÒL & PÈMISYON ----------
 
-  function rannKadWòl(pèmisyonDone) {
+  function rannKadWol(pèmisyonDone) {
     const kontenè = document.querySelector('#kad-wòl-pèmisyon');
     if (!kontenè) return;
 
-    kontenè.innerHTML = window.AdminService.WOL_VALID.map(wòl => {
-      const p = pèmisyonDone[wòl] || {};
+    kontenè.innerHTML = window.AdminService.WOL_VALID.map(wol => {
+      const p = pèmisyonDone[wol] || {};
       const kaz = window.AdminService.MODIL_LIS.map(modil => {
         const val = p[modil] || (p.tout ? true : false);
         const chwazi = val === true ? 'checked' : '';
         return `
           <label style="display:flex; align-items:center; gap:6px; font-size:12px;">
-            <input type="checkbox" class="chk-pèmisyon" data-wòl="${wòl}" data-modil="${modil}" ${chwazi}>
+            <input type="checkbox" class="chk-pèmisyon" data-wol="${wol}" data-modil="${modil}" ${chwazi}>
             ${modil}
           </label>`;
       }).join('');
 
       return `
         <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;">
-          <strong>${wòl}</strong>
+          <strong>${wol}</strong>
           <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:10px;">
             ${kaz}
           </div>
-          <button class="btn-sove-pèmisyon" data-wòl="${wòl}" style="margin-top:12px; font-size:11px; padding:6px 12px; border-radius:6px; border:none; background:var(--primary); color:white;">💾 Sove</button>
+          <button class="btn-sove-pèmisyon" data-wol="${wol}" style="margin-top:12px; font-size:11px; padding:6px 12px; border-radius:6px; border:none; background:var(--primary); color:white;">💾 Sove</button>
         </div>`;
     }).join('');
 
     document.querySelectorAll('.btn-sove-pèmisyon').forEach(btn => {
-      btn.onclick = () => sovePèmisyonWòl(btn.dataset.wòl);
+      btn.onclick = () => sovePèmisyonWol(btn.dataset.wol);
     });
   }
 
-  async function sovePèmisyonWòl(wòl) {
-    const chèk = document.querySelectorAll(`.chk-pèmisyon[data-wòl="${wòl}"]`);
+  async function sovePèmisyonWol(wol) {
+    const chèk = document.querySelectorAll(`.chk-pèmisyon[data-wol="${wol}"]`);
     const pèmisyonObj = {};
     chèk.forEach(c => {
       if (c.checked) pèmisyonObj[c.dataset.modil] = true;
     });
 
     try {
-      await window.AdminService.aktyaliizePèmisyonWòl(getBizId(), wòl, pèmisyonObj);
-      alert(`Pèmisyon "${wòl}" sove.`);
+      await window.AdminService.aktyaliizePèmisyonWol(getBizId(), wol, pèmisyonObj);
+      alert(`Pèmisyon "${wol}" sove.`);
     } catch (e) {
       alert('Erè: ' + e.message);
     }
@@ -179,7 +180,7 @@
     const bizId = getBizId();
     if (!bizId) return;
     if (unsubPèmisyon) unsubPèmisyon();
-    unsubPèmisyon = window.AdminService.abònmanPèmisyon(bizId, rannKadWòl);
+    unsubPèmisyon = window.AdminService.abònmanPèmisyon(bizId, rannKadWol);
   }
 
   // ---------- 1.9 WORKFLOW APWOBASYON ----------
@@ -358,17 +359,17 @@
     catch (e) { alert('Erè: ' + e.message); }
   }
 
-  // ---------- 1.6 POSTES ----------
+  // ---------- 1.6 POS ----------
 
-  function rannPòsList(lis) {
+  function rannPosList(lis) {
     const kontenè = document.querySelector('#pòs-kontenè');
     if (!kontenè) return;
     kontenè.innerHTML = lis.map(p => `
-      <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark); cursor:pointer;" onclick="AdminUI.dezaktivePòs('${p.id}')" title="Klike pou dezaktive">${escHtml(p.non)} ✕</span>
+      <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark); cursor:pointer;" onclick="AdminUI.dezaktivePos('${p.id}')" title="Klike pou dezaktive">${escHtml(p.non)} ✕</span>
     `).join('');
   }
 
-  async function ajoutePòs() {
+  async function ajoutePos() {
     const non = prompt('Non pòs la:');
     if (!non || !non.trim()) return;
     const depatmanOptions = depatmanCache.map(d => `${d.id} = ${d.non}`).join('\n');
@@ -376,13 +377,13 @@
       ? prompt(`ID depatman (vid = pa gen):\n${depatmanOptions}`)
       : null;
     try {
-      await window.AdminService.kreyePòs(getBizId(), { non: non.trim(), depatmanId: depatmanId || null });
+      await window.AdminService.kreyePos(getBizId(), { non: non.trim(), depatmanId: depatmanId || null });
     } catch (e) { alert('Erè: ' + e.message); }
   }
 
-  async function dezaktivePòs(pòsId) {
+  async function dezaktivePos(posId) {
     if (!confirm('Dezaktive pòs sa a?')) return;
-    try { await window.AdminService.dezaktivePòs(getBizId(), pòsId); }
+    try { await window.AdminService.dezaktivePos(getBizId(), posId); }
     catch (e) { alert('Erè: ' + e.message); }
   }
 
@@ -391,8 +392,8 @@
     if (!bizId) return;
     if (unsubDepatman) unsubDepatman();
     unsubDepatman = window.AdminService.abònmanDepatman(bizId, rannDepatmanList);
-    if (unsubPòs) unsubPòs();
-    unsubPòs = window.AdminService.abònmanPòs(bizId, rannPòsList);
+    if (unsubPos) unsubPos();
+    unsubPos = window.AdminService.abònmanPos(bizId, rannPosList);
   }
 
   // ---------- 1.10 SESSIONS AKTIF ----------
@@ -406,7 +407,7 @@
     }
     tbody.innerHTML = lis.map(s => {
       const dat = s.dateKoneksyon?.toDate ? s.dateKoneksyon.toDate().toLocaleString('fr-HT') : '—';
-      return `<tr><td>${escHtml(s.itilizatèNon)}</td><td>${escHtml(s.aparèy)}</td><td>${escHtml(s.navigatè)}</td><td>${dat}</td></tr>`;
+      return `<tr><td>${escHtml(s.itilizateNon)}</td><td>${escHtml(s.aparèy)}</td><td>${escHtml(s.navigatè)}</td><td>${dat}</td></tr>`;
     }).join('');
   }
 
@@ -421,7 +422,7 @@
     }
     tbody.innerHTML = lis.map(l => {
       const dat = l.dat?.toDate ? l.dat.toDate().toLocaleString('fr-HT') : '—';
-      return `<tr><td>${escHtml(l.itilizatèNon)}</td><td>${dat}</td><td>${escHtml(l.modil)}</td><td>${escHtml(l.aksyon)}</td><td>${escHtml(l.ansyenValè)}</td><td>${escHtml(l.nouvoValè)}</td></tr>`;
+      return `<tr><td>${escHtml(l.itilizateNon)}</td><td>${dat}</td><td>${escHtml(l.modil)}</td><td>${escHtml(l.aksyon)}</td><td>${escHtml(l.ansyenValè)}</td><td>${escHtml(l.nouvoValè)}</td></tr>`;
     }).join('');
   }
 
@@ -480,14 +481,14 @@
       console.warn('admin_ui.js: pa gen bizId disponib');
       return;
     }
-    if (unsubItilizatè) unsubItilizatè();
+    if (unsubItilizate) unsubItilizate();
 
-    unsubItilizatè = window.AdminService.abònmanItilizatè(bizId, (lis) => {
-      itilizatèKouranLis = lis;
-      rannTabloItilizatè(lis);
+    unsubItilizate = window.AdminService.abònmanItilizate(bizId, (lis) => {
+      itilizateKouranLis = lis;
+      rannTabloItilizate(lis);
     });
 
-    branchBotonNouvoItilizatè();
+    branchBotonNouvoItilizate();
     inisyaliizeSeksyonPèmisyon();
     inisyaliizeSeksyonWorkflow();
     inisyaliizeRèsSeksyon();
@@ -497,7 +498,7 @@
   window.AdminUI = {
     inisyaliseAdminUI,
     ajouteDepatman, dezaktiveDepatman,
-    ajoutePòs, dezaktivePòs
+    ajoutePos, dezaktivePos
   };
 
   document.addEventListener('DOMContentLoaded', () => {
