@@ -158,22 +158,43 @@ const CommandesService = (() => {
 
     // ---------- KONVÈTI AN VANT LÈ LIVRE (touche stock + jounal) ----------
 
+    // FIKS: lock kòmand la nan yon transaksyon AVAN kreye vant lan, pou anpeche
+    // doub-konvèsyon si etap 2 (mete ajou venteId sou kòmand la) echwe apre vant lan deja kreye.
     async function convertOrderToSale(orderId, mòdPeman) {
-        const commande = await getOrderById(orderId);
-        if (commande.estati !== 'livrée') {
-            throw new Error("Kòmand lan dwe nan estati 'livrée' anvan konvèsyon an vant.");
-        }
-        if (commande.venteId) throw new Error("Kòmand sa a deja konvèti an vant.");
+        const bizRef = getBizRef();
+        const cmdRef = bizRef.collection('commande').doc(orderId);
 
-        const vant = await window.SalesService.createSale({
-            kliyanId: commande.kliyanId,
-            kliyanNon: commande.kliyanNon,
-            mòdPeman: mòdPeman || 'kach',
-            atik: commande.atik
+        // ETAP 1: verifye + lock AVAN kreye vant — anpeche doub-konvèsyon
+        const commande = await window.db.runTransaction(async (transaction) => {
+            const doc = await transaction.get(cmdRef);
+            if (!doc.exists) throw new Error("Kòmand sa a pa egziste.");
+            const c = doc.data();
+            if (c.estati !== 'livrée') {
+                throw new Error("Kòmand lan dwe nan estati 'livrée' anvan konvèsyon an vant.");
+            }
+            if (c.venteId) throw new Error("Kòmand sa a deja konvèti an vant.");
+            if (c.konvèsyonAnKou) throw new Error("Konvèsyon deja an kou pou kòmand sa a.");
+
+            transaction.update(cmdRef, { konvèsyonAnKou: true }); // lock
+            return { id: doc.id, ...c };
         });
 
-        const bizRef = getBizRef();
-        await bizRef.collection('commande').doc(orderId).update({ venteId: vant.id });
+        // ETAP 2: kreye vant lan
+        let vant;
+        try {
+            vant = await window.SalesService.createSale({
+                kliyanId: commande.kliyanId,
+                kliyanNon: commande.kliyanNon,
+                mòdPeman: mòdPeman || 'kach',
+                atik: commande.atik
+            });
+        } catch (e) {
+            // Vant echwe → retire lock la pou moun ka eseye ankò
+            await cmdRef.update({ konvèsyonAnKou: false }).catch(() => {});
+            throw e;
+        }
+
+        await cmdRef.update({ venteId: vant.id, konvèsyonAnKou: false });
 
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
