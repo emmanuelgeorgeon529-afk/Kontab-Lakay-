@@ -112,21 +112,39 @@ const QuotesService = (() => {
 
     // ---------- KONVÈTI DEVI AN VANT (rele SalesService.createSale) ----------
 
+    // FIKS: lock devi a nan yon transaksyon AVAN kreye vant lan, pou anpeche
+    // doub-konvèsyon si etap 2 (mete ajou devi a) echwe apre vant lan deja kreye.
     async function convertQuoteToSale(quoteId, mòdPeman) {
-        const devis = await getQuoteById(quoteId);
-        if (devis.estati === 'converti') throw new Error("Devi sa a deja konvèti.");
-        if (devis.estati !== 'accepté') throw new Error("Devi a dwe aksepte anvan konvèsyon.");
+        const bizRef = getBizRef();
+        const devisRef = bizRef.collection('devis').doc(quoteId);
 
-        const vant = await window.SalesService.createSale({
-            kliyanId: devis.kliyanId,
-            kliyanNon: devis.kliyanNon,
-            mòdPeman: mòdPeman || 'kach',
-            atik: devis.atik
+        // ETAP 1: LOCK devi a AVAN kreye vant — anpeche doub-konvèsyon
+        const devis = await window.db.runTransaction(async (transaction) => {
+            const doc = await transaction.get(devisRef);
+            if (!doc.exists) throw new Error("Devi sa a pa egziste.");
+            const d = doc.data();
+            if (d.estati === 'converti') throw new Error("Devi sa a deja konvèti.");
+            if (d.estati !== 'accepté') throw new Error("Devi a dwe aksepte anvan konvèsyon.");
+            transaction.update(devisRef, { estati: 'converti' }); // lock imedya
+            return { id: doc.id, ...d };
         });
 
-        const bizRef = getBizRef();
-        await bizRef.collection('devis').doc(quoteId).update({
-            estati: 'converti',
+        // ETAP 2: kreye vant lan
+        let vant;
+        try {
+            vant = await window.SalesService.createSale({
+                kliyanId: devis.kliyanId,
+                kliyanNon: devis.kliyanNon,
+                mòdPeman: mòdPeman || 'kach',
+                atik: devis.atik
+            });
+        } catch (e) {
+            // Vant echwe → retabli devi a pou moun ka eseye ankò
+            await devisRef.update({ estati: 'accepté' }).catch(() => {});
+            throw e;
+        }
+
+        await devisRef.update({
             venteId: vant.id,
             dateConversyon: firebase.firestore.FieldValue.serverTimestamp()
         });
