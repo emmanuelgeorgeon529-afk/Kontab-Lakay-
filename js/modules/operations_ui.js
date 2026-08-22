@@ -1,259 +1,212 @@
-// js/modules/operations_ui.js
-// Konekte UI Operations (Acha + Founisè) ak PurchasesService, SuppliersService, ProductsService
+<!-- ===================== 4. OPERATIONS, SUPPLY CHAIN & GESTION DE STOCK ===================== -->
+<section id="operations" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:600;">Opérations, Supply Chain & Gestion de Stock</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Pwodwi, depo, pwodiksyon, acha & founisè</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📥 Import Excel</button>
+            <button onclick="VentesUI.openNewProductModal()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">📦 Nouvo Pwodwi</button>
+        </div>
+    </div>
 
-const OperationsUI = (() => {
+    <!-- Dashboard Visuel -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="kpi-card"><div class="label">📦 Stock Total</div><div class="value" id="kpiOperationsStockTotal" style="color:var(--primary);">—</div></div>
+        <div class="kpi-card"><div class="label">🏭 Produits</div><div class="value" id="kpiOperationsProduits">—</div></div>
+        <div class="kpi-card"><div class="label">🚚 Founisè</div><div class="value" id="kpiOperationsFounise">—</div></div>
+        <div class="kpi-card"><div class="label">🛒 Acha Mwa a</div><div class="value" id="kpiOperationsAchatMwa">—</div></div>
+        <div class="kpi-card"><div class="label">⚠️ Alèt Stock</div><div class="value" id="kpiOperationsAlèt" style="color:var(--danger);">—</div></div>
+        <div class="kpi-card"><div class="label">📈 Valè Envantè</div><div class="value" id="kpiOperationsValèEnvantè" style="color:var(--secondary);">—</div></div>
+    </div>
 
-    let panyeAcha = [];
-    let pwodwiCache = [];
-    let founisèCache = [];
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Évolution Stock</h3></div><div class="chart-container"><canvas id="stockChartEvolution"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Achats Mensuels</h3></div><div class="chart-container"><canvas id="purchasesChart"></canvas></div></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Produits Plus Vendus</h3></div><div class="chart-container"><canvas id="topProductsChart"></canvas></div></div>
+        <div class="chart-section"><div class="chart-header" style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="font-weight:600;">Répartition Catégories</h3></div><div class="chart-container"><canvas id="categoryDistributionChart"></canvas></div></div>
+    </div>
 
-    async function chajePwodwiEtFounisè() {
-        try {
-            const [pwodwi, founisè] = await Promise.all([
-                window.ProductsService.getProducts(true),
-                window.SuppliersService.getSuppliers(true)
-            ]);
-            pwodwiCache = pwodwi;
-            founisèCache = founisè;
-            renderPwodwiDropdown();
-            renderFounisèDropdown();
-        } catch (err) {
-            console.error('Erè chajman pwodwi/founisè:', err);
-        }
-    }
+    <!-- 4.1 Gestion des Produits -->
+    <details class="chart-section" open style="padding:0; margin-top:8px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 4.1 — Gestion des Produits</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>SKU</th><th>Non</th><th>Catégorie</th><th>Prix Achat</th><th>Prix Vente</th><th>Unité</th></tr>
+                <tbody id="operationsProduitsTableBody">
+                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="VentesUI.openNewProductModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajouter</button>
+                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Import Excel</button>
+            </div>
+        </div>
+    </details>
 
-    function renderPwodwiDropdown() {
-        const select = document.getElementById('achatPwodwiSelect');
-        if (!select) return;
-        select.innerHTML = '<option value="">— Chwazi pwodwi —</option>' +
-            pwodwiCache.map(p => `<option value="${p.id}" data-pri="${p.priAchat || 0}">${p.non} (Stock: ${p.kantiteStock ?? 0})</option>`).join('');
-        select.onchange = () => {
-            const selected = select.options[select.selectedIndex];
-            document.getElementById('achatPriInite').value = selected?.dataset?.pri || 0;
-        };
-    }
+    <!-- 4.2 Gestion de Stock -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 4.2 — Gestion de Stock</summary>
+        <div style="padding:0 20px 20px;">
+            <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); margin-bottom:14px;">
+                <div class="kpi-card"><div class="label">Valeur Totale</div><div class="value" id="kpiStockValèTotal">—</div></div>
+                <div class="kpi-card"><div class="label">Disponibles</div><div class="value" id="kpiStockDisponib" style="color:var(--secondary);">—</div></div>
+                <div class="kpi-card"><div class="label">Faibles</div><div class="value" id="kpiStockFèb" style="color:#B45309;">—</div></div>
+                <div class="kpi-card"><div class="label">Épuisés</div><div class="value" id="kpiStockEpwize" style="color:var(--danger);">—</div></div>
+            </div>
+            <table class="fin-table">
+                <tr><th>Produit</th><th>Quantité</th><th>Min Stock</th><th>Statut</th><th></th></tr>
+                <tbody id="stockTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </details>
 
-    function renderFounisèDropdown() {
-        const select = document.getElementById('achatFounisèSelect');
-        if (!select) return;
-        select.innerHTML = '<option value="">— Chwazi founisè —</option>' +
-            founisèCache.map(f => `<option value="${f.id}">${f.non}</option>`).join('');
-    }
+    <!-- 4.3 Multi-Dépôts -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏢 4.3 — Multi-Dépôts</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">⚠️ Fonksyon sa a poko konekte — kounye a chak pwodwi gen yon sèl kantite stock global, pa yon kantite pa depo.</p>
+            <table class="fin-table">
+                <tr><th>Dépôt</th><th>Adresse</th><th>Responsable</th></tr>
+                <tr><td>Dépôt Principal</td><td>Delmas 33</td><td>Pierre A.</td></tr>
+                <tr><td>Magasin Centre-Ville</td><td>Rue du Centre</td><td>Marie L.</td></tr>
+                <tr><td>Entrepôt Nord</td><td>Cap-Haïtien</td><td>Jean D.</td></tr>
+                <tr><td>Succursale Ouest</td><td>Pétion-Ville</td><td>Rose M.</td></tr>
+            </table>
+        </div>
+    </details>
 
-    function showError(elId, msg) {
-        const el = document.getElementById(elId);
-        if (!el) return;
-        el.textContent = msg;
-        el.style.display = 'block';
-    }
+    <!-- 4.4 Production -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏭 4.4 — Production</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">⚠️ Fonksyon sa a poko konekte — pa gen sèvis backend pou nomenclature/BOM ni Ordres de Fabrication.</p>
+            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Nomenclature (BOM) — Egzanp</p>
+            <table class="fin-table">
+                <tr><th>Matière Première</th><th>Quantité Requise</th></tr>
+                <tr><td>Charbon actif</td><td style="text-align:right;">2 kg</td></tr>
+                <tr><td>Huile de coco</td><td style="text-align:right;">1 L</td></tr>
+            </table>
+        </div>
+    </details>
 
-    function openNewSupplierModal() {
-        document.getElementById('newSupplierError').style.display = 'none';
-        document.getElementById('suppNon').value = '';
-        document.getElementById('suppTelefòn').value = '';
-        document.getElementById('suppAdrès').value = '';
-        document.getElementById('newSupplierModal').style.display = 'flex';
-    }
+    <!-- 4.5 Gestion des Achats -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛒 4.5 — Gestion des Achats</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>N° Acha</th><th>Founisè</th><th>Total</th><th>Estati</th></tr>
+                <tbody id="achatTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.openNewPurchaseModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Acha</button>
+            </div>
+        </div>
+    </details>
 
-    function closeNewSupplierModal() {
-        document.getElementById('newSupplierModal').style.display = 'none';
-    }
+    <!-- 4.6 Fournisseurs -->
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🚚 4.6 — Fournisseurs</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <table class="fin-table">
+                <tr><th>Founisè</th><th>Telefòn</th><th>Solde Dû</th></tr>
+                <tbody id="founisèTableBody">
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.openNewSupplierModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Founisè</button>
+            </div>
+        </div>
+    </details>
 
-    async function submitNewSupplier() {
-        const non = document.getElementById('suppNon').value.trim();
-        const telefòn = document.getElementById('suppTelefòn').value.trim();
-        const adrès = document.getElementById('suppAdrès').value.trim();
+    <!-- 4.7 Prévisions de Stock -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📈 4.7 — Prévisions de Stock</summary>
+        <div style="padding:0 20px 20px;">
+            <p style="color:var(--text-muted); font-size:13px;">⚠️ Fonksyon sa a poko konekte — mande analiz done istorik vant pou prevwa.</p>
+        </div>
+    </details>
 
-        if (!non) { showError('newSupplierError', 'Non founisè a obligatwa.'); return; }
+    <!-- ===================== MODAL: NOUVO FOUNISÈ ===================== -->
+    <div id="newSupplierModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">🚚 Nouvo Founisè</h3>
+                <span onclick="OperationsUI.closeNewSupplierModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="newSupplierError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
 
-        const btn = document.getElementById('suppSubmitBtn');
-        btn.disabled = true;
-        btn.textContent = '⏳ Ap kreye...';
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Non *</label>
+            <input type="text" id="suppNon" class="settings-input" style="margin-bottom:12px;" placeholder="Non founisè oswa antrepriz">
 
-        try {
-            const result = await window.SuppliersService.createSupplier({
-                non, telefòn: telefòn || null, adrès: adrès || null
-            });
-            closeNewSupplierModal();
-            await chajePwodwiEtFounisè();
-            const founisèSelect = document.getElementById('achatFounisèSelect');
-            if (founisèSelect) founisèSelect.value = result.id;
-            await loadSuppliersTable();
-            alert(`✅ Founisè "${non}" kreye avèk siksè!`);
-        } catch (err) {
-            showError('newSupplierError', err.message || 'Erè pandan kreyasyon founisè a.');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '✅ Kreye Founisè';
-        }
-    }
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Telefòn</label>
+            <input type="tel" id="suppTelefòn" class="settings-input" style="margin-bottom:12px;" placeholder="+509 ....">
 
-    function openNewPurchaseModal() {
-        panyeAcha = [];
-        renderPanyeAcha();
-        document.getElementById('newPurchaseError').style.display = 'none';
-        document.getElementById('newPurchaseModal').style.display = 'flex';
-        chajePwodwiEtFounisè();
-    }
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Adrès</label>
+            <input type="text" id="suppAdrès" class="settings-input" style="margin-bottom:20px;">
 
-    function closeNewPurchaseModal() {
-        document.getElementById('newPurchaseModal').style.display = 'none';
-    }
+            <button id="suppSubmitBtn" onclick="OperationsUI.submitNewSupplier()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Kreye Founisè</button>
+        </div>
+    </div>
 
-    function addItemToPurchaseCart() {
-        const pwodwiSelect = document.getElementById('achatPwodwiSelect');
-        const pwodwiId = pwodwiSelect.value;
-        const pwodwiNon = pwodwiSelect.options[pwodwiSelect.selectedIndex]?.text || '';
-        const kantite = parseInt(document.getElementById('achatKantite').value, 10);
-        const priInite = parseFloat(document.getElementById('achatPriInite').value);
-        const rabaisPousantaj = parseFloat(document.getElementById('achatRabaisPousantaj').value) || 0;
+    <!-- ===================== MODAL: NOUVO ACHA ===================== -->
+    <div id="newPurchaseModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">📦 Nouvo Acha</h3>
+                <span onclick="OperationsUI.closeNewPurchaseModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="newPurchaseError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
 
-        if (!pwodwiId) { showError('newPurchaseError', 'Chwazi yon pwodwi anvan.'); return; }
-        if (!kantite || kantite <= 0) { showError('newPurchaseError', 'Kantite dwe pi gran pase 0.'); return; }
-        if (isNaN(priInite) || priInite < 0) { showError('newPurchaseError', 'Pri inite pa valid.'); return; }
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Founisè</label>
+            <select id="achatFounisèSelect" class="settings-input" style="margin-bottom:4px;">
+                <option value="">— Chwazi founisè —</option>
+            </select>
+            <a onclick="OperationsUI.openNewSupplierModal()" style="font-size:12px; color:var(--primary); cursor:pointer; display:inline-block; margin-bottom:14px;">➕ Nouvo Founisè</a>
 
-        const atik = { pwodwiId, non: pwodwiNon, kantite, priInite };
-        if (rabaisPousantaj > 0) {
-            atik.rabais = { valeur: rabaisPousantaj, estPousantaj: true };
-        }
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pwodwi</label>
+            <select id="achatPwodwiSelect" class="settings-input" style="margin-bottom:14px;">
+                <option value="">— Chwazi pwodwi —</option>
+            </select>
 
-        panyeAcha.push(atik);
-        renderPanyeAcha();
-        document.getElementById('newPurchaseError').style.display = 'none';
-    }
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kantite</label>
+                    <input type="number" id="achatKantite" class="settings-input" value="1" min="1">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pri Inite (HTG)</label>
+                    <input type="number" id="achatPriInite" class="settings-input" value="0" min="0">
+                </div>
+            </div>
 
-    function removeItemFromPurchaseCart(index) {
-        panyeAcha.splice(index, 1);
-        renderPanyeAcha();
-    }
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Rabais (%) — opsyonèl</label>
+            <input type="number" id="achatRabaisPousantaj" class="settings-input" value="0" min="0" max="100" style="margin-bottom:14px;">
 
-    function renderPanyeAcha() {
-        const listEl = document.getElementById('achatPanyeList');
-        const totalEl = document.getElementById('achatPanyeTotal');
+            <button onclick="OperationsUI.addItemToPurchaseCart()" style="width:100%; background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px; margin-bottom:14px;">➕ Ajoute nan Panye</button>
 
-        if (panyeAcha.length === 0) {
-            listEl.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">Panye vid</p>';
-            totalEl.textContent = '0';
-            return;
-        }
+            <div id="achatPanyeList" style="margin-bottom:14px; font-size:13px;"></div>
+            <div style="text-align:right; font-weight:700; margin-bottom:14px;">Total: <span id="achatPanyeTotal">0</span> HTG</div>
 
-        let total = 0;
-        listEl.innerHTML = panyeAcha.map((item, i) => {
-            const prixBrut = item.kantite * item.priInite;
-            const rabaisMontan = item.rabais ? prixBrut * (item.rabais.valeur / 100) : 0;
-            const sousTotal = prixBrut - rabaisMontan;
-            total += sousTotal;
-            const rabaisTxt = item.rabais ? ` (-${item.rabais.valeur}%)` : '';
-            return `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #F1F5F9;">
-                <span>${item.non} × ${item.kantite}${rabaisTxt}</span>
-                <span>${sousTotal.toLocaleString()} HTG <span onclick="OperationsUI.removeItemFromPurchaseCart(${i})" style="color:var(--danger); cursor:pointer; margin-left:8px;">✕</span></span>
-            </div>`;
-        }).join('');
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Frè Accessoires (transpò, dwàn — opsyonèl)</label>
+            <input type="number" id="achatFraisAccessoires" class="settings-input" value="0" min="0" style="margin-bottom:14px;">
 
-        totalEl.textContent = total.toLocaleString();
-    }
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Mòd Peman</label>
+            <select id="achatMòdPeman" class="settings-input" style="margin-bottom:20px;">
+                <option value="kach">Kach</option>
+                <option value="transfè">Transfè Bank</option>
+                <option value="kredi">Kredi (Dèt Founisè)</option>
+            </select>
 
-    async function submitNewPurchase() {
-        if (panyeAcha.length === 0) { showError('newPurchaseError', 'Ajoute pou pi piti yon atik nan panye a.'); return; }
-
-        const founisèSelect = document.getElementById('achatFounisèSelect');
-        const founisèId = founisèSelect.value;
-        const founisèNon = founisèSelect.options[founisèSelect.selectedIndex]?.text || '';
-        const mòdPeman = document.getElementById('achatMòdPeman').value;
-        const fraisAccessoires = parseFloat(document.getElementById('achatFraisAccessoires').value) || 0;
-
-        if (!founisèId) { showError('newPurchaseError', 'Chwazi yon founisè anvan.'); return; }
-
-        const btn = document.getElementById('achatSubmitBtn');
-        btn.disabled = true;
-        btn.textContent = '⏳ Ap trete...';
-
-        try {
-            const result = await window.PurchasesService.createPurchase({
-                founisèId, founisèNon, mòdPeman,
-                atik: panyeAcha,
-                fraisAccessoires
-            });
-            closeNewPurchaseModal();
-            await loadPurchasesTable();
-            alert(`✅ Acha kreye avèk siksè! Nimewo: ${result.nimewoAcha}`);
-        } catch (err) {
-            showError('newPurchaseError', err.message || 'Yon erè rive pandan kreyasyon acha a.');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '✅ Konfime Acha';
-        }
-    }
-
-    async function loadPurchasesTable() {
-        const tbody = document.getElementById('achatTableBody');
-        if (!tbody) return;
-
-        try {
-            const achats = await window.PurchasesService.getPurchases(20);
-
-            if (achats.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">Pa gen acha ankò</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = achats.map(a => {
-                const estatiBadge = a.estati === 'anile'
-                    ? '<span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Anile</span>'
-                    : '<span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Aktif</span>';
-                return `<tr>
-                    <td>${a.nimewoAcha}</td>
-                    <td>${a.founisèNon}</td>
-                    <td style="text-align:right;">${(a.total || 0).toLocaleString()} HTG</td>
-                    <td>${estatiBadge}</td>
-                </tr>`;
-            }).join('');
-        } catch (err) {
-            console.error('Erè chajman lis acha:', err);
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger); padding:20px;">❌ Erè chajman done</td></tr>';
-        }
-    }
-
-    async function loadSuppliersTable() {
-        const tbody = document.getElementById('founisèTableBody');
-        if (!tbody) return;
-
-        try {
-            const founisèYo = await window.SuppliersService.getSuppliers(true);
-
-            if (founisèYo.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">Pa gen founisè ankò</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = founisèYo.map(f => `<tr>
-                <td>${f.non}</td>
-                <td>${f.telefòn || '—'}</td>
-                <td style="text-align:right; ${f.dèt > 0 ? 'color:var(--danger);' : ''}">${(f.dèt || 0).toLocaleString()} HTG</td>
-            </tr>`).join('');
-        } catch (err) {
-            console.error('Erè chajman lis founisè:', err);
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--danger); padding:20px;">❌ Erè chajman done</td></tr>';
-        }
-    }
-
-    return {
-        openNewSupplierModal, closeNewSupplierModal, submitNewSupplier,
-        openNewPurchaseModal, closeNewPurchaseModal,
-        addItemToPurchaseCart, removeItemFromPurchaseCart, submitNewPurchase,
-        loadPurchasesTable, loadSuppliersTable
-    };
-})();
-
-window.OperationsUI = OperationsUI;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const operationsNavItem = document.querySelector('[data-target="operations"]');
-    if (operationsNavItem) {
-        OperationsUI.loadPurchasesTable();
-        operationsNavItem.addEventListener('click', () => {
-            OperationsUI.loadPurchasesTable();
-            OperationsUI.loadSuppliersTable();
-        });
-    }
-});
+            <button id="achatSubmitBtn" onclick="OperationsUI.submitNewPurchase()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Konfime Acha</button>
+        </div>
+    </div>
+</section>
