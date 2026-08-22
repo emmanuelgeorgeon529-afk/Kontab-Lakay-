@@ -22,9 +22,16 @@ const AccountingService = (() => {
      * @param {Object} entryData
      *   entryData.liy - [{ kont, débit, crédit }] — total débit dwe egal total crédit
      *   entryData.libellé - deskripsyon ekriti a
+     *   entryData.referans - referans dokiman sous (obligatwa pa firestore.rules)
      *   entryData.sous - 'manuel' | 'automatique'
      */
+    // FIKS: ajoute `referans` — firestore.rules egzije hasAll(['liy','dat','referans','sous'])
+    // pou nenpòt ekriti nan koleksyon 'jounal'; san li, chak ekriti manyèl te refize.
     async function addJournalEntry(entryData) {
+        if (!entryData.referans || !String(entryData.referans).trim()) {
+            throw new Error("Yon referans obligatwa pou chak ekriti jounal (dokiman sous, oswa 'manuel-' + dat si pa gen okenn).");
+        }
+
         const totalDébit = entryData.liy.reduce((s, l) => s + (l.débit || 0), 0);
         const totalCrédit = entryData.liy.reduce((s, l) => s + (l.crédit || 0), 0);
 
@@ -39,6 +46,7 @@ const AccountingService = (() => {
             liy: entryData.liy,
             libellé: entryData.libellé || '',
             sous: entryData.sous || 'manuel',
+            referans: entryData.referans,
             dat: firebase.firestore.FieldValue.serverTimestamp(),
             itilizatèId: window.auth?.currentUser?.uid || null
         });
