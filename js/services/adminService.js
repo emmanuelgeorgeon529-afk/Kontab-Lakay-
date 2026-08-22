@@ -39,6 +39,8 @@
 
   // ---------- ITILIZATE ----------
 
+  // FIKS: Firestore pa aksepte transaction.get() sou yon Query (sèlman DocumentReference).
+  // Verifikasyon dwoub imèl la fèt AVAN transaksyon an kòmanse; ekriti a rete apre.
   async function kreyeItilizate(bizId, itilizateData) {
     if (!bizId || !itilizateData?.imèl || !itilizateData?.wol) {
       throw new Error('Done itilizate yo enkonplè (bizId, imèl, wol obligatwa)');
@@ -47,31 +49,25 @@
       throw new Error(`Wol "${itilizateData.wol}" pa valid`);
     }
 
-    const itilizateRef = db
-      .collection('biznis').doc(bizId)
-      .collection('itilizate').doc();
+    const itilizateCol = db.collection('biznis').doc(bizId).collection('itilizate');
 
-    await db.runTransaction(async (tx) => {
-      const kIm = await tx.get(
-        db.collection('biznis').doc(bizId)
-          .collection('itilizate')
-          .where('imèl', '==', itilizateData.imèl)
-      );
-      if (!kIm.empty) {
-        throw new Error('Yon itilizate ak imèl sa a deja egziste');
-      }
+    // Verifikasyon dwoub imèl AVAN — Firestore pa aksepte Query nan tx.get()
+    const kIm = await itilizateCol.where('imèl', '==', itilizateData.imèl).get();
+    if (!kIm.empty) {
+      throw new Error('Yon itilizate ak imèl sa a deja egziste');
+    }
 
-      tx.set(itilizateRef, {
-        non: itilizateData.non,
-        imèl: itilizateData.imèl,
-        depatman: itilizateData.depatman || null,
-        pos: itilizateData.pos || null,
-        wol: itilizateData.wol,
-        pèmisyon: PEMISYON_PA_WOL[itilizateData.wol] || {},
-        estati: 'aktif',
-        dateKreyasyon: firebase.firestore.FieldValue.serverTimestamp(),
-        kreyePa: window.auth?.currentUser?.uid || null
-      });
+    const itilizateRef = itilizateCol.doc();
+    await itilizateRef.set({
+      non: itilizateData.non,
+      imèl: itilizateData.imèl,
+      depatman: itilizateData.depatman || null,
+      pos: itilizateData.pos || null,
+      wol: itilizateData.wol,
+      pèmisyon: PEMISYON_PA_WOL[itilizateData.wol] || {},
+      estati: 'aktif',
+      dateKreyasyon: firebase.firestore.FieldValue.serverTimestamp(),
+      kreyePa: window.auth?.currentUser?.uid || null
     });
 
     return itilizateRef.id;
