@@ -7,17 +7,16 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Koleksyon itilizate a rele "itilizate" (SAN aksan), chan wol la rele "wol"
     function manmBiznis(bizId) {
       return konekte()
         && exists(
-          /databases/$(database)/documents/businesses/$(bizId)/itilizate/$(request.auth.uid)
+          /databases/$(database)/documents/biznis/$(bizId)/itilizate/$(request.auth.uid)
         );
     }
 
     function wolItilizate(bizId) {
       return get(
-        /databases/$(database)/documents/businesses/$(bizId)/itilizate/$(request.auth.uid)
+        /databases/$(database)/documents/biznis/$(bizId)/itilizate/$(request.auth.uid)
       ).data.wol;
     }
 
@@ -42,17 +41,24 @@ service cloud.firestore {
       return genWol(bizId, ['Propriyete', 'Administrate', 'Magasinier']);
     }
 
-    match /businesses/{bizId} {
+    match /biznis/{bizId} {
 
+      // BOOTSTRAP: nenpot itilizate konekte ka kreye YON biznis (li vin premye pwopriyete a)
+      allow create: if konekte();
       allow read: if manmBiznis(bizId);
-      allow write: if seAdministrate(bizId);
+      allow update, delete: if seAdministrate(bizId);
 
       // ---------- 1. STRUCTURE, GOUVERNANCE & ADMINISTRATION ----------
 
       match /itilizate/{userId} {
+        // BOOTSTRAP: pwopriyete a ka kreye pwop pwofil li lokay, oswa yon admin envite lot moun
+        allow create: if konekte() && (
+          request.auth.uid == userId
+          || seAdministrate(bizId)
+        );
         allow read: if manmBiznis(bizId)
           && (request.auth.uid == userId || seAdministrate(bizId));
-        allow create, update: if seAdministrate(bizId);
+        allow update: if seAdministrate(bizId);
         allow delete: if false;
       }
 
@@ -84,22 +90,31 @@ service cloud.firestore {
       }
 
       match /sessions/{docId} {
-        allow read: if seAdministrate(bizId);
-        allow create: if manmBiznis(bizId);
-        allow update: if manmBiznis(bizId);
+        // Itilizate ka li PWOP sesyon li; admin ka li tout sesyon yo
+        allow read: if manmBiznis(bizId)
+          && (resource.data.itilizateId == request.auth.uid || seAdministrate(bizId));
+        allow create: if manmBiznis(bizId)
+          && request.resource.data.itilizateId == request.auth.uid;
+        allow update: if manmBiznis(bizId)
+          && resource.data.itilizateId == request.auth.uid;
         allow delete: if false;
       }
 
       match /auditLog/{docId} {
         allow read: if seAdministrate(bizId);
-        allow create: if manmBiznis(bizId);
+        // Egzije itilizateId nan log la matche moun k ap ekri a (anpeche fosifikasyon)
+        allow create: if manmBiznis(bizId)
+          && request.resource.data.itilizateId == request.auth.uid;
         allow update, delete: if false;
       }
 
       match /notifikasyon/{docId} {
-        allow read: if manmBiznis(bizId);
+        // Chak itilizate li sèlman pwop notifikasyon li
+        allow read: if manmBiznis(bizId)
+          && resource.data.destinataireId == request.auth.uid;
         allow create: if manmBiznis(bizId);
-        allow update: if manmBiznis(bizId);
+        allow update: if manmBiznis(bizId)
+          && resource.data.destinataireId == request.auth.uid;
         allow delete: if false;
       }
 
@@ -202,7 +217,11 @@ service cloud.firestore {
 
       match /jounal/{docId} {
         allow read: if manmBiznis(bizId);
-        allow create: if manmBiznis(bizId);
+        // Egzije chan debaz obligatwa pou diminye risk fo antre kontab manyèl
+        allow create: if manmBiznis(bizId)
+          && request.resource.data.keys().hasAll(['liy', 'dat', 'referans', 'sous'])
+          && request.resource.data.liy is list
+          && request.resource.data.liy.size() > 0;
         allow update, delete: if false;
       }
 
@@ -213,3 +232,4 @@ service cloud.firestore {
     }
   }
 }
+
