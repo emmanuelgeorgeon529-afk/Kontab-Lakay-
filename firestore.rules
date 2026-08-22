@@ -122,7 +122,8 @@ service cloud.firestore {
 
       match /pwodwi/{pwodwiId} {
         allow read: if manmBiznis(bizId);
-        allow create, update: if seMagasinierOswaAdmin(bizId) || seVandeOswaAdmin(bizId);
+        // FIKS: ajoute seKontablOswaAdmin pou wòl Direkte ka mete ajou stock pandan yon Acha
+        allow create, update: if seMagasinierOswaAdmin(bizId) || seVandeOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
         allow delete: if false;
       }
 
@@ -232,4 +233,3 @@ service cloud.firestore {
     }
   }
 }
-
