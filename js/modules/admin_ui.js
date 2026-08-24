@@ -212,7 +212,7 @@
       } else if (d.estati === 'apwouve_manadjè') {
         aksyon = `<button class="btn-apwouve" data-id="${d.id}" data-etap="direktè" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px;">Apwouve (Direktè)</button>`;
       } else if (d.estati === 'apwouve_direktè') {
-        aksyon = `<button class="btn-egzekite" data-id="${d.id}" style="background:#047857; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px;">✓ Egzekite</button>`;
+        aksyon = `<button class="btn-egzekite" data-id="${d.id}" data-tip="${escHtml(d.tip)}" style="background:#047857; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px;">✓ Egzekite</button>`;
       }
 
       return `
@@ -239,9 +239,15 @@
         .catch(e => alert('Erè: ' + e.message));
     });
     document.querySelectorAll('.btn-egzekite').forEach(btn => {
-      btn.onclick = () => window.AdminService
-        .egzekiteDemand(getBizId(), btn.dataset.id)
-        .catch(e => alert('Erè: ' + e.message));
+      btn.onclick = () => {
+        // NÒT: si demand la se yon depans (tip='depans'), egzekisyon an dwe
+        // pase pa DepansService pou l kreye vrè dokiman 'depans' + jounal la.
+        // Pou lòt tip demand, konpòtman jenerik AdminService.egzekiteDemand la rete.
+        const promès = (btn.dataset.tip === 'depans' && window.DepansService)
+          ? window.DepansService.egzekiteDepansApwouve(btn.dataset.id)
+          : window.AdminService.egzekiteDemand(getBizId(), btn.dataset.id);
+        promès.catch(e => alert('Erè: ' + e.message));
+      };
     });
     document.querySelectorAll('.btn-rejte').forEach(btn => {
       btn.onclick = () => {
