@@ -36,6 +36,8 @@
     <script src="js/services/adminService.js"></script>
     <script src="js/services/modalService.js"></script>
     <script src="js/services/accountingService.js"></script>
+    <script src="js/services/kesService.js"></script>
+    <script src="js/services/depansService.js"></script>
     <script src="js/services/productsService.js"></script>
     <script src="js/services/customersService.js"></script>
     <script src="js/services/salesService.js"></script>
@@ -50,7 +52,10 @@
 
     <!-- Modil UI -->
     <script src="js/modules/admin_ui.js"></script>
+    <script src="js/modules/kes_ui.js"></script>
+    <script src="js/modules/depans_ui.js"></script>
     <script src="js/modules/ventes_ui.js"></script>
+    <script src="js/modules/operations_ui.js"></script>
     <!-- ... ajoute lòt sèvis yo menm jan ... -->
 
 </head>
@@ -496,16 +501,36 @@
 
     <!-- 2.6 Trésorerie + 2.7 Multi-Comptes -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
-        <details class="chart-section" style="padding:0;">
-            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💵 2.6 — Gestion de Trésorerie</summary>
+        <details class="chart-section" open style="padding:0;">
+            <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💵 2.6 — Gestion de Trésorerie (Kès)</summary>
             <div style="padding:0 20px 20px;">
-                <p style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Kès</p>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
-                    <span class="ged-status" style="background:#D1FAE5; color:#047857;">Antre</span>
-                    <span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Sòti</span>
-                    <span class="ged-status" style="background:#F1F5F9; color:var(--text-dark);">Ajustement</span>
+                <div id="kesStatusCard" style="padding:14px; border-radius:10px; background:#F1F5F9; margin-bottom:14px;">
+                    <p style="color:var(--text-muted); font-size:13px;">⏳ Chajman...</p>
                 </div>
-                <p style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Bank</p>
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+                    <button id="kesBtnLouvri" onclick="KesUI.ouvriSesyon()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:none;">🔓 Louvri Sesyon</button>
+                    <button id="kesBtnFèmen" onclick="KesUI.fèmenSesyon()" style="background:var(--danger); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:none;">🔒 Fèmen Sesyon</button>
+                    <button id="kesBtnMouvman" onclick="KesUI.openMouvmanModal()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:none;">➕ Nouvo Mouvman</button>
+                </div>
+
+                <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Mouvman Sesyon Aktyèl</p>
+                <table class="fin-table">
+                    <tr><th>Lè</th><th>Tip</th><th>Rezon</th><th>Montan</th></tr>
+                    <tbody id="kesMouvmanTableBody">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px;">Pa gen sesyon ouvè</td></tr>
+                    </tbody>
+                </table>
+
+                <p style="font-size:13px; font-weight:600; margin:16px 0 8px;">Istorik Sesyon</p>
+                <table class="fin-table">
+                    <tr><th>Ouvèti</th><th>Teyorik</th><th>Reyèl</th><th>Ekar</th></tr>
+                    <tbody id="kesSesyonTableBody">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px;">⏳ Chajman...</td></tr>
+                    </tbody>
+                </table>
+
+                <p style="font-size:13px; font-weight:600; color:var(--text-muted); margin-top:16px; margin-bottom:6px;">Bank</p>
                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     <span class="ged-status" style="background:#D1FAE5; color:#047857;">Dépôts</span>
                     <span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Retraits</span>
@@ -540,18 +565,19 @@
 
     <!-- 2.9 Dépenses + 2.10 Revenus -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
-        <details class="chart-section" style="padding:0;">
+        <details class="chart-section" open style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📉 2.9 — Gestion des Dépenses</summary>
-            <div style="padding:0 20px 20px;">
-                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                    <span class="ged-status" style="background:#F1F5F9;">Loyer</span>
-                    <span class="ged-status" style="background:#F1F5F9;">Transport</span>
-                    <span class="ged-status" style="background:#F1F5F9;">Salaires</span>
-                    <span class="ged-status" style="background:#F1F5F9;">Téléphone</span>
-                    <span class="ged-status" style="background:#F1F5F9;">Marketing</span>
-                    <span class="ged-status" style="background:#F1F5F9;">Maintenance</span>
+            <div style="padding:0 20px 20px; overflow-x:auto;">
+                <table class="fin-table">
+                    <tr><th>N°</th><th>Kategori</th><th>Montan</th><th>Estati</th></tr>
+                    <tbody id="depansTableBody">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px;">⏳ Chajman...</td></tr>
+                    </tbody>
+                </table>
+                <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                    <button onclick="DepansUI.openNewDepansModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Depans</button>
                 </div>
-                <p style="font-size:12px; color:var(--text-muted);">Création → Validation → Paiement → Archivage</p>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:10px;">Depans pi wo pase 50 000 HTG pase pa workflow apwobasyon (Gouvernance → Demand Apwobasyon).</p>
             </div>
         </details>
         <details class="chart-section" style="padding:0;">
@@ -682,6 +708,90 @@
             <div class="kpi-card"><div class="label">⚠️ Risques</div><div class="value" style="color:var(--danger);">2</div></div>
         </div>
     </details>
+
+    <!-- ===================== MODAL: NOUVO MOUVMAN KÈS ===================== -->
+    <div id="kesMouvmanModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">💵 Nouvo Mouvman Kès</h3>
+                <span onclick="KesUI.closeMouvmanModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="kesMouvmanError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Rezon</label>
+            <select id="kesMouvmanRezonSelect" class="settings-input" style="margin-bottom:12px;" onchange="KesUI.onRezonChange()">
+                <option value="retrè_pwopriyetè">Retrè Pwopriyetè</option>
+                <option value="depo_kapital">Depo Kapital Pwopriyetè</option>
+                <option value="ranbousman">Ranbousman Depans</option>
+                <option value="depo_bank">Depo nan Bank (Kès → Bank)</option>
+                <option value="retrè_bank">Retrè nan Bank (Bank → Kès)</option>
+                <option value="lòt">Lòt (kont manyèl)</option>
+            </select>
+
+            <div id="kesMouvmanKontManyèlWrap" style="display:none;">
+                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Tip</label>
+                <select id="kesMouvmanTipManyèl" class="settings-input" style="margin-bottom:12px;">
+                    <option value="antre">Antre (lajan rantre)</option>
+                    <option value="sòti">Sòti (lajan sòti)</option>
+                </select>
+                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kòd Kont Kontrepati</label>
+                <input type="text" id="kesMouvmanKontManyèl" class="settings-input" style="margin-bottom:12px;" placeholder="ex: 601">
+            </div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Deskripsyon</label>
+            <input type="text" id="kesMouvmanDeskripsyon" class="settings-input" style="margin-bottom:12px;" placeholder="Detay (opsyonèl)">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Montan (HTG)</label>
+            <input type="number" id="kesMouvmanMontan" class="settings-input" value="0" min="0" style="margin-bottom:20px;">
+
+            <button id="kesMouvmanSubmitBtn" onclick="KesUI.submitMouvman()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Anrejistre</button>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL: NOUVO DEPANS ===================== -->
+    <div id="newDepansModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">📉 Nouvo Depans</h3>
+                <span onclick="DepansUI.closeNewDepansModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="newDepansError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kategori</label>
+            <select id="depansKategoriSelect" class="settings-input" style="margin-bottom:12px;">
+                <option value="Loyer">Loyer</option>
+                <option value="Électricité">Électricité</option>
+                <option value="Internet">Internet</option>
+                <option value="Salaires">Salaires</option>
+                <option value="Transport">Transport</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Autres">Autres</option>
+            </select>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Deskripsyon</label>
+            <input type="text" id="depansDeskripsyon" class="settings-input" style="margin-bottom:12px;" placeholder="Detay depans lan">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Montan (HTG)</label>
+            <input type="number" id="depansMontan" class="settings-input" value="0" min="0" style="margin-bottom:12px;">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Mòd Peman</label>
+            <select id="depansMòdPeman" class="settings-input" style="margin-bottom:4px;" onchange="DepansUI.onMòdPemanChange()">
+                <option value="kach">Kach</option>
+                <option value="transfè">Transfè Bank</option>
+                <option value="kredi">Kredi (Dèt Founisè)</option>
+            </select>
+
+            <div id="depansFounisèWrap" style="display:none; margin-top:8px;">
+                <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Founisè</label>
+                <select id="depansFounisèSelect" class="settings-input" style="margin-bottom:12px;">
+                    <option value="">— Chwazi founisè —</option>
+                </select>
+            </div>
+
+            <button id="depansSubmitBtn" onclick="DepansUI.submitNewDepans()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px; margin-top:8px;">✅ Anrejistre Depans</button>
+        </div>
+    </div>
 </section>
 
             <!-- ===================== 3. VENTES ===================== -->
@@ -1339,19 +1449,20 @@
             <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Pwodwi, depo, pwodiksyon, acha & founisè</p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button onclick="OperationsUI.sovSnapshotStock()" style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📸 Sove Snapshot Jodi a</button>
             <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📥 Import Excel</button>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">📦 Nouvo Pwodwi</button>
+            <button onclick="VentesUI.openNewProductModal()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">📦 Nouvo Pwodwi</button>
         </div>
     </div>
 
     <!-- Dashboard Visuel -->
     <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-        <div class="kpi-card"><div class="label">📦 Stock Total</div><div class="value" style="color:var(--primary);">12 450</div><div class="change up">↑ 120</div></div>
-        <div class="kpi-card"><div class="label">🏭 Produits</div><div class="value">284</div><div class="change up">↑ 5</div></div>
-        <div class="kpi-card"><div class="label">🚚 Founisè</div><div class="value">18</div></div>
-        <div class="kpi-card"><div class="label">🛒 Acha Mwa a</div><div class="value">540 000 HTG</div><div class="change up">↑ 6%</div></div>
-        <div class="kpi-card"><div class="label">⚠️ Alèt Stock</div><div class="value" style="color:var(--danger);">4</div></div>
-        <div class="kpi-card"><div class="label">📈 Valè Envantè</div><div class="value" style="color:var(--secondary);">2 850 000 HTG</div></div>
+        <div class="kpi-card"><div class="label">📦 Stock Total</div><div class="value" id="kpiOperationsStockTotal" style="color:var(--primary);">—</div></div>
+        <div class="kpi-card"><div class="label">🏭 Produits</div><div class="value" id="kpiOperationsProduits">—</div></div>
+        <div class="kpi-card"><div class="label">🚚 Founisè</div><div class="value" id="kpiOperationsFounise">—</div></div>
+        <div class="kpi-card"><div class="label">🛒 Acha Mwa a</div><div class="value" id="kpiOperationsAchatMwa">—</div></div>
+        <div class="kpi-card"><div class="label">⚠️ Alèt Stock</div><div class="value" id="kpiOperationsAlèt" style="color:var(--danger);">—</div></div>
+        <div class="kpi-card"><div class="label">📈 Valè Envantè</div><div class="value" id="kpiOperationsValèEnvantè" style="color:var(--secondary);">—</div></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -1369,14 +1480,12 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>SKU</th><th>Non</th><th>Catégorie</th><th>Prix Achat</th><th>Prix Vente</th><th>Unité</th></tr>
-                <tr><td>SKU-001</td><td>Riz 25lb</td><td>Alimentaire</td><td style="text-align:right;">1 200 HTG</td><td style="text-align:right;">1 500 HTG</td><td>Sac</td></tr>
-                <tr><td>SKU-002</td><td>Luil Kris</td><td>Alimentaire</td><td style="text-align:right;">380 HTG</td><td style="text-align:right;">450 HTG</td><td>Litre</td></tr>
-                <tr><td>SKU-003</td><td>Savon Charbon</td><td>Hygiène</td><td style="text-align:right;">45 HTG</td><td style="text-align:right;">75 HTG</td><td>Pièce</td></tr>
+                <tbody id="operationsProduitsTableBody">
+                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajouter</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✏️ Modifier</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🚫 Désactiver</button>
+                <button onclick="VentesUI.openNewProductModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajouter</button>
                 <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Import Excel</button>
             </div>
         </div>
@@ -1387,23 +1496,19 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 4.2 — Gestion de Stock</summary>
         <div style="padding:0 20px 20px;">
             <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); margin-bottom:14px;">
-                <div class="kpi-card"><div class="label">Valeur Totale</div><div class="value">2 850 000 HTG</div></div>
-                <div class="kpi-card"><div class="label">Disponibles</div><div class="value" style="color:var(--secondary);">260</div></div>
-                <div class="kpi-card"><div class="label">Faibles</div><div class="value" style="color:#B45309;">18</div></div>
-                <div class="kpi-card"><div class="label">Épuisés</div><div class="value" style="color:var(--danger);">6</div></div>
+                <div class="kpi-card"><div class="label">Valeur Totale</div><div class="value" id="kpiStockValèTotal">—</div></div>
+                <div class="kpi-card"><div class="label">Disponibles</div><div class="value" id="kpiStockDisponib" style="color:var(--secondary);">—</div></div>
+                <div class="kpi-card"><div class="label">Faibles</div><div class="value" id="kpiStockFèb" style="color:#B45309;">—</div></div>
+                <div class="kpi-card"><div class="label">Épuisés</div><div class="value" id="kpiStockEpwize" style="color:var(--danger);">—</div></div>
             </div>
             <table class="fin-table">
-                <tr><th>Produit</th><th>Dépôt</th><th>Quantité</th><th>Min Stock</th><th>Statut</th></tr>
-                <tr><td>Riz 25lb</td><td>Dépôt Principal</td><td style="text-align:right;">45</td><td style="text-align:right;">20</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Disponible</span></td></tr>
-                <tr><td>Luil Kris</td><td>Dépôt Principal</td><td style="text-align:right;">12</td><td style="text-align:right;">15</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">🟡 Faible</span></td></tr>
-                <tr><td>Savon Charbon</td><td>Entrepôt Nord</td><td style="text-align:right;">0</td><td style="text-align:right;">10</td><td><span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">🔴 Rupture</span></td></tr>
+                <tr><th>Produit</th><th>Quantité</th><th>Min Stock</th><th>Statut</th><th></th></tr>
+                <tbody id="stockTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Entrée Stock</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📤 Sortie Stock</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚖️ Ajustement</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔍 Inventaire Physique</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📜 Historique</button>
+                <button onclick="OperationsUI.ajusteStockManyèl()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚖️ Ajustement</button>
             </div>
         </div>
     </details>
@@ -1412,6 +1517,7 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏢 4.3 — Multi-Dépôts</summary>
         <div style="padding:0 20px 20px;">
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">⚠️ Fonksyon sa a poko konekte — kounye a chak pwodwi gen yon sèl kantite stock global, pa yon kantite pa depo.</p>
             <table class="fin-table">
                 <tr><th>Dépôt</th><th>Adresse</th><th>Responsable</th></tr>
                 <tr><td>Dépôt Principal</td><td>Delmas 33</td><td>Pierre A.</td></tr>
@@ -1419,14 +1525,6 @@
                 <tr><td>Entrepôt Nord</td><td>Cap-Haïtien</td><td>Jean D.</td></tr>
                 <tr><td>Succursale Ouest</td><td>Pétion-Ville</td><td>Rose M.</td></tr>
             </table>
-            <p style="font-size:13px; font-weight:600; margin:16px 0 8px;">Transfert Inter-Dépôts</p>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:8px; margin-bottom:10px;">
-                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Dépôt source</option></select>
-                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Dépôt destination</option></select>
-                <input type="text" placeholder="Produit" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
-                <input type="number" placeholder="Quantité" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
-            </div>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">📦 Effectuer Transfert</button>
         </div>
     </details>
 
@@ -1434,21 +1532,12 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏭 4.4 — Production</summary>
         <div style="padding:0 20px 20px;">
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Nomenclature (BOM) — Savon Charbon</p>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">⚠️ Fonksyon sa a poko konekte — pa gen sèvis backend pou nomenclature/BOM ni Ordres de Fabrication.</p>
+            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Nomenclature (BOM) — Egzanp</p>
             <table class="fin-table">
                 <tr><th>Matière Première</th><th>Quantité Requise</th></tr>
                 <tr><td>Charbon actif</td><td style="text-align:right;">2 kg</td></tr>
                 <tr><td>Huile de coco</td><td style="text-align:right;">1 L</td></tr>
-                <tr><td>Soude</td><td style="text-align:right;">0,5 kg</td></tr>
-                <tr><td>Eau</td><td style="text-align:right;">3 L</td></tr>
-            </table>
-            <button style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Créer Nomenclature</button>
-
-            <p style="font-size:13px; font-weight:600; margin:18px 0 8px;">Ordres de Fabrication</p>
-            <table class="fin-table">
-                <tr><th>N° OF</th><th>Produit</th><th>Qté à Produire</th><th>Responsable</th><th>Statut</th></tr>
-                <tr><td>OF-0012</td><td>Savon Charbon</td><td style="text-align:right;">500</td><td>Jean D.</td><td><span class="ged-status" style="background:#DBEAFE; color:#1D4ED8;">🔵 En cours</span></td></tr>
-                <tr><td>OF-0011</td><td>Savon Charbon</td><td style="text-align:right;">300</td><td>Jean D.</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Terminé</span></td></tr>
             </table>
         </div>
     </details>
@@ -1456,66 +1545,117 @@
     <!-- 4.5 Gestion des Achats -->
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛒 4.5 — Gestion des Achats</summary>
-        <div style="padding:0 20px 20px;">
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Demandes d'Achat</p>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>Produit</th><th>Quantité</th><th>Justification</th><th>Estati</th></tr>
-                <tr><td>Riz 25lb</td><td style="text-align:right;">100 sacs</td><td>Réappro stock faible</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Atant</span></td></tr>
+                <tr><th>N° Acha</th><th>Founisè</th><th>Total</th><th>Estati</th></tr>
+                <tbody id="achatTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
-            <button style="margin:10px 0 18px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">Soumettre</button>
-
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Bons de Commande</p>
-            <table class="fin-table">
-                <tr><th>N° BC</th><th>Founisè</th><th>Total</th><th>Estati</th></tr>
-                <tr><td>BC-0034</td><td>Distributeur National</td><td style="text-align:right;">150 000 HTG</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Envoyé</span></td></tr>
-            </table>
-            <button style="margin:10px 0 18px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">Envoyer au Founisè</button>
-
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Réception Marchandises</p>
-            <table class="fin-table">
-                <tr><th>N° BC</th><th>Quantité Reçue</th><th>Dat Réception</th></tr>
-                <tr><td>BC-0033</td><td style="text-align:right;">95 sacs</td><td>28/07/2026</td></tr>
-            </table>
-            <button style="margin-top:10px; background:var(--secondary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">Valider Réception</button>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.openNewPurchaseModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Acha</button>
+            </div>
         </div>
     </details>
 
     <!-- 4.6 Fournisseurs -->
-    <details class="chart-section" style="padding:0; margin-top:16px;">
+    <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🚚 4.6 — Fournisseurs</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>Founisè</th><th>Pays</th><th>Solde Dû</th><th>Achats Totaux</th></tr>
-                <tr><td>Distributeur National</td><td>Haïti</td><td style="text-align:right; color:var(--danger);">85 000 HTG</td><td style="text-align:right;">1 240 000 HTG</td></tr>
-                <tr><td>Import Caraïbes SA</td><td>Rép. Dominicaine</td><td style="text-align:right;">0 HTG</td><td style="text-align:right;">560 000 HTG</td></tr>
+                <tr><th>Founisè</th><th>Telefòn</th><th>Solde Dû</th></tr>
+                <tbody id="founisèTableBody">
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.openNewSupplierModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Founisè</button>
+            </div>
         </div>
     </details>
 
     <!-- 4.7 Prévisions de Stock -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📈 4.7 — Prévisions de Stock</summary>
-        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⚠️ Luil Kris — Produit faible</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>⚠️ Savon Charbon — Bientôt épuisé</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#F1F5F9;"><span>💤 Produit X — Dormant depuis 90 jours</span><span style="color:var(--text-muted); font-weight:600;">Enfo</span></div>
+        <div style="padding:0 20px 20px;">
+            <p style="color:var(--text-muted); font-size:13px;">⚠️ Fonksyon sa a poko konekte — mande analiz done istorik vant pou prevwa.</p>
         </div>
     </details>
 
-    <!-- Rapports Disponibles -->
-    <details class="chart-section" style="padding:0; margin-top:16px;">
-        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 Rapports Disponibles</summary>
-        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:10px;">
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📦 Rapport Stock</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💰 Valeur Inventaire</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📜 Historique Mouvements</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🚚 Achats par Founisè</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🏆 Produits Plus Vendus</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💤 Produits Dormants</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🏭 Consommation Matières</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">⚙️ Production Réalisée</button>
+    <!-- ===================== MODAL: NOUVO FOUNISÈ ===================== -->
+    <div id="newSupplierModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">🚚 Nouvo Founisè</h3>
+                <span onclick="OperationsUI.closeNewSupplierModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="newSupplierError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Non *</label>
+            <input type="text" id="suppNon" class="settings-input" style="margin-bottom:12px;" placeholder="Non founisè oswa antrepriz">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Telefòn</label>
+            <input type="tel" id="suppTelefòn" class="settings-input" style="margin-bottom:12px;" placeholder="+509 ....">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Adrès</label>
+            <input type="text" id="suppAdrès" class="settings-input" style="margin-bottom:20px;">
+
+            <button id="suppSubmitBtn" onclick="OperationsUI.submitNewSupplier()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Kreye Founisè</button>
         </div>
-    </details>
+    </div>
+
+    <!-- ===================== MODAL: NOUVO ACHA ===================== -->
+    <div id="newPurchaseModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">📦 Nouvo Acha</h3>
+                <span onclick="OperationsUI.closeNewPurchaseModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="newPurchaseError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Founisè</label>
+            <select id="achatFounisèSelect" class="settings-input" style="margin-bottom:4px;">
+                <option value="">— Chwazi founisè —</option>
+            </select>
+            <a onclick="OperationsUI.openNewSupplierModal()" style="font-size:12px; color:var(--primary); cursor:pointer; display:inline-block; margin-bottom:14px;">➕ Nouvo Founisè</a>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pwodwi</label>
+            <select id="achatPwodwiSelect" class="settings-input" style="margin-bottom:14px;">
+                <option value="">— Chwazi pwodwi —</option>
+            </select>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kantite</label>
+                    <input type="number" id="achatKantite" class="settings-input" value="1" min="1">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pri Inite (HTG)</label>
+                    <input type="number" id="achatPriInite" class="settings-input" value="0" min="0">
+                </div>
+            </div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Rabais (%) — opsyonèl</label>
+            <input type="number" id="achatRabaisPousantaj" class="settings-input" value="0" min="0" max="100" style="margin-bottom:14px;">
+
+            <button onclick="OperationsUI.addItemToPurchaseCart()" style="width:100%; background:var(--bg-white); border:1px solid #E2E8F0; padding:8px; border-radius:8px; font-weight:600; font-size:13px; margin-bottom:14px;">➕ Ajoute nan Panye</button>
+
+            <div id="achatPanyeList" style="margin-bottom:14px; font-size:13px;"></div>
+            <div style="text-align:right; font-weight:700; margin-bottom:14px;">Total: <span id="achatPanyeTotal">0</span> HTG</div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Frè Accessoires (transpò, dwàn — opsyonèl)</label>
+            <input type="number" id="achatFraisAccessoires" class="settings-input" value="0" min="0" style="margin-bottom:14px;">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Mòd Peman</label>
+            <select id="achatMòdPeman" class="settings-input" style="margin-bottom:20px;">
+                <option value="kach">Kach</option>
+                <option value="transfè">Transfè Bank</option>
+                <option value="kredi">Kredi (Dèt Founisè)</option>
+            </select>
+
+            <button id="achatSubmitBtn" onclick="OperationsUI.submitNewPurchase()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Konfime Acha</button>
+        </div>
+    </div>
 </section>
 
             <!-- ===================== 5. LOGISTIQUE ===================== -->
@@ -3841,5 +3981,17 @@
     });
 </script>
 
+    <!-- Modal jenerik pou ModalService — itilize pa kesService/depansService ak lòt modil kap vini -->
+    <div id="genericModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:420px; padding:24px; max-height:90vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 id="genericModalTitle" style="font-size:18px; font-weight:700;"></h3>
+                <span onclick="ModalService.close()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="genericModalError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+            <div id="genericModalBody"></div>
+            <div id="genericModalFooter" style="display:flex; gap:10px; margin-top:18px;"></div>
+        </div>
+    </div>
 </body>
 </html>

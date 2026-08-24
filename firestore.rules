@@ -133,6 +133,12 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
+      match /stock_istorik/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seMagasinierOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
       match /kliyan/{kliyanId} {
         allow read: if manmBiznis(bizId);
         allow create, update: if seVandeOswaAdmin(bizId);
@@ -207,6 +213,28 @@ service cloud.firestore {
       match /objectif_vande/{docId} {
         allow read: if manmBiznis(bizId);
         allow write: if seAdministrate(bizId);
+      }
+
+      // ---------- KÈS ----------
+
+      match /sesyon_kes/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seKontablOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /kes_mouvman/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if seKontablOswaAdmin(bizId);
+        allow update, delete: if false;
+      }
+
+      // ---------- DEPANS ----------
+
+      match /depans/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if seKontablOswaAdmin(bizId);
+        allow update, delete: if false;
       }
 
       // ---------- KONTABILITE (kominan pou plizyè modil) ----------
