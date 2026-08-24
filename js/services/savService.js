@@ -88,6 +88,11 @@ const SavService = (() => {
 
     // ---------- WORKFLOW RETOUR: retour_demandé → inspection → remboursement/échange/rejeté ----------
 
+    // FIKS: tout bagay (chanjman estati tikè + retabli stock + antre ajistman_stock) fèt
+    // nan MENM transaksyon an kounye a, olye de operasyon separe. Sa anpeche yon tikè
+    // rete "fèmen" pandan yon atik pa retabli nan stock si yon etap entèmedyè echwe.
+    // Pwoteksyon wòl la vin natirèl: si moun nan pa gen dwa ekri nan 'ajistman_stock'
+    // (sèlman Magasinier/Admin/Propriyete), TOUT transaksyon an refize — pa gen chanjman pasyèl.
     async function advanceReturnStatus(ticketId, nouvoEstati) {
         if (!ETAP_RETOUR.includes(nouvoEstati)) throw new Error("Etap pa valid.");
 
@@ -95,6 +100,7 @@ const SavService = (() => {
         const ref = bizRef.collection('sav').doc(ticketId);
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
+            // ---- 1. TOUT LEKTI ANVAN NENPÒT EKRITI ----
             const doc = await transaction.get(ref);
             if (!doc.exists) throw new Error("Tikè sa a pa egziste.");
             const tikè = doc.data();
@@ -103,6 +109,13 @@ const SavService = (() => {
                 throw new Error("Tikè sa a deja fèmen.");
             }
 
+            const dwèRetabliStock = (nouvoEstati === 'remboursement' || nouvoEstati === 'échange_effectué');
+            const atikLis = dwèRetabliStock ? (tikè.atik || []) : [];
+
+            const productRefs = atikLis.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
+            const productDocs = await Promise.all(productRefs.map(r => transaction.get(r)));
+
+            // ---- 2. EKRITI (tout ansanm, oswa okenn) ----
             transaction.update(ref, {
                 estati: nouvoEstati,
                 istorik: firebase.firestore.FieldValue.arrayUnion({
@@ -110,19 +123,27 @@ const SavService = (() => {
                 })
             });
 
-            return { nimewoTikè: tikè.nimewoTikè, atik: tikè.atik, venteId: tikè.venteId };
-        });
+            productDocs.forEach((pDoc, i) => {
+                if (!pDoc.exists) return; // pwodwi disparèt — pa bloke fèmti tikè a pou sa
+                const stockAvan = pDoc.data().kantiteStock || 0;
+                const stockApre = stockAvan + atikLis[i].kantite;
+                transaction.update(productRefs[i], { kantiteStock: stockApre });
 
-        // Si echanj oswa ranbousman apwouve, remèt pwodwi nan stock
-        if (nouvoEstati === 'remboursement' || nouvoEstati === 'échange_effectué') {
-            for (const atik of (rezilta.atik || [])) {
-                if (atik.pwodwiId) {
-                    await window.ProductsService.adjustStock(
-                        atik.pwodwiId, atik.kantite, `Retour SAV ${rezilta.nimewoTikè}`
-                    );
-                }
-            }
-        }
+                const ajistmanRef = bizRef.collection('ajistman_stock').doc();
+                transaction.set(ajistmanRef, {
+                    pwodwiId: atikLis[i].pwodwiId,
+                    pwodwiNon: atikLis[i].non || pDoc.data().non,
+                    stockAvan,
+                    kantiteChanjman: atikLis[i].kantite,
+                    stockApre,
+                    rezon: `Retour SAV ${tikè.nimewoTikè}`,
+                    dat: firebase.firestore.FieldValue.serverTimestamp(),
+                    itilizatèId: window.auth?.currentUser?.uid || null
+                });
+            });
+
+            return { nimewoTikè: tikè.nimewoTikè };
+        });
 
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
