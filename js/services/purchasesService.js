@@ -17,12 +17,19 @@ const PurchasesService = (() => {
         return 'ACH-' + String(nextNum).padStart(6, '0');
     }
 
+    /**
+     * @param {Object} purchaseData
+     *   purchaseData.founiseId, founiseNon, mòdPeman
+     *   purchaseData.atik - [{ pwodwiId, non, kantite, priInite, rabaisPousantaj? }]
+     *   purchaseData.fraisAccessoires - transpò/dwàn kapitalize nan kou envantè a (opsyonèl)
+     */
     async function createPurchase(purchaseData) {
         if (!purchaseData.founiseId) {
             throw new Error("Founisè a obligatwa pou yon acha.");
         }
 
         const bizRef = getBizRef();
+        const fraisAccessoires = purchaseData.fraisAccessoires || 0;
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
             const productRefs = purchaseData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
@@ -32,21 +39,30 @@ const PurchasesService = (() => {
             const founiseDoc = await transaction.get(founiseRef);
             if (!founiseDoc.exists) throw new Error("Founisè sa a pa egziste.");
 
-            let total = 0;
+            let totalMarchandiz = 0;
             const stockUpdates = [];
             productDocs.forEach((doc, i) => {
                 if (!doc.exists) {
                     throw new Error(`Pwodwi "${purchaseData.atik[i].non}" pa egziste.`);
                 }
                 const data = doc.data();
-                const kantite = purchaseData.atik[i].kantite;
-                const sousTotal = kantite * purchaseData.atik[i].priInite;
-                total += sousTotal;
+                const atikSaisie = purchaseData.atik[i];
+                const kantite = atikSaisie.kantite;
+
+                // Aplike rabè liy la (si genyen)
+                const brutLiy = kantite * atikSaisie.priInite;
+                const rabaisPousantaj = atikSaisie.rabaisPousantaj || 0;
+                const sousTotal = brutLiy * (1 - rabaisPousantaj / 100);
+
+                totalMarchandiz += sousTotal;
                 stockUpdates.push({
                     ref: productRefs[i],
                     nouvoKantite: (data.kantiteStock || 0) + kantite
                 });
             });
+
+            // Total final = machandiz (apre rabè) + frè akseswa kapitalize
+            const total = totalMarchandiz + fraisAccessoires;
 
             const nimewoAcha = await getNextPurchaseNumber(transaction, bizRef);
 
@@ -61,6 +77,8 @@ const PurchasesService = (() => {
                 founiseNon: purchaseData.founiseNon || founiseDoc.data().non,
                 mòdPeman: purchaseData.mòdPeman,
                 atik: purchaseData.atik,
+                totalMarchandiz,
+                fraisAccessoires,
                 total,
                 estati: 'aktif',
                 dat: firebase.firestore.FieldValue.serverTimestamp()
