@@ -175,6 +175,12 @@ const SalesService = (() => {
             ).catch(err => console.warn('Audit log echwe:', err));
         }
 
+        // ---- 7. PWEN FIDÉLITÉ (apre vant konfime, san blòke vant si sa echwe) ----
+        if (saleData.kliyanId && window.FideliteService?.ajoutePwenApreVant) {
+            window.FideliteService.ajoutePwenApreVant(saleData.kliyanId, rezilta.total)
+                .catch(err => console.warn('Ajoute pwen fidélité echwe:', err));
+        }
+
         return rezilta;
     }
 
