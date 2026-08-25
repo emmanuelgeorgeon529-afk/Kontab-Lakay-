@@ -18,5 +18,10 @@
     window.db = firebase.firestore();
     window.auth = firebase.auth();
 
+    // Multi-Dépôt: ID fikse pou depo default la (kreye manyèlman nan
+    // Firebase Console — biznis/{bizId}/depo/depo_principal).
+    // Tout sèvis (Vant, Acha, Ajistman, SAV) referanse MENM konstan sa a.
+    window.DEPO_PRINCIPAL_ID = 'depo_principal';
+
     console.log('config.js: window.db ak window.auth pare.');
 })();
