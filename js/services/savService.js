@@ -1,6 +1,6 @@
 // js/services/savService.js
 // Depann de window.db, window.currentCompanyId, window.AdminService,
-// window.SalesService, window.ProductsService
+// window.SalesService, window.ProductsService, window.StockService
 
 const SavService = (() => {
 
@@ -86,13 +86,23 @@ const SavService = (() => {
         return { id: doc.id, ...doc.data() };
     }
 
-    // ---------- WORKFLOW RETOUR: retour_demandé → inspection → remboursement/échange/rejeté ----------
+    // ---------- WORKFLOW RETOUR: retour_demandé → inspection → remboursement/échange_effectué/rejeté ----------
 
-    // FIKS: tout bagay (chanjman estati tikè + retabli stock + antre ajistman_stock) fèt
-    // nan MENM transaksyon an kounye a, olye de operasyon separe. Sa anpeche yon tikè
-    // rete "fèmen" pandan yon atik pa retabli nan stock si yon etap entèmedyè echwe.
-    // Pwoteksyon wòl la vin natirèl: si moun nan pa gen dwa ekri nan 'ajistman_stock'
-    // (sèlman Magasinier/Admin/Propriyete), TOUT transaksyon an refize — pa gen chanjman pasyèl.
+    // MIZAJOU MULTI-DÉPÔT: retabli stock la kounye a pase pa
+    // StockService (stock/{pwodwiId}__{depoId}) ANPLIS pwodwi.kantiteStock.
+    // depoId jwenn sou VANT ORIJINAL la (lavant/{venteId}.depoId), PA sou
+    // Dépôt Principal fikse — sa asire retou a retabli nan MENM depo kote
+    // machandiz la te sòti orijinèlman. Si vant lan pa gen depoId (vant
+    // ki te fèt anvan Multi-Dépôt), fallback sou DEPO_PRINCIPAL_ID.
+    //
+    // Sekans strik: FAZ 1 (tikè + vant + pwodwi + stock pa depo, tout GET)
+    // → FAZ 2 (tout WRITE). Menm patwon ak createSale()/createPurchase().
+    //
+    // FIKS ORIJINAL (konsève): tout bagay (chanjman estati tikè + retabli
+    // stock + antre ajistman_stock) fèt nan MENM transaksyon an, olye de
+    // operasyon separe. Pwoteksyon wòl la vin natirèl: si moun nan pa gen
+    // dwa ekri nan 'ajistman_stock' (sèlman Magasinier/Admin/Propriyete),
+    // TOUT transaksyon an refize — pa gen chanjman pasyèl.
     async function advanceReturnStatus(ticketId, nouvoEstati) {
         if (!ETAP_RETOUR.includes(nouvoEstati)) throw new Error("Etap pa valid.");
 
@@ -100,7 +110,7 @@ const SavService = (() => {
         const ref = bizRef.collection('sav').doc(ticketId);
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
-            // ---- 1. TOUT LEKTI ANVAN NENPÒT EKRITI ----
+            // ============ FAZ 1 : TOUT LEKTI ============
             const doc = await transaction.get(ref);
             if (!doc.exists) throw new Error("Tikè sa a pa egziste.");
             const tikè = doc.data();
@@ -112,10 +122,30 @@ const SavService = (() => {
             const dwèRetabliStock = (nouvoEstati === 'remboursement' || nouvoEstati === 'échange_effectué');
             const atikLis = dwèRetabliStock ? (tikè.atik || []) : [];
 
+            // Jwenn depoId sou vant orijinal la (sèlman si gen atik pou retabli)
+            let depoId = window.DEPO_PRINCIPAL_ID;
+            if (dwèRetabliStock && atikLis.length > 0 && tikè.venteId) {
+                const venteRef = bizRef.collection('lavant').doc(tikè.venteId);
+                const venteDoc = await transaction.get(venteRef);
+                if (venteDoc.exists && venteDoc.data().depoId) {
+                    depoId = venteDoc.data().depoId;
+                }
+                // Si vant lan pa egziste ankò oswa pa gen depoId, rete sou fallback DEPO_PRINCIPAL_ID
+            }
+
             const productRefs = atikLis.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(r => transaction.get(r)));
 
-            // ---- 2. EKRITI (tout ansanm, oswa okenn) ----
+            // GET stock pa depo, pou chak atik ki pral retabli
+            const stockAvanParLiy = [];
+            if (dwèRetabliStock) {
+                for (const atik of atikLis) {
+                    const stockAvan = await window.StockService.liStokPouTransaction(atik.pwodwiId, depoId, transaction);
+                    stockAvanParLiy.push(stockAvan);
+                }
+            }
+
+            // ============ FAZ 2 : TOUT EKRITI (tout ansanm, oswa okenn) ============
             transaction.update(ref, {
                 estati: nouvoEstati,
                 istorik: firebase.firestore.FieldValue.arrayUnion({
@@ -129,10 +159,15 @@ const SavService = (() => {
                 const stockApre = stockAvan + atikLis[i].kantite;
                 transaction.update(productRefs[i], { kantiteStock: stockApre });
 
+                window.StockService.ekriStokPouTransaction(
+                    atikLis[i].pwodwiId, depoId, stockAvanParLiy[i], atikLis[i].kantite, transaction
+                );
+
                 const ajistmanRef = bizRef.collection('ajistman_stock').doc();
                 transaction.set(ajistmanRef, {
                     pwodwiId: atikLis[i].pwodwiId,
                     pwodwiNon: atikLis[i].non || pDoc.data().non,
+                    depoId,
                     stockAvan,
                     kantiteChanjman: atikLis[i].kantite,
                     stockApre,
