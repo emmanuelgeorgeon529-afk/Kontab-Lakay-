@@ -51,6 +51,11 @@ body { background: var(--bg-main); color: var(--text-dark); display: flex; heigh
 .chart-section { background: var(--bg-white); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow-card); border: 1px solid #E2E8F0; margin-bottom: 24px; }
 .chart-container { height: 250px; width: 100%; }
 
+/* Grid 2 kolòn jenerik (Carburant/Depans Transpò, Retours/Avoirs, elatriye)
+   — ranplase style="display:grid; grid-template-columns:1fr 1fr;" inline
+   pou responsive.css ka kolapse l an 1 kolòn sou mobil. */
+.two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+
 .fin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .fin-table th { text-align: left; padding: 8px 4px; border-bottom: 2px solid #E2E8F0; font-weight: 600; color: var(--text-muted); }
 .fin-table td { padding: 6px 4px; border-bottom: 1px solid #f1f5f9; }
@@ -103,4 +108,5 @@ body { background: var(--bg-main); color: var(--text-dark); display: flex; heigh
     .sidebar.open .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
     .view-container { padding: 16px; }
     .kpi-grid { grid-template-columns: 1fr 1fr; }
-}
+    .two-col-grid { grid-template-columns: 1fr; }
+                            }
