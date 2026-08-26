@@ -1,4 +1,5 @@
 // js/services/purchasesService.js
+// Depann de window.db, window.currentCompanyId, window.AdminService, window.StockService
 const PurchasesService = (() => {
 
     function getBizRef() {
@@ -20,6 +21,8 @@ const PurchasesService = (() => {
     /**
      * @param {Object} purchaseData
      *   purchaseData.founiseId, founiseNon, mòdPeman
+     *   purchaseData.depoId - OPSYONÈL, default window.DEPO_PRINCIPAL_ID
+     *     (kote machandiz la ap antre — yon sèl depo pou tout panye a)
      *   purchaseData.atik - [{ pwodwiId, non, kantite, priInite, rabaisPousantaj? }]
      *   purchaseData.fraisAccessoires - transpò/dwàn kapitalize nan kou envantè a (opsyonèl)
      */
@@ -30,8 +33,13 @@ const PurchasesService = (() => {
 
         const bizRef = getBizRef();
         const fraisAccessoires = purchaseData.fraisAccessoires || 0;
+        const depoId = purchaseData.depoId || window.DEPO_PRINCIPAL_ID;
+        if (!depoId) {
+            throw new Error("depoId obligatwa (DEPO_PRINCIPAL_ID pa defini — verifye config.js).");
+        }
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
+            // ============ FAZ 1 : TOUT GET (pwodwi + founisè + stock pa depo) ============
             const productRefs = purchaseData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
 
@@ -39,6 +47,14 @@ const PurchasesService = (() => {
             const founiseDoc = await transaction.get(founiseRef);
             if (!founiseDoc.exists) throw new Error("Founisè sa a pa egziste.");
 
+            // GET stock pa depo, pou CHAK liy — sekans, anvan okenn write
+            const stockAvanParLiy = [];
+            for (const atik of purchaseData.atik) {
+                const stockAvan = await window.StockService.liStokPouTransaction(atik.pwodwiId, depoId, transaction);
+                stockAvanParLiy.push(stockAvan);
+            }
+
+            // ============ FAZ 2 : KALKIL (san Firestore) ============
             let totalMarchandiz = 0;
             const stockUpdates = [];
             productDocs.forEach((doc, i) => {
@@ -49,25 +65,34 @@ const PurchasesService = (() => {
                 const atikSaisie = purchaseData.atik[i];
                 const kantite = atikSaisie.kantite;
 
-                // Aplike rabè liy la (si genyen)
                 const brutLiy = kantite * atikSaisie.priInite;
                 const rabaisPousantaj = atikSaisie.rabaisPousantaj || 0;
                 const sousTotal = brutLiy * (1 - rabaisPousantaj / 100);
 
                 totalMarchandiz += sousTotal;
                 stockUpdates.push({
-                    ref: productRefs[i],
-                    nouvoKantite: (data.kantiteStock || 0) + kantite
+                    pwodwiRef: productRefs[i],
+                    pwodwiId: atikSaisie.pwodwiId,
+                    kantite,
+                    nouvoKantiteTotal: (data.kantiteStock || 0) + kantite
                 });
             });
 
-            // Total final = machandiz (apre rabè) + frè akseswa kapitalize
             const total = totalMarchandiz + fraisAccessoires;
+            const nimewoAcha = await getNextPurchaseNumber(transaction, bizRef); // GET + WRITE (konte) — dwe rete anvan lòt write yo
 
-            const nimewoAcha = await getNextPurchaseNumber(transaction, bizRef);
+            // ============ FAZ 3 : TOUT WRITE (okenn GET apre isit la) ============
 
+            // 3a. Stock pa depo, pou chak liy (WRITE sèlman, itilize stockAvanParLiy deja jwenn)
+            stockUpdates.forEach((u, i) => {
+                window.StockService.ekriStokPouTransaction(
+                    u.pwodwiId, depoId, stockAvanParLiy[i], u.kantite, transaction
+                );
+            });
+
+            // 3b. Total agrégé pwodwi.kantiteStock
             stockUpdates.forEach(u => {
-                transaction.update(u.ref, { kantiteStock: u.nouvoKantite });
+                transaction.update(u.pwodwiRef, { kantiteStock: u.nouvoKantiteTotal });
             });
 
             const achatRef = bizRef.collection('acha').doc();
@@ -76,6 +101,7 @@ const PurchasesService = (() => {
                 founiseId: purchaseData.founiseId,
                 founiseNon: purchaseData.founiseNon || founiseDoc.data().non,
                 mòdPeman: purchaseData.mòdPeman,
+                depoId,
                 atik: purchaseData.atik,
                 totalMarchandiz,
                 fraisAccessoires,
@@ -134,15 +160,23 @@ const PurchasesService = (() => {
         return { id: doc.id, ...doc.data() };
     }
 
+    /**
+     * NÒT: acha ki te kreye AVAN Multi-Dépôt (san chan "depoId") ap
+     * itilize window.DEPO_PRINCIPAL_ID kòm fallback — sa sipoze
+     * migrasyon deja mete tout ansyen stock nan Dépôt Principal.
+     */
     async function cancelPurchase(purchaseId, rezon) {
         const bizRef = getBizRef();
 
         const achaAnile = await window.db.runTransaction(async (transaction) => {
+            // ============ FAZ 1 : TOUT GET ============
             const achatRef = bizRef.collection('acha').doc(purchaseId);
             const achatDoc = await transaction.get(achatRef);
             if (!achatDoc.exists) throw new Error("Acha sa a pa egziste.");
             const acha = achatDoc.data();
             if (acha.estati === 'anile') throw new Error("Acha sa a deja anile.");
+
+            const depoId = acha.depoId || window.DEPO_PRINCIPAL_ID;
 
             const productRefs = acha.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
             const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
@@ -154,6 +188,13 @@ const PurchasesService = (() => {
                 founiseDoc = await transaction.get(founiseRef);
             }
 
+            const stockAvanParLiy = [];
+            for (const atik of acha.atik) {
+                const stockAvan = await window.StockService.liStokPouTransaction(atik.pwodwiId, depoId, transaction);
+                stockAvanParLiy.push(stockAvan);
+            }
+
+            // ============ FAZ 2 : VERIFYE (san write) ============
             productDocs.forEach((doc, i) => {
                 if (doc.exists) {
                     const stockAktyèl = doc.data().kantiteStock || 0;
@@ -161,7 +202,19 @@ const PurchasesService = (() => {
                     if (nouvoKantite < 0) {
                         throw new Error(`Pa ka anile: stock "${acha.atik[i].non}" ta vin negatif (deja itilize/vann).`);
                     }
+                }
+            });
+
+            // ============ FAZ 3 : TOUT WRITE ============
+            productDocs.forEach((doc, i) => {
+                if (doc.exists) {
+                    const stockAktyèl = doc.data().kantiteStock || 0;
+                    const nouvoKantite = stockAktyèl - acha.atik[i].kantite;
                     transaction.update(productRefs[i], { kantiteStock: nouvoKantite });
+
+                    window.StockService.ekriStokPouTransaction(
+                        acha.atik[i].pwodwiId, depoId, stockAvanParLiy[i], -acha.atik[i].kantite, transaction
+                    );
                 }
             });
 
@@ -208,3 +261,4 @@ const PurchasesService = (() => {
     return { createPurchase, getPurchases, getPurchaseById, cancelPurchase };
 })();
 window.PurchasesService = PurchasesService;
+                    
