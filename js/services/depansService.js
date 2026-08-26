@@ -35,6 +35,10 @@ const DepansService = (() => {
      *   data.deskripsyon
      *   data.mòdPeman - 'kach' | 'transfè' | 'kredi'
      *   data.founiseId - obligatwa si mòdPeman === 'kredi'
+     *   data.veyikilId - opsyonèl (Modil 5 — Logistique, kategori 'Transport')
+     *   data.chofeId - opsyonèl (Modil 5 — Logistique, kategori 'Transport')
+     *   data.souKategori - opsyonèl (ex: 'Carburant'|'Péage'|'Reparasyon'|'Lojman Chofè'|'Manje')
+     *   data.kantite - opsyonèl (galon, sèlman itilize pou souKategori 'Carburant')
      *
      * @returns { enAtant: true, demandId } si montan depase sèy la (soumèt pou apwobasyon)
      *          { enAtant: false, id, nimewoDepans } si kreye dirèkteman
@@ -61,7 +65,11 @@ const DepansService = (() => {
         const payload = JSON.stringify({
             kategori: data.kategori,
             mòdPeman: data.mòdPeman,
-            founiseId: data.founiseId || null
+            founiseId: data.founiseId || null,
+            veyikilId: data.veyikilId || null,
+            chofeId: data.chofeId || null,
+            souKategori: data.souKategori || null,
+            kantite: data.kantite || null
         });
 
         const demandId = await window.AdminService.soumèTDemandApwobasyon(window.currentCompanyId, {
@@ -108,6 +116,10 @@ const DepansService = (() => {
                 deskripsyon: data.deskripsyon || '',
                 mòdPeman: data.mòdPeman,
                 founiseId: data.founiseId || null,
+                veyikilId: data.veyikilId || null,
+                chofeId: data.chofeId || null,
+                souKategori: data.souKategori || null,
+                kantite: data.kantite || null,
                 estati: 'peye',
                 dat: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -172,7 +184,11 @@ const DepansService = (() => {
             montan: demand.montan,
             deskripsyon: demand.deskripsyon || '',
             mòdPeman: payload.mòdPeman,
-            founiseId: payload.founiseId
+            founiseId: payload.founiseId,
+            veyikilId: payload.veyikilId,
+            chofeId: payload.chofeId,
+            souKategori: payload.souKategori,
+            kantite: payload.kantite
         });
 
         // Make demand lan kòm egzekite (apre depans la konfime kreye)
