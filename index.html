@@ -38,11 +38,15 @@
     <script src="js/services/accountingService.js"></script>
     <script src="js/services/kesService.js"></script>
     <script src="js/services/depansService.js"></script>
+    <script src="js/services/stockService.js"></script>
     <script src="js/services/productsService.js"></script>
     <script src="js/services/suppliersService.js"></script>
+    <script src="js/services/depoService.js"></script>
     <script src="js/services/customersService.js"></script>
     <script src="js/services/salesService.js"></script>
     <script src="js/services/purchasesService.js"></script>
+    <script src="js/services/veyikilSevis.js"></script>
+    <script src="js/services/chofeSevis.js"></script>
     <script src="js/services/quotesService.js"></script>
     <script src="js/services/commandesService.js"></script>
     <script src="js/services/promotionsService.js"></script>
@@ -50,6 +54,7 @@
     <script src="js/services/marketingService.js"></script>
     <script src="js/services/savService.js"></script>
     <script src="js/services/objectifsService.js"></script>
+    <script src="js/services/bonLivrezonSevis.js"></script>
 
     <!-- Modil UI -->
     <script src="js/modules/admin_ui.js"></script>
@@ -57,6 +62,7 @@
     <script src="js/modules/depans_ui.js"></script>
     <script src="js/modules/ventes_ui.js"></script>
     <script src="js/modules/operations_ui.js"></script>
+    <script src="js/modules/logistique_ui.js"></script>
     <!-- ... ajoute lòt sèvis yo menm jan ... -->
 
 </head>
@@ -1480,9 +1486,9 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 4.1 — Gestion des Produits</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>SKU</th><th>Non</th><th>Catégorie</th><th>Prix Achat</th><th>Prix Vente</th><th>Unité</th></tr>
+                <tr><th>SKU</th><th>Non</th><th>Catégorie</th><th>Prix Achat</th><th>Prix Vente</th><th>Unité</th><th>Aksyon</th></tr>
                 <tbody id="operationsProduitsTableBody">
-                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
                 </tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
@@ -1509,6 +1515,8 @@
                 </tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.entreeStockRapid()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Entrée Stock</button>
+                <button onclick="OperationsUI.sortieStockRapid()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📤 Sortie Stock</button>
                 <button onclick="OperationsUI.ajusteStockManyèl()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚖️ Ajustement</button>
             </div>
         </div>
@@ -1518,13 +1526,38 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏢 4.3 — Multi-Dépôts</summary>
         <div style="padding:0 20px 20px;">
-            <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">⚠️ Fonksyon sa a poko konekte — kounye a chak pwodwi gen yon sèl kantite stock global, pa yon kantite pa depo.</p>
             <table class="fin-table">
-                <tr><th>Dépôt</th><th>Adresse</th><th>Responsable</th></tr>
-                <tr><td>Dépôt Principal</td><td>Delmas 33</td><td>Pierre A.</td></tr>
-                <tr><td>Magasin Centre-Ville</td><td>Rue du Centre</td><td>Marie L.</td></tr>
-                <tr><td>Entrepôt Nord</td><td>Cap-Haïtien</td><td>Jean D.</td></tr>
-                <tr><td>Succursale Ouest</td><td>Pétion-Ville</td><td>Rose M.</td></tr>
+                <tr><th>Dépôt</th><th>Adresse</th><th>Responsab</th><th>Estati</th><th>Aksyon</th></tr>
+                <tbody id="depoTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
+            </table>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="OperationsUI.openNewDepoModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Depo</button>
+            </div>
+
+            <p style="font-size:13px; font-weight:600; margin:16px 0 8px;">Transfert Inter-Dépôts</p>
+            <div id="transferDepoError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:10px;"></div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:8px; margin-bottom:10px;">
+                <select id="transferDepoSource" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                    <option value="">— Depo sous —</option>
+                </select>
+                <select id="transferDepoDest" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                    <option value="">— Depo destinasyon —</option>
+                </select>
+                <select id="transferDepoPwodwi" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                    <option value="">— Chwazi pwodwi —</option>
+                </select>
+                <input type="number" id="transferDepoKantite" placeholder="Kantite" min="1" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+            </div>
+            <button id="transferDepoSubmitBtn" onclick="OperationsUI.submitTransferDepo()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">📦 Effectuer Transfert</button>
+
+            <p style="font-size:13px; font-weight:600; margin:18px 0 8px;">Istorik Transfè</p>
+            <table class="fin-table">
+                <tr><th>Pwodwi</th><th>Sous</th><th>Destinasyon</th><th>Kantite</th></tr>
+                <tbody id="transferDepoHistoTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
         </div>
     </details>
@@ -1657,6 +1690,49 @@
             <button id="achatSubmitBtn" onclick="OperationsUI.submitNewPurchase()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Konfime Acha</button>
         </div>
     </div>
+
+    <!-- ===================== MODAL: MODIFYE PWODWI ===================== -->
+    <div id="editProductModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:700;">✏️ Modifye Pwodwi</h3>
+                <span onclick="OperationsUI.closeEditProductModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+            </div>
+            <div id="editProductError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:10px; border-radius:8px; font-size:13px; margin-bottom:14px;"></div>
+
+            <input type="hidden" id="editProductId">
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Non *</label>
+            <input type="text" id="editProduitNon" class="settings-input" style="margin-bottom:12px;">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Prix Achat</label>
+                    <input type="number" id="editProduitPriAchat" class="settings-input" min="0">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Prix Vente *</label>
+                    <input type="number" id="editProduitPriVente" class="settings-input" min="0">
+                </div>
+            </div>
+
+            <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Catégorie</label>
+            <input type="text" id="editProduitKategori" class="settings-input" style="margin-bottom:12px;">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Stock Minimum</label>
+                    <input type="number" id="editProduitStockMin" class="settings-input" min="0">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Unité</label>
+                    <input type="text" id="editProduitInite" class="settings-input">
+                </div>
+            </div>
+
+            <button id="editProductSubmitBtn" onclick="OperationsUI.submitEditProduct()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Sove Chanjman</button>
+        </div>
+    </div>
 </section>
 
             <!-- ===================== 5. LOGISTIQUE ===================== -->
@@ -1668,13 +1744,13 @@
             <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Livrezon, flòt, chofè, gaz & retou machandiz</p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📄 Nouvo BL</button>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">🚚 Nouvo Livrezon</button>
+            <button onclick="LogistiqueUI.ouvriModalKreyeBL()" style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">📄 Nouvo BL</button>
+            <button onclick="LogistiqueUI.ouvriModalKreyeBL()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">🚚 Nouvo Livrezon</button>
         </div>
     </div>
 
     <!-- 5.1 Dashboard Logistique -->
-    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+    <div class="kpi-grid">
         <div class="kpi-card"><div class="label">🚚 Livrezon an Atant</div><div class="value">12</div><div class="change down">↑ 3</div></div>
         <div class="kpi-card"><div class="label">📦 Livrezon Jodi a</div><div class="value">8</div><div class="change up">↑ 2</div></div>
         <div class="kpi-card"><div class="label">💰 Depans Transpò (mwa)</div><div class="value">215 000 HTG</div><div class="change down">↑ 5%</div></div>
@@ -1692,10 +1768,8 @@
     <!-- Alèt -->
     <details class="chart-section" open style="padding:0;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">⚠️ Alèt Logistik</summary>
-        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>🪪 Lisans chofè Jean D. ekspire nan 12 jou</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>🔧 Kamyon T-2201 bezwen antretyen</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⏰ Livrezon BL-0045 an reta</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
+        <div id="alètLogistikContainer" style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
+            <p style="font-size:12px; color:var(--text-muted);">Ap chaje...</p>
         </div>
     </details>
 
@@ -1703,10 +1777,13 @@
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📄 5.2 — Bon de Livraison (BL)</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
-            <table class="fin-table">
-                <tr><th>N° BL</th><th>Kliyan</th><th>Chofè</th><th>Veyikil</th><th>Estati</th></tr>
-                <tr><td>BL-0045</td><td>Ti Boutik Delmas</td><td>Jean D.</td><td>T-2201</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Reta</span></td></tr>
-                <tr><td>BL-0044</td><td>Marie L.</td><td>Wilner P.</td><td>T-1150</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Livré</span></td></tr>
+            <table class="fin-table responsive-cards">
+                <thead>
+                    <tr><th>N° BL</th><th>Kliyan</th><th>Chofè</th><th>Veyikil</th><th>Estati</th></tr>
+                </thead>
+                <tbody id="blTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Ap chaje...</td></tr>
+                </tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
                 <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye BL</button>
@@ -1721,10 +1798,13 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📍 5.3 — Gestion des Expéditions</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
-            <table class="fin-table">
-                <tr><th>Kliyan</th><th>BL</th><th>Chofè</th><th>Dat Depa</th><th>Estati</th></tr>
-                <tr><td>Ti Boutik Delmas</td><td>BL-0045</td><td>Jean D.</td><td>01/08/2026</td><td><span class="ged-status" style="background:#DBEAFE; color:#1D4ED8;">En route</span></td></tr>
-                <tr><td>Marie L.</td><td>BL-0044</td><td>Wilner P.</td><td>31/07/2026</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Livré</span></td></tr>
+            <table class="fin-table responsive-cards">
+                <thead>
+                    <tr><th>Kliyan</th><th>BL</th><th>Chofè</th><th>Dat Depa</th><th>Estati</th></tr>
+                </thead>
+                <tbody id="expeditionTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Ap chaje...</td></tr>
+                </tbody>
             </table>
             <p style="font-size:12px; color:var(--text-muted); margin-top:12px;">Préparation → En route → Livré / Annulé</p>
         </div>
@@ -1734,15 +1814,17 @@
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🚛 5.4 — Gestion de Flotte</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
-            <table class="fin-table">
-                <tr><th>Plak</th><th>Mak/Modèl</th><th>Ane</th><th>Kilométrage</th><th>Estati</th></tr>
-                <tr><td>T-2201</td><td>Isuzu NPR</td><td>2019</td><td style="text-align:right;">85 400 km</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">Antretyen</span></td></tr>
-                <tr><td>T-1150</td><td>Toyota Hilux</td><td>2021</td><td style="text-align:right;">42 100 km</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
-            </table>
-            <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
-                <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>🛡️ Asirans T-2201 ap ekspire nan 20 jou</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
-                <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#F1F5F9;"><span>🛢️ Chanjman lwil pwograme pou T-1150</span><span style="color:var(--text-muted); font-weight:600;">Enfo</span></div>
+            <div style="margin-bottom:10px;">
+                <button onclick="LogistiqueUI.ouvriModalVeyikil()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Veyikil</button>
             </div>
+            <table class="fin-table">
+                <thead>
+                    <tr><th>Plak</th><th>Mak/Modèl</th><th>Ane</th><th>Kilométrage</th><th>Estati</th><th>Aksyon</th></tr>
+                </thead>
+                <tbody id="flotteTableBody">
+                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Ap chaje...</td></tr>
+                </tbody>
+            </table>
         </div>
     </details>
 
@@ -1750,28 +1832,35 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧑‍✈️ 5.5 — Gestion des Chauffeurs</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
-            <table class="fin-table">
-                <tr><th>Chofè</th><th>Lisans Ekspire</th><th>Livrezon Fèt</th><th>Reta</th></tr>
-                <tr><td>Jean D.</td><td style="color:var(--danger);">14/08/2026</td><td style="text-align:right;">142</td><td style="text-align:right;">6</td></tr>
-                <tr><td>Wilner P.</td><td>02/2027</td><td style="text-align:right;">98</td><td style="text-align:right;">2</td></tr>
+            <table class="fin-table responsive-cards">
+                <thead>
+                    <tr><th>Chofè</th><th>Lisans Ekspire</th><th>Livrezon Fèt</th><th>Reta</th></tr>
+                </thead>
+                <tbody id="chauffeurTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Ap chaje...</td></tr>
+                </tbody>
             </table>
-            <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); margin-top:14px; margin-bottom:0;">
-                <div class="kpi-card"><div class="label">Livrezon Reyisi</div><div class="value" style="color:var(--secondary);">234</div></div>
-                <div class="kpi-card"><div class="label">Livrezon An Reta</div><div class="value" style="color:var(--danger);">8</div></div>
+            <div class="kpi-grid" style="margin-top:14px; margin-bottom:0;">
+                <div class="kpi-card"><div class="label">Livrezon Reyisi</div><div class="value" style="color:var(--secondary);" id="kpiLivrezonReyisi">—</div></div>
+                <div class="kpi-card"><div class="label">Livrezon An Reta</div><div class="value" style="color:var(--danger);" id="kpiLivrezonReta">—</div></div>
                 <div class="kpi-card"><div class="label">Km Parcourus</div><div class="value">4 850 km</div></div>
             </div>
         </div>
     </details>
 
     <!-- 5.6 Carburant + 5.7 Dépenses Transport -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+    <div class="two-col-grid">
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">⛽ 5.6 — Gestion Carburant</summary>
             <div style="padding:0 20px 20px;">
-                <table class="fin-table">
-                    <tr><th>Veyikil</th><th>Chofè</th><th>Kantite</th><th>Total</th></tr>
-                    <tr><td>T-2201</td><td>Jean D.</td><td style="text-align:right;">40 gal</td><td style="text-align:right;">10 000 HTG</td></tr>
-                    <tr><td>T-1150</td><td>Wilner P.</td><td style="text-align:right;">30 gal</td><td style="text-align:right;">7 500 HTG</td></tr>
+                <button onclick="LogistiqueUI.ouvriModalCarburant()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; margin-bottom:10px;">➕ Nouvo Gaz</button>
+                <table class="fin-table responsive-cards">
+                    <thead>
+                        <tr><th>Veyikil</th><th>Chofè</th><th>Kantite</th><th>Total</th></tr>
+                    </thead>
+                    <tbody id="carburantTableBody">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Ap chaje...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </details>
@@ -1785,28 +1874,38 @@
                     <span class="ged-status" style="background:#F1F5F9;">Lojman Chofè</span>
                     <span class="ged-status" style="background:#F1F5F9;">Manje</span>
                 </div>
+                <button onclick="LogistiqueUI.ouvriModalDepansTranspò()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; margin-bottom:10px;">➕ Nouvo Depans</button>
                 <p style="font-size:12px; color:var(--text-muted);">Ekriti otomatik: Débit Charges Transport / Crédit Caisse-Banque</p>
             </div>
         </details>
     </div>
 
     <!-- 5.8 Retours + 5.9 Avoirs -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+    <div class="two-col-grid">
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔄 5.8 — Retours Marchandises</summary>
             <div style="padding:0 20px 20px;">
-                <table class="fin-table">
-                    <tr><th>Fakti</th><th>Pwodwi</th><th>Rezon</th><th>Aksyon</th></tr>
-                    <tr><td>FT-000448</td><td>Riz 25lb</td><td>Domaje</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">Rembousman</span></td></tr>
+                <button onclick="LogistiqueUI.ouvriModalNouvoRetour()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; margin-bottom:10px;">➕ Nouvo Retou</button>
+                <table class="fin-table responsive-cards">
+                    <thead>
+                        <tr><th>Fakti</th><th>Pwodwi</th><th>Rezon</th><th>Estati</th><th>Aksyon</th></tr>
+                    </thead>
+                    <tbody id="retourTableBody">
+                        <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Ap chaje...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </details>
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📝 5.9 — Gestion des Avoirs</summary>
             <div style="padding:0 20px 20px;">
-                <table class="fin-table">
-                    <tr><th>N° Avoir</th><th>Kliyan</th><th>Montan</th></tr>
-                    <tr><td>AV-0012</td><td>Ti Boutik Delmas</td><td style="text-align:right;">1 500 HTG</td></tr>
+                <table class="fin-table responsive-cards">
+                    <thead>
+                        <tr><th>N° Avoir</th><th>Kliyan</th><th>Montan</th></tr>
+                    </thead>
+                    <tbody id="avoirTableBody">
+                        <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Ap chaje...</td></tr>
+                    </tbody>
                 </table>
                 <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Débit Ventes / Crédit Client ou Caisse</p>
             </div>
@@ -1817,11 +1916,26 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 5.10 — Rapports Logistiques</summary>
         <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:10px;">
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📊 Livrezon pa Peryòd</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💰 Depans Transpò</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">⛽ Konsomasyon Gaz</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🧑‍✈️ Pèfòmans Chofè</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🔄 Retou Pwodwi</button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                <span>📊 Livrezon pa Peryòd</span>
+                <span id="rapòLivrezonKont" style="color:var(--primary); font-weight:700;">—</span>
+            </button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                <span>💰 Depans Transpò</span>
+                <span id="rapòDepansTranspòKont" style="color:var(--primary); font-weight:700;">—</span>
+            </button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                <span>⛽ Konsomasyon Gaz</span>
+                <span id="rapòGazKont" style="color:var(--primary); font-weight:700;">—</span>
+            </button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                <span>🧑‍✈️ Pèfòmans Chofè</span>
+                <span id="rapòChofèKont" style="color:var(--primary); font-weight:700;">—</span>
+            </button>
+            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                <span>🔄 Retou Pwodwi</span>
+                <span id="rapòRetouKont" style="color:var(--primary); font-weight:700;">—</span>
+            </button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📈 Rentabilité Livrezon</button>
         </div>
     </details>
@@ -3826,6 +3940,15 @@
         const nav = document.querySelector(`.nav-item[data-target="${targetId}"]`);
         if(nav) nav.classList.add('active');
         document.getElementById('sidebar').classList.remove('open');
+
+        // Chaje done dinamik pou seksyon an, si yon fonksyon chajman egziste pou li.
+        // Chak antre isit la se OPSYONÈL — si fonksyon an pa la, anyen pa kase.
+        const chajmanPaSeksyon = {
+            logistique: () => window.LogistiqueUI?.chajeSeksyonLogistique(),
+            // kes: () => window.KesUI?.chajeSesyon(),      // dekomante lè siyati egzat konfime
+            // depans: () => window.DepansUI?.chajeDepans(), // dekomante lè siyati egzat konfime
+        };
+        chajmanPaSeksyon[targetId]?.();
     }
     window.navigate = navigate;
 

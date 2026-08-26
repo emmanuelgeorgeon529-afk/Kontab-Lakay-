@@ -210,9 +210,74 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      match /avoir/{docId} {
+        allow read: if manmBiznis(bizId);
+        // Avoir se rezilta yon SAV — ID dokiman an dwe egal ticketSavId
+        // (menm patwon ak bon_livrezon/venteId), pou anpeche 2 Avoir pou menm tikè
+        allow create: if seVandeOswaAdmin(bizId)
+          && request.resource.data.keys().hasAll(['ticketSavId', 'numeroAvoir', 'montantTTC'])
+          && request.resource.data.ticketSavId is string
+          && docId == request.resource.data.ticketSavId;
+        allow update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
       match /objectif_vande/{docId} {
         allow read: if manmBiznis(bizId);
         allow write: if seAdministrate(bizId);
+      }
+
+      // ---------- LOGISTIQUE (Modil 5) ----------
+      match /veyikil/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seAdministrate(bizId);
+        allow delete: if false;
+      }
+
+      match /chofe/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seAdministrate(bizId);
+        allow delete: if false;
+      }
+
+      match /bon_livrezon/{docId} {
+        allow read: if manmBiznis(bizId);
+        // BL egzije yon referans venteId valid — menm wòl ak lavant, paske BL se ekstansyon dirèk Vant lan
+        allow create: if seVandeOswaAdmin(bizId)
+          && request.resource.data.keys().hasAll(['venteId', 'nimewoBL', 'estati'])
+          && request.resource.data.venteId is string
+          && docId == request.resource.data.venteId;
+        allow update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      // ---------- MULTI-DÉPÔT (Modil 4.3) ----------
+      match /depo/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seMagasinierOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /stock/{docId} {
+        allow read: if manmBiznis(bizId);
+
+        allow create, update: if manmBiznis(bizId)
+          && request.resource.data.keys().hasAll([
+            'pwodwiId',
+            'depoId',
+            'kantiteStock'
+          ])
+          && request.resource.data.kantiteStock is number
+          && request.resource.data.kantiteStock >= 0
+          && docId == request.resource.data.pwodwiId + '__' + request.resource.data.depoId;
+
+        allow delete: if false;
+      }
+
+      match /transferans_depo/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if manmBiznis(bizId);
+        allow delete: if false;
       }
 
       // ---------- KÈS ----------
