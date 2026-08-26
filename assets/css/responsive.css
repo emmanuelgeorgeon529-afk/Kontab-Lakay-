@@ -21,6 +21,7 @@
     .sidebar.open .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
     .view-container { padding: 16px; }
     .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .two-col-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -28,4 +29,25 @@
     .fin-table { font-size: 12px; }
     .login-card { padding: 24px; border-radius: 16px; }
     .chart-container { height: 200px; }
+
+    /* Tabl → Cards (fin-table.responsive-cards) — chak liy <tr> vin yon
+       kat vètikal, chak <td> montre etikèt li via data-label. Itilize sou
+       tabl ki gen anpil kolòn (5.2 BL, 5.3 Expéditions, 5.5 Chauffeurs,
+       5.6 Carburant, 5.8 Retours, 5.9 Avoirs) pou anpeche kraze/soti sou
+       kote sou ekran mobil etwat. */
+    .fin-table.responsive-cards thead { display: none; }
+    .fin-table.responsive-cards, .fin-table.responsive-cards tbody,
+    .fin-table.responsive-cards tr, .fin-table.responsive-cards td { display: block; width: 100%; }
+    .fin-table.responsive-cards tr {
+        margin-bottom: 12px; border: 1px solid #E2E8F0; border-radius: 8px;
+        padding: 10px; background: var(--bg-white);
+    }
+    .fin-table.responsive-cards td {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 6px 4px; border-bottom: none; text-align: right;
+    }
+    .fin-table.responsive-cards td::before {
+        content: attr(data-label); font-weight: 600; color: var(--text-muted);
+        margin-right: 8px; text-align: left;
+    }
 }
