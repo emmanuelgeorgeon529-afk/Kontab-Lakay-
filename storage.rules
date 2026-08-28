@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function konekte() {
+      return request.auth != null;
+    }
+
+    // Logo ak imaj antrepriz — piblik an lekti, sèlman itilizatè konekte ekri
+    match /biznis/{bizId}/logo/{fichye} {
+      allow read: if true;
+      allow write: if konekte() && request.resource.size < 5 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+    }
+
+    // Dokiman (fakti PDF, kontra, elt.) — sèlman itilizatè konekte nan menm biznis
+    match /biznis/{bizId}/documents/{fichye} {
+      allow read, write: if konekte() && request.resource.size < 15 * 1024 * 1024;
+    }
+
+    // CV Kandida — 6.3 Rekritman (RH)
+    match /biznis/{bizId}/kandida/{kandidaId}/{fichye} {
+      allow read, write: if konekte() && request.resource.size < 5 * 1024 * 1024
+                           && request.resource.contentType.matches('application/pdf');
+    }
+
+    // Tout lòt chemen — refize pa default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
