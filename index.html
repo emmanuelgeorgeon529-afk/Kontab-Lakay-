@@ -24,6 +24,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Core -->
@@ -55,6 +56,9 @@
     <script src="js/services/savService.js"></script>
     <script src="js/services/objectifsService.js"></script>
     <script src="js/services/bonLivrezonSevis.js"></script>
+    <script src="js/services/rhService.js"></script>
+    <script src="js/services/payrollService.js"></script>
+    <script src="js/services/rekritmanService.js"></script>
 
     <!-- Modil UI -->
     <script src="js/modules/admin_ui.js"></script>
@@ -63,6 +67,8 @@
     <script src="js/modules/ventes_ui.js"></script>
     <script src="js/modules/operations_ui.js"></script>
     <script src="js/modules/logistique_ui.js"></script>
+    <script src="js/modules/rekritman_ui.js"></script>
+    <script src="js/modules/rh_ui.js"></script>
     <!-- ... ajoute lòt sèvis yo menm jan ... -->
 
 </head>
@@ -1946,23 +1952,24 @@
 <section id="rh" class="view-section">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div>
-            <h2 style="font-size:22px; font-weight:600;">Ressources Humaines & Paie</h2>
+            <h2 style="font-size:22px; font-weight:600;">Resous Imèn & Pewòl</h2>
             <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Anplwaye, prezans, konje, pewòl & pèfòmans</p>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">🧾 Woule Pewòl</button>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">➕ Nouvo Anplwaye</button>
+        <div style="display:flex; gap:8px; flex-wrap:nowrap;">
+            <button id="btn-woule-pewol" style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 12px; border-radius:8px; font-weight:600; white-space:nowrap; font-size:13px;">🧾 Woule Pewòl</button>
+            <button id="btn-konfig-kont-pewol" title="Konfigire Kòd Kont Pewòl" style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 10px; border-radius:8px; font-weight:600; white-space:nowrap; font-size:13px;">⚙️</button>
+            <button id="btn-nouvo-anplwaye" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:600; white-space:nowrap; font-size:13px;">➕ Nouvo Anplwaye</button>
         </div>
     </div>
 
     <!-- 6.1 Dashboard RH -->
     <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-        <div class="kpi-card"><div class="label">👥 Total Anplwaye</div><div class="value" style="color:var(--primary);">47</div><div class="change up">↑ 2</div></div>
-        <div class="kpi-card"><div class="label">🟢 Anplwaye Aktif</div><div class="value" style="color:var(--secondary);">42</div><div class="change up">↑ 1</div></div>
-        <div class="kpi-card"><div class="label">🏖️ Anplwaye an Konje</div><div class="value" style="color:var(--text-muted);">3</div><div class="change down">↓ 1</div></div>
-        <div class="kpi-card"><div class="label">💰 Pewòl Mwa a</div><div class="value">1 850 000 HTG</div></div>
-        <div class="kpi-card"><div class="label">⏱️ Lè Siplemantè</div><div class="value">42 h</div></div>
-        <div class="kpi-card"><div class="label">📄 Kontra ki pral Ekspire</div><div class="value" style="color:var(--danger);">2</div></div>
+        <div class="kpi-card" id="kpi-rh-total-anplwaye"><div class="label">👥 Total Anplwaye</div><div class="value" style="color:var(--primary);">—</div></div>
+        <div class="kpi-card" id="kpi-rh-anplwaye-aktif"><div class="label">🟢 Anplwaye Aktif</div><div class="value" style="color:var(--secondary);">—</div></div>
+        <div class="kpi-card" id="kpi-rh-anplwaye-konje"><div class="label">🏖️ Anplwaye an Konje</div><div class="value" style="color:var(--text-muted);">—</div></div>
+        <div class="kpi-card" id="kpi-rh-pewol-mwa"><div class="label">💰 Pewòl Mwa a</div><div class="value">—</div></div>
+        <div class="kpi-card"><div class="label">⏱️ Lè Siplemantè</div><div class="value">—</div></div>
+        <div class="kpi-card" id="kpi-rh-kontra-ekspire"><div class="label">📄 Kontra ki pral Ekspire</div><div class="value" style="color:var(--danger);">—</div></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -1976,12 +1983,11 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🪪 6.2 — Dosye Anplwaye</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>N°</th><th>Non</th><th>Depatman</th><th>Pozisyon</th><th>Kontra</th><th>Salè Baz</th></tr>
-                <tr><td>EMP-001</td><td>Jean D.</td><td>Finans</td><td>Comptable</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">CDI</span></td><td style="text-align:right;">65 000 HTG</td></tr>
-                <tr><td>EMP-002</td><td>Marie L.</td><td>Komèsyal</td><td>Caissier</td><td><span class="ged-status" style="background:#EEF2FF; color:var(--primary);">CDI</span></td><td style="text-align:right;">42 000 HTG</td></tr>
-                <tr><td>EMP-003</td><td>Pierre A.</td><td>Lojistik</td><td>Chofè</td><td><span class="ged-status" style="background:#F1F5F9;">CDD</span></td><td style="text-align:right;">38 000 HTG</td></tr>
+                <tr><th>N°</th><th>Non</th><th>Depatman</th><th>Pozisyon</th><th>Kontra</th><th>Salè Baz</th><th></th></tr>
+                <tbody id="rh-tab-anplwaye-body">
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
-            <button style="margin-top:14px; background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajoute Anplwaye</button>
         </div>
     </details>
 
@@ -1990,12 +1996,13 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧑‍💼 6.3 — Rekritman</summary>
         <div style="padding:0 20px 20px;">
             <table class="fin-table">
-                <tr><th>Kandida</th><th>Pozisyon</th><th>Etap</th></tr>
-                <tr><td>Nadège R.</td><td>Comptable Junior</td><td><span class="ged-status" style="background:#DBEAFE; color:#1D4ED8;">Entèvyou</span></td></tr>
-                <tr><td>Frantz M.</td><td>Chofè</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aksepte</span></td></tr>
+                <tr><th>Kandida</th><th>Pozisyon</th><th>Etap</th><th></th></tr>
+                <tbody id="rh-tab-kandida-body">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
             <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Kandida → Entèvyou → Evalyasyon → Aksepte / Rejte</p>
-            <button style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📤 Upload CV</button>
+            <button id="btn-nouvo-kandida" style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Kandida</button>
         </div>
     </details>
 
@@ -2004,16 +2011,16 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🕐 6.4 — Prezans & Pointage</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                <span class="ged-status" style="background:#F1F5F9;">✅ Manuel</span>
-                <span class="ged-status" style="background:#F1F5F9;">📱 QR Code</span>
-                <span class="ged-status" style="background:#F1F5F9;">🪪 Badge</span>
-                <span class="ged-status" style="background:#F1F5F9;">📲 Mobile</span>
+                <span class="ged-status" style="background:#D1FAE5; color:#047857;">✅ Manuel</span>
+                <span class="ged-status" style="background:#F1F5F9; color:var(--text-muted);">📱 QR Code (byento)</span>
+                <span class="ged-status" style="background:#F1F5F9; color:var(--text-muted);">🪪 Badge (byento)</span>
+                <span class="ged-status" style="background:#F1F5F9; color:var(--text-muted);">📲 Mobile (byento)</span>
             </div>
             <table class="fin-table">
-                <tr><th>Anplwaye</th><th>Lè Antre</th><th>Lè Sòti</th><th>Estati</th></tr>
-                <tr><td>Jean D.</td><td>08:02</td><td>17:05</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Prezan</span></td></tr>
-                <tr><td>Marie L.</td><td>08:25</td><td>17:00</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Reta</span></td></tr>
-                <tr><td>Pierre A.</td><td>—</td><td>—</td><td><span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Absan</span></td></tr>
+                <tr><th>Anplwaye</th><th>Lè Antre</th><th>Lè Sòti</th><th>Estati</th><th></th></tr>
+                <tbody id="rh-tab-prezans-body">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
         </div>
     </details>
@@ -2030,9 +2037,12 @@
                 <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📝 Konje Espesyal</span>
             </div>
             <table class="fin-table">
-                <tr><th>Anplwaye</th><th>Tip</th><th>Dat</th><th>Estati</th></tr>
-                <tr><td>Rose M.</td><td>Konje Anyèl</td><td>28/07 - 04/08</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Atant RH</span></td></tr>
+                <tr><th>Anplwaye</th><th>Tip</th><th>Dat</th><th>Estati</th><th></th></tr>
+                <tbody id="rh-tab-konje-body">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
+            <button id="btn-nouvo-konje" style="margin-top:14px; background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Demann Konje</button>
             <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Anplwaye → Demann → Manadjè → Apwobasyon RH → Konje Aktif</p>
         </div>
     </details>
@@ -2040,11 +2050,12 @@
     <!-- 6.6 Orè Travay -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🕓 6.6 — Orè Travay</summary>
-        <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
-            <span class="ged-status" style="background:#F1F5F9;">🌅 Maten (07h-15h)</span>
-            <span class="ged-status" style="background:#F1F5F9;">🌇 Aprèmidi (15h-23h)</span>
-            <span class="ged-status" style="background:#F1F5F9;">🌙 Lannwit (23h-07h)</span>
-            <span class="ged-status" style="background:#F1F5F9;">🔄 Flexible</span>
+        <div style="padding:0 20px 20px;">
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Konfigire orè travay biznis ou a — sa itilize pou detekte "An Reta" nan 6.4.</p>
+            <div id="rh-lis-orè" style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span style="color:var(--text-muted); font-size:13px;">⏳ Chajman...</span>
+            </div>
+            <button id="btn-nouvo-orè" style="margin-top:14px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Orè</button>
         </div>
     </details>
 
@@ -2054,11 +2065,12 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>N° Pewòl</th><th>Anplwaye</th><th>Salè Brit</th><th>Dediksyon</th><th>Salè Nèt</th></tr>
-                <tr><td>PW-2026-07-01</td><td>Jean D.</td><td style="text-align:right;">65 000</td><td style="text-align:right; color:var(--danger);">-6 500</td><td style="text-align:right; font-weight:600;">58 500 HTG</td></tr>
-                <tr><td>PW-2026-07-02</td><td>Marie L.</td><td style="text-align:right;">42 000</td><td style="text-align:right; color:var(--danger);">-4 200</td><td style="text-align:right; font-weight:600;">37 800 HTG</td></tr>
+                <tbody id="rh-tab-pewol-body">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
-            <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Dediksyon: IRI · ONA · OFATMA · Lòt · Avantaj: Prime Transpò · Prime Manje · Bonus · Komisyon</p>
-            <button style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📄 Fich Pewòl PDF</button>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Dediksyon: Enpo · Kotizasyon sosyal (selon peyi) · Avans Salè · Avantaj: Prime Transpò · Prime Manje · Bonus · Komisyon</p>
+            <button style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;" disabled title="Pa konekte ankò">📄 Fich Pewòl PDF</button>
         </div>
     </details>
 
@@ -2067,23 +2079,28 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💵 6.8 — Avans Salè</summary>
         <div style="padding:0 20px 20px;">
             <table class="fin-table">
-                <tr><th>Anplwaye</th><th>Montan</th><th>Estati</th></tr>
-                <tr><td>Pierre A.</td><td style="text-align:right;">5 000 HTG</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Atant</span></td></tr>
+                <tr><th>Anplwaye</th><th>Montan</th><th>Estati</th><th></th></tr>
+                <tbody id="rh-tab-avans-body">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                </tbody>
             </table>
+            <button id="btn-nouvo-avans" style="margin-top:14px; background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Demann Avans</button>
             <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Dediksyon otomatik sou pwochen pewòl</p>
         </div>
     </details>
 
     <!-- 6.9 Evalyasyon + 6.10 Fòmasyon -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:16px;">
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">⭐ 6.9 — Evalyasyon Pèfòmans</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
                     <tr><th>Anplwaye</th><th>Nòt</th><th>Rezilta</th></tr>
-                    <tr><td>Jean D.</td><td style="text-align:right;">⭐⭐⭐⭐⭐</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Ekselan</span></td></tr>
-                    <tr><td>Marie L.</td><td style="text-align:right;">⭐⭐⭐⭐</td><td><span class="ged-status" style="background:#DBEAFE; color:#1D4ED8;">Bon</span></td></tr>
+                    <tbody id="rh-tab-evalyasyon-body">
+                        <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                    </tbody>
                 </table>
+                <button id="btn-nouvo-evalyasyon" style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Evalyasyon</button>
             </div>
         </details>
         <details class="chart-section" style="padding:0;">
@@ -2091,8 +2108,11 @@
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
                     <tr><th>Fòmasyon</th><th>Dat</th><th>Patisipan</th></tr>
-                    <tr><td>Sekirite POS</td><td>15/07/2026</td><td style="text-align:right;">8</td></tr>
+                    <tbody id="rh-tab-fòmasyon-body">
+                        <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px;">⏳ Chajman...</td></tr>
+                    </tbody>
                 </table>
+                <button id="btn-nouvo-fòmasyon" style="margin-top:10px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Fòmasyon</button>
             </div>
         </details>
     </div>
@@ -2101,13 +2121,13 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📄 6.11 — Rapò RH</summary>
         <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px;">
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Lis Anplwaye</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Absans</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Prezans</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Konje</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Pewòl</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Depans Salè</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Evalyasyon</button>
+            <button id="btn-rapò-anplwaye" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Lis Anplwaye</button>
+            <button id="btn-rapò-absans" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Absans</button>
+            <button id="btn-rapò-prezans" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Prezans</button>
+            <button id="btn-rapò-konje" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Konje</button>
+            <button id="btn-rapò-pewòl" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Pewòl</button>
+            <button id="btn-rapò-depans-sale" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Depans Salè</button>
+            <button id="btn-rapò-evalyasyon" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Rapò Evalyasyon</button>
         </div>
     </details>
 
@@ -2115,15 +2135,15 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔄 6.12 — Workflow Apwobasyon</summary>
         <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
-            <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Demann Konje</div>
+            <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Demann Konje (6.5)</div>
             <div>⬇</div>
-            <div style="background:#EEF2FF; color:var(--primary); border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Chef Depatman</div>
+            <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">RH / Administratè</div>
             <div>⬇</div>
-            <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">RH</div>
-            <div>⬇</div>
-            <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Validasyon Final</div>
+            <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Konje Aktif</div>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:12px;">Etap "Chef Depatman" pa ankò egziste — apwobasyon se yon sèl etap RH/Admin kounye a. Yon etap entèmedyè pa depatman ta mande yon nouvo wòl "manadjè depatman".</p>
         </div>
     </details>
+
 </section>
 
             <!-- ===================== 7. ACTIFS ===================== -->
@@ -3945,6 +3965,7 @@
         // Chak antre isit la se OPSYONÈL — si fonksyon an pa la, anyen pa kase.
         const chajmanPaSeksyon = {
             logistique: () => window.LogistiqueUI?.chajeSeksyonLogistique(),
+            rh: () => window.RhUI?.chajeSeksyonRH(),
             // kes: () => window.KesUI?.chajeSesyon(),      // dekomante lè siyati egzat konfime
             // depans: () => window.DepansUI?.chajeDepans(), // dekomante lè siyati egzat konfime
         };
@@ -4059,7 +4080,7 @@
         const ctxRh1 = document.getElementById('salaryExpenseChart')?.getContext('2d');
         if(ctxRh1) new Chart(ctxRh1, { type: 'line', data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin'], datasets: [{ label:'Salè (k HTG)', data:[1100,1150,1200,1180,1240,1240], borderColor:'#4F46E5', tension:0.4, fill:true, backgroundColor:'rgba(79,70,229,0.1)' }] }, options: { responsive:true, maintainAspectRatio:false } });
         const ctxRh2 = document.getElementById('deptDistributionChart')?.getContext('2d');
-        if(ctxRh2) new Chart(ctxRh2, { type: 'pie', data: { labels: ['Direksyon','Finans','Vant','Operasyon','RH','IT'], datasets: [{ data: [5,8,12,15,4,3], backgroundColor: ['#4F46E5','#10B981','#EF4444','#F59E0B','#8B5CF6','#3B82F6'] }] }, options: { responsive:true, maintainAspectRatio:false } });
+        if(ctxRh2) new Chart(ctxRh2, { type: 'pie', data: { labels: ['Direksyon','Finans','Vant','Operasyon','RH','IT'], datasets: [{ data: [5,8,12,15,4,3], backgroundColor: ['#4F46E5','#10B981','#EF4444','#F59E0B','#8B5CF6','#3B82F6'] }] }, options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { position:'bottom', labels: { boxWidth:12, padding:8 } } } } });
 
         // Actifs
         const ctxAct1 = document.getElementById('actifValueChart')?.getContext('2d');

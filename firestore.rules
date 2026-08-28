@@ -323,6 +323,88 @@ service cloud.firestore {
         allow read: if manmBiznis(bizId);
         allow write: if seKontablOswaAdmin(bizId);
       }
+
+      // ---------- RESSOURCES HUMAINES (Modil 6) ----------
+
+      function seRHOswaAdmin(bizId) {
+        return genWol(bizId, ['Propriyete', 'Administrate', 'Direkte']);
+      }
+
+      match /anplwaye/{docId} {
+        allow read: if manmBiznis(bizId)
+          && (seRHOswaAdmin(bizId) || resource.data.itilizateId == request.auth.uid);
+        allow create, update: if seRHOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /demann_konje/{docId} {
+        allow read: if manmBiznis(bizId)
+          && (seRHOswaAdmin(bizId) || resource.data.itilizateId == request.auth.uid);
+        allow create: if manmBiznis(bizId)
+          && request.resource.data.itilizateId == request.auth.uid
+          && request.resource.data.estati == 'AnAtant';
+        allow update: if seRHOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /prezans/{docId} {
+        allow read: if manmBiznis(bizId)
+          && (seRHOswaAdmin(bizId) || resource.data.itilizateId == request.auth.uid);
+        allow create: if manmBiznis(bizId)
+          && request.resource.data.itilizateId == request.auth.uid;
+        allow update: if seRHOswaAdmin(bizId)
+          || (manmBiznis(bizId) && resource.data.itilizateId == request.auth.uid);
+        allow delete: if false;
+      }
+
+      match /pewol/{docId} {
+        allow read: if manmBiznis(bizId)
+          && (seRHOswaAdmin(bizId) || seKontablOswaAdmin(bizId)
+              || resource.data.itilizateId == request.auth.uid);
+        allow create, update: if seRHOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /avans_sale/{docId} {
+        allow read: if manmBiznis(bizId)
+          && (seRHOswaAdmin(bizId) || seKontablOswaAdmin(bizId)
+              || resource.data.itilizateId == request.auth.uid);
+        // Anplwaye ka soumèt pwòp demann li (menm patwon ak demann_konje);
+        // RH/Kontab ka tou kreye yon avans dirèkteman pou yon anplwaye
+        allow create: if manmBiznis(bizId)
+          && ((request.resource.data.itilizateId == request.auth.uid
+               && request.resource.data.estati == 'AnAtant')
+              || seRHOswaAdmin(bizId) || seKontablOswaAdmin(bizId));
+        allow update: if seRHOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /kandida/{docId} {
+        // Done rekritman entèn — sèlman RH/Admin, pa gen aksè pou kandida a (li pa yon itilizatè app)
+        allow read: if seRHOswaAdmin(bizId);
+        allow create, update: if seRHOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /evalyasyon/{docId} {
+        // Anplwaye ka wè pwòp evalyasyon li si li gen kont (itilizateId), RH/Admin wè tout
+        allow read: if manmBiznis(bizId)
+          && (seRHOswaAdmin(bizId) || resource.data.itilizateId == request.auth.uid);
+        allow create, update: if seRHOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /fòmasyon/{docId} {
+        allow read: if seRHOswaAdmin(bizId);
+        allow create, update: if seRHOswaAdmin(bizId);
+        allow delete: if false;
+      }
+    }
+
+    // ---------- PARAMÈT FISKAL GLOBAL (miltip-peyi, pa biznis-espesifik) ----------
+    match /paramet_fiskal_global/{peyiCode} {
+      allow read: if konekte();
+      allow write: if false;   // Modifye sèlman via Firebase Console / Admin SDK
     }
   }
 }
