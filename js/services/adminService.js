@@ -30,7 +30,7 @@
 
   const MODIL_LIS = [
     'vant', 'acha', 'kès', 'depans', 'enventè',
-    'kliyan', 'founisè', 'rapò', 'kontabilite', 'aprouve'
+    'kliyan', 'founisè', 'rapò', 'kontabilite', 'aprouve', 'ged'  // 'ged' AJOUTE pou Modil 8
   ];
 
   const SÈY_APWOBASYON = 50000; // HTG
