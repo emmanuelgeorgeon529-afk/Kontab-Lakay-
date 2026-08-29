@@ -59,6 +59,8 @@
     <script src="js/services/rhService.js"></script>
     <script src="js/services/payrollService.js"></script>
     <script src="js/services/rekritmanService.js"></script>
+    <script src="js/services/saasService.js"></script>
+    <script src="js/services/gedService.js"></script>
 
     <!-- Modil UI -->
     <script src="js/modules/admin_ui.js"></script>
@@ -69,6 +71,8 @@
     <script src="js/modules/logistique_ui.js"></script>
     <script src="js/modules/rekritman_ui.js"></script>
     <script src="js/modules/rh_ui.js"></script>
+    <script src="js/modules/saas_ui.js"></script>
+    <script src="js/modules/ged_ui.js"></script>
     <!-- ... ajoute lòt sèvis yo menm jan ... -->
 
 </head>
@@ -2295,13 +2299,13 @@
 
     <!-- 8.1 Dashboard GED -->
     <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-        <div class="kpi-card"><div class="label">📁 Total Dokiman</div><div class="value" style="color:var(--primary);">1 245</div></div>
-        <div class="kpi-card"><div class="label">📄 Dokiman Mwa sa</div><div class="value">86</div><div class="change up">↑ 12</div></div>
-        <div class="kpi-card"><div class="label">☁️ Espas Itilize</div><div class="value">4.2 GB / 50 GB</div></div>
-        <div class="kpi-card"><div class="label">🔒 Konfidansyèl</div><div class="value">32</div></div>
-        <div class="kpi-card"><div class="label">📋 Kontra Aktif</div><div class="value" style="color:var(--secondary);">42</div></div>
-        <div class="kpi-card"><div class="label">📦 Achiv Anyèl</div><div class="value">318</div></div>
-        <div class="kpi-card"><div class="label">⚠️ Ekspire Byento</div><div class="value" style="color:var(--danger);">3</div></div>
+        <div class="kpi-card"><div class="label">📁 Total Dokiman</div><div class="value" id="gedKpiTotal" style="color:var(--primary);">—</div></div>
+        <div class="kpi-card"><div class="label">📄 Dokiman Mwa sa</div><div class="value" id="gedKpiMwaSa">—</div></div>
+        <div class="kpi-card"><div class="label">☁️ Espas Itilize</div><div class="value" id="gedKpiEspas">—</div></div>
+        <div class="kpi-card"><div class="label">🔒 Konfidansyèl</div><div class="value" id="gedKpiKonfidansyèl">—</div></div>
+        <div class="kpi-card"><div class="label">📋 Kontra Aktif</div><div class="value" style="color:var(--secondary);">—</div></div>
+        <div class="kpi-card"><div class="label">📦 Achiv Anyèl</div><div class="value">—</div></div>
+        <div class="kpi-card"><div class="label">⚠️ Ekspire Byento</div><div class="value" style="color:var(--danger);">—</div></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -2315,27 +2319,22 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📂 8.2 — Bibliyotèk Dokiman</summary>
         <div style="padding:0 20px 20px;">
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📑 Fakti</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📋 Devis</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📜 Kontra</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">👥 RH</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🏦 Finans</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🚚 Logistique</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">🏭 Production</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">⚖️ Juridique</span>
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">📁 Divers</span>
+                <span onclick="GedUI.filtreKategori('Fakti')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">📑 Fakti</span>
+                <span onclick="GedUI.filtreKategori('Devis')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">📋 Devis</span>
+                <span onclick="GedUI.filtreKategori('Kontra')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">📜 Kontra</span>
+                <span onclick="GedUI.filtreKategori('RH')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">👥 RH</span>
+                <span onclick="GedUI.filtreKategori('Finans')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">🏦 Finans</span>
+                <span onclick="GedUI.filtreKategori('Logistique')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">🚚 Logistique</span>
+                <span onclick="GedUI.filtreKategori('Production')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">🏭 Production</span>
+                <span onclick="GedUI.filtreKategori('Juridique')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">⚖️ Juridique</span>
+                <span onclick="GedUI.filtreKategori('Divers')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">📁 Divers</span>
             </div>
             <table class="fin-table">
                 <tr><th>Dokiman</th><th>Kategori</th><th>Dat</th><th>Responsab</th><th>Estati</th></tr>
-                <tr><td>Kontra_Client_A.pdf</td><td>Kontra</td><td>28/07/2026</td><td>Jean D.</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
-                <tr><td>Facture_FT-000452.pdf</td><td>Fakti</td><td>02/08/2026</td><td>Marie L.</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Aktif</span></td></tr>
+                <tbody id="gedBibliyotèkTableBody"><tr><td colspan="5">Ap chaje...</td></tr></tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📥 Upload</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📤 Download</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">👁️ Preview</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔄 Versioning</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📤 Partage</button>
+                <p style="font-size:12px; color:var(--text-muted);">Klike ⬇️ pou download, 🔄 pou versioning, 🖊️ pou siyati</p>
             </div>
         </div>
     </details>
@@ -2345,12 +2344,20 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📎 8.3 — Upload Dokiman</summary>
         <div style="padding:0 20px 20px;">
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin-bottom:14px;">
-                <input type="text" placeholder="Tit dokiman" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
-                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Kategori</option></select>
-                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Nivo Konfidansyalite</option></select>
+                <input type="text" id="gedUploadTit" placeholder="Tit dokiman" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                <select id="gedUploadKategori" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                    <option value="Fakti">Fakti</option><option value="Devis">Devis</option><option value="Kontra">Kontra</option>
+                    <option value="RH">RH</option><option value="Finans">Finans</option><option value="Logistique">Logistique</option>
+                    <option value="Production">Production</option><option value="Juridique">Juridique</option><option value="Divers">Divers</option>
+                </select>
+                <select id="gedUploadKonfidansyalite" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                    <option value="Interne">Interne</option><option value="Public">Public</option>
+                    <option value="Confidentiel">Confidentiel</option><option value="Strictement Confidentiel">Strictement Confidentiel</option>
+                </select>
             </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Fichye sipòte: PDF · DOCX · XLSX · PPTX · JPG · PNG · ZIP</p>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">📤 Voye Dokiman</button>
+            <input type="file" id="gedUploadFile" style="margin-bottom:10px;">
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Fichye sipòte: PDF · DOCX · XLSX · PPTX · JPG · PNG · ZIP (limit 15 MB)</p>
+            <button id="gedUploadBtn" onclick="GedUI.soumèTUpload()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px;">📤 Voye Dokiman</button>
         </div>
     </details>
 
@@ -2359,11 +2366,17 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔎 8.4 — Rechèch Avanse</summary>
         <div style="padding:0 20px 20px;">
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:8px;">
-                <input type="text" placeholder="Mot kle" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                <input type="text" id="gedRechèchMotKle" placeholder="Mot kle" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
                 <input type="date" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
-                <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Kategori</option></select>
+                <select id="gedRechèchKategori" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                    <option value="">Kategori</option>
+                    <option value="Fakti">Fakti</option><option value="Devis">Devis</option><option value="Kontra">Kontra</option>
+                    <option value="RH">RH</option><option value="Finans">Finans</option><option value="Logistique">Logistique</option>
+                    <option value="Production">Production</option><option value="Juridique">Juridique</option><option value="Divers">Divers</option>
+                </select>
                 <select style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;"><option>Depatman</option></select>
             </div>
+            <button onclick="GedUI.rechèchAvanse()" style="margin-top:10px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔎 Chèche</button>
         </div>
     </details>
 
@@ -2371,17 +2384,7 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔄 8.5 — Versioning</summary>
         <div style="padding:0 20px 20px;">
-            <p style="font-size:13px; font-weight:600; margin-bottom:8px;">Kontra_Client_A.pdf</p>
-            <table class="fin-table">
-                <tr><th>Vèsyon</th><th>Dat</th><th>Modifye pa</th></tr>
-                <tr><td>Version 3</td><td>28/07/2026</td><td>Jean D.</td></tr>
-                <tr><td>Version 2</td><td>15/06/2026</td><td>Marie L.</td></tr>
-                <tr><td>Version 1</td><td>02/05/2026</td><td>Jean D.</td></tr>
-            </table>
-            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">↩️ Retabli</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔍 Konpare</button>
-            </div>
+            <p style="font-size:13px; color:var(--text-muted);">Klike 🔄 sou nenpòt dokiman nan Bibliyotèk (8.2) pou wè istorik vèsyon li, retabli yon ansyen vèsyon, oswa voye yon nouvo vèsyon.</p>
         </div>
     </details>
 
@@ -2389,10 +2392,10 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔒 8.6 — Nivo Aksè Dokiman</summary>
         <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px;">
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Public</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout moun ka wè</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Interne</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Anplwaye sèlman</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Confidentiel</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Manadjè sèlman</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Strictement Confidentiel</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Administratè sèlman</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Public</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout moun ka wè</p><p id="gedNivoAksè_Public" style="font-size:12px; color:var(--primary); margin-top:4px;">—</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Interne</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Anplwaye sèlman</p><p id="gedNivoAksè_Interne" style="font-size:12px; color:var(--primary); margin-top:4px;">—</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Confidentiel</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Manadjè sèlman</p><p id="gedNivoAksè_Confidentiel" style="font-size:12px; color:var(--primary); margin-top:4px;">—</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Strictement Confidentiel</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Administratè sèlman</p><p id="gedNivoAksè_StrictementConfidentiel" style="font-size:12px; color:var(--primary); margin-top:4px;">—</p></div>
         </div>
     </details>
 
@@ -2400,14 +2403,8 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">✍️ 8.7 — Signature Électronique</summary>
-            <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
-                <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Création</div>
-                <div>⬇</div>
-                <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Validation</div>
-                <div>⬇</div>
-                <div style="background:#EEF2FF; color:var(--primary); border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Signature</div>
-                <div>⬇</div>
-                <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Archivage</div>
+            <div id="gedSignatureWorkflow" style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
+                Chwazi yon dokiman nan Bibliyotèk (🖊️) pou wè pwogrè siyati li.
             </div>
         </details>
         <details class="chart-section" style="padding:0;">
@@ -2429,23 +2426,18 @@
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 8.9 — Archivage Automatique</summary>
             <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
-                <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Exercice 2026</div>
+                <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Exercice <input type="number" id="gedArchivageAne" value="2026" style="width:70px; border:1px solid #E2E8F0; border-radius:6px; padding:2px 6px; font-size:13px;"></div>
                 <div>⬇</div>
                 <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Archivage</div>
                 <div>⬇</div>
                 <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Read Only</div>
                 <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Konfòmite légal · Audit fasil</p>
+                <button onclick="GedUI.lanseArchivageAne()" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📦 Lanse Archivage</button>
             </div>
         </details>
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📚 8.10 — Archivage Fiscal</summary>
-            <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
-                <span class="ged-status" style="background:#F1F5F9;">TVA</span>
-                <span class="ged-status" style="background:#F1F5F9;">TCA</span>
-                <span class="ged-status" style="background:#F1F5F9;">Déclarations Fiscales</span>
-                <span class="ged-status" style="background:#F1F5F9;">États Financiers</span>
-                <span class="ged-status" style="background:#F1F5F9;">Audit</span>
-            </div>
+            <div id="gedFiskalBadges" style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;"></div>
         </details>
     </div>
 
@@ -2455,9 +2447,7 @@
         <div style="padding:0 20px 20px;">
             <table class="fin-table">
                 <tr><th>Dokiman</th><th>Modil Konekte</th></tr>
-                <tr><td>Fakti</td><td>Finance</td></tr>
-                <tr><td>Bon Livraison</td><td>Logistique</td></tr>
-                <tr><td>Contrat Employé</td><td>RH</td></tr>
+                <tbody id="gedLiaisonTableBody"><tr><td colspan="2">Ap chaje...</td></tr></tbody>
             </table>
         </div>
     </details>
@@ -2465,11 +2455,7 @@
     <!-- 8.12 Alertes -->
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔔 8.12 — Alertes Documentaires</summary>
-        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>⚠️ Kontra Client A pral ekspire nan 12 jou</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⚠️ Garanti Kamyon T-2201 ap fini byento</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⚠️ Asirans T-2201 ap fini nan 20 jou</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
-        </div>
+        <div id="gedAlètesContainer" style="padding:0 20px 20px;"></div>
     </details>
 
     <!-- 8.13 Audit Trail -->
@@ -2478,8 +2464,7 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Dat/Lè</th><th>Itilizatè</th><th>Aksyon</th><th>Dokiman</th></tr>
-                <tr><td>02/08, 09:14</td><td>Jean D.</td><td>Upload</td><td>Facture_FT-000452.pdf</td></tr>
-                <tr><td>28/07, 15:30</td><td>Marie L.</td><td>Modifye</td><td>Kontra_Client_A.pdf</td></tr>
+                <tbody id="gedAuditTableBody"><tr><td colspan="4">Ap chaje...</td></tr></tbody>
             </table>
         </div>
     </details>
@@ -2488,12 +2473,12 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📈 8.14 — Rapò GED</summary>
         <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:10px;">
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Dokiman pa Kategori</button>
+            <button onclick="GedUI.ekspòteRapòKategori()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Dokiman pa Kategori</button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Dokiman pa Depatman</button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Istorik Downloads</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Kontra Aktif</button>
+            <button onclick="GedUI.ekspòteRapòKontraAktif()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Kontra Aktif</button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Kontra Ekspire Byento</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">☁️ Espas Cloud Itilize</button>
+            <button onclick="GedUI.ekspòteRapòEspasCloud()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">☁️ Espas Cloud Itilize</button>
         </div>
     </details>
 
@@ -2501,10 +2486,13 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 Pèmisyon</summary>
         <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrateur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Direction</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Lecture + Validation</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Responsable Département</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Gestion pwòp depatman</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Employé</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Upload + Consultation limite</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Propriyete</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p><button onclick="SaasUI.ouvriModalPèmisyon('Propriyete')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrate</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p><button onclick="SaasUI.ouvriModalPèmisyon('Administrate')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Direkte</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Lekti + Validation</p><button onclick="SaasUI.ouvriModalPèmisyon('Direkte')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Kontable</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">GED (lekti/ekri selon pèmisyon)</p><button onclick="SaasUI.ouvriModalPèmisyon('Kontable')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Vande</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Upload + Konsiltasyon limite</p><button onclick="SaasUI.ouvriModalPèmisyon('Vande')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Magasinier</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Upload + Konsiltasyon limite</p><button onclick="SaasUI.ouvriModalPèmisyon('Magasinier')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Komis</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Konsiltasyon limite</p><button onclick="SaasUI.ouvriModalPèmisyon('Komis')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
         </div>
     </details>
 </section>
@@ -2732,20 +2720,20 @@
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button style="background:var(--bg-white); color:var(--text-dark); border:1px solid #E2E8F0; padding:8px 16px; border-radius:8px; font-weight:600;">🔗 Entegrasyon</button>
-            <button style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">🌍 Ajoute Lang</button>
+            <button onclick="SaasUI.ouvriInfoAjoutePeyi()" style="background:var(--primary); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600;">🌍 Ajoute Lang</button>
         </div>
     </div>
 
     <!-- 10.1 Dashboard Paramètres Globaux -->
     <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-        <div class="kpi-card"><div class="label">🌍 Peyi Aktif</div><div class="value" style="color:var(--primary);">6</div></div>
-        <div class="kpi-card"><div class="label">💱 Deviz Aktif</div><div class="value">5</div></div>
-        <div class="kpi-card"><div class="label">🌐 Lang Aktif</div><div class="value">4</div></div>
-        <div class="kpi-card"><div class="label">🏢 Antrepriz Aktif</div><div class="value">3</div></div>
-        <div class="kpi-card"><div class="label">👥 Itilizatè Aktif</div><div class="value">12</div></div>
-        <div class="kpi-card"><div class="label">📈 Abònman SaaS</div><div class="value" style="color:var(--secondary);">Professional</div></div>
-        <div class="kpi-card"><div class="label">🔒 Lisans Aktif</div><div class="value" style="color:var(--secondary);">🟢 Active</div></div>
-        <div class="kpi-card"><div class="label">⚙️ API Connectées</div><div class="value">4</div></div>
+        <div class="kpi-card"><div class="label">🌍 Peyi Aktif</div><div class="value" id="saasKpiPeyi" style="color:var(--primary);">—</div></div>
+        <div class="kpi-card"><div class="label">💱 Deviz Aktif</div><div class="value" id="saasKpiDeviz">—</div></div>
+        <div class="kpi-card"><div class="label">🌐 Lang Aktif</div><div class="value" id="saasKpiLang">—</div></div>
+        <div class="kpi-card"><div class="label">🏢 Antrepriz Aktif</div><div class="value">1</div></div>
+        <div class="kpi-card"><div class="label">👥 Itilizatè Aktif</div><div class="value" id="saasKpiItilizate">—</div></div>
+        <div class="kpi-card"><div class="label">📈 Abònman SaaS</div><div class="value" id="saasKpiAbònman" style="color:var(--secondary);">—</div></div>
+        <div class="kpi-card"><div class="label">🔒 Lisans Aktif</div><div class="value" id="saasKpiLisans" style="color:var(--secondary);">—</div></div>
+        <div class="kpi-card"><div class="label">⚙️ API Connectées</div><div class="value" id="saasKpiApi">—</div></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -2759,14 +2747,9 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Peyi</th><th>Kòd ISO</th><th>Deviz</th><th>Lang</th></tr>
-                <tr><td>🇭🇹 Haiti</td><td>HT</td><td>HTG</td><td>Kreyòl</td></tr>
-                <tr><td>🇺🇸 United States</td><td>US</td><td>USD</td><td>English</td></tr>
-                <tr><td>🇨🇦 Canada</td><td>CA</td><td>CAD</td><td>Français</td></tr>
-                <tr><td>🇫🇷 France</td><td>FR</td><td>EUR</td><td>Français</td></tr>
-                <tr><td>🇩🇴 République Dominicaine</td><td>DO</td><td>DOP</td><td>Español</td></tr>
-                <tr><td>🇧🇷 Brazil</td><td>BR</td><td>BRL</td><td>Português</td></tr>
+                <tbody id="saasPeyiTableBody"><tr><td colspan="4">Ap chaje...</td></tr></tbody>
             </table>
-            <button style="margin-top:14px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajoute Peyi</button>
+            <button onclick="SaasUI.ouvriInfoAjoutePeyi()" style="margin-top:14px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Ajoute Peyi</button>
         </div>
     </details>
 
@@ -2774,14 +2757,8 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🌐 10.3 — Gestion des Langues</summary>
         <div style="padding:0 20px 20px;">
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                <span class="ged-status" style="background:#D1FAE5; color:#047857;">🇭🇹 Kreyòl</span>
-                <span class="ged-status" style="background:#D1FAE5; color:#047857;">🇫🇷 Français</span>
-                <span class="ged-status" style="background:#D1FAE5; color:#047857;">🇺🇸 English</span>
-                <span class="ged-status" style="background:#F1F5F9;">🇪🇸 Español</span>
-                <span class="ged-status" style="background:#F1F5F9;">🇧🇷 Português</span>
-            </div>
-            <p style="font-size:12px; color:var(--text-muted);">Chanje lang imedyatman · Tradiksyon dinamik · Dat lokal · Fòma nimewo lokal</p>
+            <div id="saasLangBadges" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;"></div>
+            <p style="font-size:12px; color:var(--text-muted);">Klike sou yon lang pou aktive/dezaktive li pou biznis ou a</p>
         </div>
     </details>
 
@@ -2791,17 +2768,13 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Kòd</th><th>Non</th><th>Senbòl</th><th>To Chanj Aktyèl</th></tr>
-                <tr><td>HTG</td><td>Gourde Haïtienne</td><td>G</td><td style="text-align:right;">1,00</td></tr>
-                <tr><td>USD</td><td>Dollar Américain</td><td>$</td><td style="text-align:right;">132,50</td></tr>
-                <tr><td>EUR</td><td>Euro</td><td>€</td><td style="text-align:right;">143,20</td></tr>
-                <tr><td>CAD</td><td>Dollar Canadien</td><td>C$</td><td style="text-align:right;">96,80</td></tr>
-                <tr><td>DOP</td><td>Peso Dominicain</td><td>RD$</td><td style="text-align:right;">2,23</td></tr>
+                <tbody id="saasDevizTableBody"><tr><td colspan="4">Ap chaje...</td></tr></tbody>
             </table>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;">
-                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Kliyan</span>
-                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Founisè</span>
-                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Fakti</span>
-                <span class="ged-status" style="background:#F1F5F9;">✅ Deviz pa Kont Labank</span>
+                <span id="saasDevizPa_kliyan" onclick="SaasUI.toggleDevizPa('kliyan')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">✅ Deviz pa Kliyan</span>
+                <span id="saasDevizPa_founise" onclick="SaasUI.toggleDevizPa('founise')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">✅ Deviz pa Founisè</span>
+                <span id="saasDevizPa_fakti" onclick="SaasUI.toggleDevizPa('fakti')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">✅ Deviz pa Fakti</span>
+                <span id="saasDevizPa_kontLabank" onclick="SaasUI.toggleDevizPa('kontLabank')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">✅ Deviz pa Kont Labank</span>
             </div>
         </div>
     </details>
@@ -2812,14 +2785,12 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Dat</th><th>Deviz Sous</th><th>Deviz Destinasyon</th><th>To Chanj</th></tr>
-                <tr><td>02/08/2026</td><td>USD</td><td>HTG</td><td style="text-align:right;">132,50</td></tr>
-                <tr><td>02/08/2026</td><td>EUR</td><td>HTG</td><td style="text-align:right;">143,20</td></tr>
-                <tr><td>02/08/2026</td><td>CAD</td><td>HTG</td><td style="text-align:right;">96,80</td></tr>
+                <tbody id="saasTauxTableBody"><tr><td colspan="4">Ap chaje...</td></tr></tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✍️ Manyèl</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚡ API Otomatik</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📜 Istorik</button>
+                <button onclick="SaasUI.ouvriModalTauxManyèl()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✍️ Manyèl</button>
+                <button onclick="SaasUI.chaJeAPIOtomatik()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚡ API Otomatik</button>
+                <button onclick="SaasUI.ouvriIstorikTaux()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📜 Istorik</button>
             </div>
         </div>
     </details>
@@ -2829,12 +2800,8 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🧾 10.6 — Moteur Fiscal International</summary>
         <div style="padding:0 20px 20px;">
             <table class="fin-table">
-                <tr><th>Taks</th><th>To</th><th>Kalite</th></tr>
-                <tr><td>TVA</td><td style="text-align:right;">10%</td><td>Inclusif</td></tr>
-                <tr><td>TCA</td><td style="text-align:right;">10%</td><td>Exclusif</td></tr>
-                <tr><td>Sales Tax</td><td style="text-align:right;">8,5%</td><td>Exclusif</td></tr>
-                <tr><td>VAT</td><td style="text-align:right;">20%</td><td>Inclusif</td></tr>
-                <tr><td>GST</td><td style="text-align:right;">5%</td><td>Exclusif</td></tr>
+                <tr><th>Peyi</th><th>Taks</th><th>To</th><th>Kalite</th></tr>
+                <tbody id="saasFiscalTableBody"><tr><td colspan="4">Ap chaje...</td></tr></tbody>
             </table>
         </div>
     </details>
@@ -2845,20 +2812,19 @@
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏢 10.7 — Multi-Entreprises</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
-                    <tr><td>Entreprise A</td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
-                    <tr><td>Entreprise B</td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
-                    <tr><td>Entreprise C</td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Chanje →</a></td></tr>
+                    <tbody id="saasBiznisTableBody"><tr><td colspan="2">Ap chaje...</td></tr></tbody>
                 </table>
-                <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Rapò separe · Done izole pa antrepriz</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <p style="font-size:12px; color:var(--text-muted);">Rapò separe · Done izole pa antrepriz</p>
+                    <button onclick="SaasUI.ouvriModalKreyeBiznis()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Antrepriz</button>
+                </div>
             </div>
         </details>
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏬 10.8 — Multi-Succursales</summary>
             <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
-                <span class="ged-status" style="background:#F1F5F9;">Branch</span>
-                <span class="ged-status" style="background:#F1F5F9;">Magazen</span>
-                <span class="ged-status" style="background:#F1F5F9;">Depo</span>
-                <span class="ged-status" style="background:#F1F5F9;">Faktori</span>
+                <div id="saasSuccursaleBadges" style="display:flex; flex-wrap:wrap; gap:8px; width:100%;"></div>
+                <button onclick="SaasUI.ouvriModalKreyeSuccursale()" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Nouvo Succursale</button>
                 <p style="font-size:12px; color:var(--text-muted); width:100%; margin-top:8px;">Dashboard konsolide pou tout branch ansanm</p>
             </div>
         </details>
@@ -2867,16 +2833,8 @@
     <!-- 10.9 Abonnements SaaS -->
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 10.9 — Gestion des Abonnements SaaS</summary>
-        <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:12px;">
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center;">🥉<br><strong>Starter</strong></div>
-            <div style="border:2px solid var(--primary); border-radius:12px; padding:14px; text-align:center; background:#EEF2FF;">🥈<br><strong>Professional</strong><br><span style="font-size:11px; color:var(--primary);">Plan Aktyèl</span></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center;">🥇<br><strong>Enterprise</strong></div>
-        </div>
-        <div style="padding:0 20px 20px; display:flex; gap:8px; flex-wrap:wrap;">
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🔄 Renouvèlman</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🧾 Facturation</button>
-            <button style="background:var(--secondary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⬆️ Upgrade</button>
-        </div>
+        <div id="saasAbònmanCards" style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:12px;"></div>
+        <p style="padding:0 20px 10px; font-size:12px; color:var(--text-muted);">Klike sou yon plan pou chanje abònman biznis ou a</p>
     </details>
 
     <!-- 10.10 Gestion des Licences -->
@@ -2885,7 +2843,7 @@
         <div style="padding:0 20px 20px;">
             <table class="fin-table">
                 <tr><th>N° Lisans</th><th>Plan</th><th>Dat Ekspirasyon</th><th>Estati</th></tr>
-                <tr><td>LIC-88213</td><td>Professional</td><td>14/03/2027</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">🟢 Active</span></td></tr>
+                <tbody id="saasLisansTableBody"><tr><td colspan="4">Ap chaje...</td></tr></tbody>
             </table>
         </div>
     </details>
@@ -2896,10 +2854,7 @@
         <div style="padding:0 20px 20px;">
             <table class="fin-table">
                 <tr><th>Sèvis</th><th>Estati</th><th></th></tr>
-                <tr><td>📧 Gmail</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--danger); font-weight:600;">Déconnecter</a></td></tr>
-                <tr><td>📂 Google Drive</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--danger); font-weight:600;">Déconnecter</a></td></tr>
-                <tr><td>💬 WhatsApp Business</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
-                <tr><td>🤖 OpenAI</td><td><span class="ged-status" style="background:#F1F5F9;">Non Connecté</span></td><td style="text-align:right;"><a href="#" style="color:var(--primary); font-weight:600;">Connecter</a></td></tr>
+                <tbody id="saasIntegrasyonTableBody"><tr><td colspan="3">Ap chaje...</td></tr></tbody>
             </table>
         </div>
     </details>
@@ -2909,14 +2864,15 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🎨 10.12 — Paramètres Interface</summary>
         <div style="padding:0 20px 20px;">
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">☀️ Light</span>
-                <span class="ged-status" style="background:#F1F5F9;">🌙 Dark</span>
-                <span class="ged-status" style="background:#F1F5F9;">💻 System</span>
+                <span id="saasTèm_light" onclick="SaasUI.chanjeTèm('light')" class="ged-status" style="background:#EEF2FF; color:var(--primary); cursor:pointer;">☀️ Light</span>
+                <span id="saasTèm_dark" onclick="SaasUI.chanjeTèm('dark')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">🌙 Dark</span>
+                <span id="saasTèm_system" onclick="SaasUI.chanjeTèm('system')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">💻 System</span>
             </div>
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:8px;">
-                <input type="text" placeholder="Nom entreprise" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
-                <input type="color" value="#4F46E5" style="border:1px solid #E2E8F0; border-radius:8px; padding:4px; height:36px;">
+                <input type="text" id="saasInterfaceNon" placeholder="Nom entreprise" style="border:1px solid #E2E8F0; border-radius:8px; padding:8px; font-size:13px;">
+                <input type="color" id="saasInterfaceKoulè" value="#4F46E5" style="border:1px solid #E2E8F0; border-radius:8px; padding:4px; height:36px;">
             </div>
+            <button onclick="SaasUI.anrejistreParamInterface()" style="margin-top:10px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">💾 Anrejistre</button>
         </div>
     </details>
 
@@ -2924,10 +2880,10 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔔 10.13 — Notifications Globales</summary>
         <div style="padding:0 20px 20px; display:flex; flex-wrap:wrap; gap:8px;">
-            <span class="ged-status" style="background:#D1FAE5; color:#047857;">📧 Email</span>
-            <span class="ged-status" style="background:#D1FAE5; color:#047857;">📱 Push</span>
-            <span class="ged-status" style="background:#F1F5F9;">💬 WhatsApp</span>
-            <span class="ged-status" style="background:#F1F5F9;">📲 SMS</span>
+            <span id="saasNotif_email" onclick="SaasUI.toggleNotifikasyonKanal('email')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">📧 Email</span>
+            <span id="saasNotif_push" onclick="SaasUI.toggleNotifikasyonKanal('push')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">📱 Push</span>
+            <span id="saasNotif_whatsapp" onclick="SaasUI.toggleNotifikasyonKanal('whatsapp')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">💬 WhatsApp</span>
+            <span id="saasNotif_sms" onclick="SaasUI.toggleNotifikasyonKanal('sms')" class="ged-status" style="background:#F1F5F9; cursor:pointer;">📲 SMS</span>
         </div>
     </details>
 
@@ -2939,9 +2895,9 @@
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Entreprises</button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Abonnements</button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Licences</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Devises</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Taux de Change</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Intégrations API</button>
+            <button onclick="SaasUI.ekspòteRapòDeviz()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Devises</button>
+            <button onclick="SaasUI.ekspòteRapòTaux()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Taux de Change</button>
+            <button onclick="SaasUI.ekspòteRapòIntegrasyon()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📄 Intégrations API</button>
         </div>
     </details>
 
@@ -2949,9 +2905,13 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔐 Pèmisyon</summary>
         <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px;">
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Super Admin</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrateur Entreprise</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Jere pwòp antrepriz li</p></div>
-            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Utilisateur</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Aksè limite</p></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Propriyete</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p><button onclick="SaasUI.ouvriModalPèmisyon('Propriyete')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Administrate</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Tout dwa</p><button onclick="SaasUI.ouvriModalPèmisyon('Administrate')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Direkte</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Rapò, Aprouve, Vant/Acha (lekti)</p><button onclick="SaasUI.ouvriModalPèmisyon('Direkte')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Kontable</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Kontabilite, Rapò, Kès</p><button onclick="SaasUI.ouvriModalPèmisyon('Kontable')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Vande</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Vant, Kliyan (ekri)</p><button onclick="SaasUI.ouvriModalPèmisyon('Vande')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Magasinier</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Enventè (ekri), Pwodwi (lekti)</p><button onclick="SaasUI.ouvriModalPèmisyon('Magasinier')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
+            <div style="border:1px solid #E2E8F0; border-radius:12px; padding:14px;"><strong>Komis</strong><p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Vant (lekti)</p><button onclick="SaasUI.ouvriModalPèmisyon('Komis')" style="margin-top:8px; background:var(--bg-white); border:1px solid #E2E8F0; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">Modifye</button></div>
         </div>
     </details>
 </section>
@@ -3966,6 +3926,8 @@
         const chajmanPaSeksyon = {
             logistique: () => window.LogistiqueUI?.chajeSeksyonLogistique(),
             rh: () => window.RhUI?.chajeSeksyonRH(),
+            saas: () => window.SaasUI?.chajeSeksyonSaas(),
+            ged: () => window.GedUI?.chajeSeksyonGed(),
             // kes: () => window.KesUI?.chajeSesyon(),      // dekomante lè siyati egzat konfime
             // depans: () => window.DepansUI?.chajeDepans(), // dekomante lè siyati egzat konfime
         };

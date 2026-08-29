@@ -399,6 +399,50 @@ service cloud.firestore {
         allow create, update: if seRHOswaAdmin(bizId);
         allow delete: if false;
       }
+
+      // ---------- SAAS, LOCALISATION & PARAMÈTRES GLOBAUX (Modil 10) ----------
+
+      match /tauxChange/{docId} {
+        allow read: if manmBiznis(bizId);
+        // Istorik pa dwe modifye — sèlman nouvo antre chak fwa
+        allow create: if seKontablOswaAdmin(bizId);
+        allow update, delete: if false;
+      }
+
+      match /abònman/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seAdministrate(bizId);
+        allow delete: if false;
+      }
+
+      match /lisans/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seAdministrate(bizId);
+        allow delete: if false;
+      }
+
+      match /integrasyon/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seAdministrate(bizId);
+        allow delete: if false;
+      }
+
+      // ---------- GED, ARCHIVAGE & GESTION DOCUMENTAIRE (Modil 8) ----------
+
+      match /dokiman/{docId} {
+        allow read: if manmBiznis(bizId);
+        // Nenpòt manm biznis ka upload (Anplwaye gen dwa "Upload" selon Pèmisyon 8-Pèmisyon)
+        allow create: if manmBiznis(bizId)
+          && request.resource.data.keys().hasAll(['tit', 'kategori', 'storagePath', 'estati']);
+        allow update: if manmBiznis(bizId);
+        allow delete: if false;
+
+        match /vèsyon/{vèsyonId} {
+          allow read: if manmBiznis(bizId);
+          allow create: if manmBiznis(bizId);
+          allow update, delete: if false;
+        }
+      }
     }
 
     // ---------- PARAMÈT FISKAL GLOBAL (miltip-peyi, pa biznis-espesifik) ----------
