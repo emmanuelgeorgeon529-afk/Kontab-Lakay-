@@ -1250,4 +1250,5 @@ const RhUI = (() => {
 
   return { renderAnplwayeTable, chajeSeksyonRH, initListeners };
 })();
+window.RhUI = RhUI;   // FIKS: san sa, navigate() (window.RhUI?.chajeSeksyonRH()) pa jwenn RhUI
 document.addEventListener('DOMContentLoaded', () => { RhUI.initListeners(); });
