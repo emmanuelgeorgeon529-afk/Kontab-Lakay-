@@ -400,6 +400,39 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // ---------- ACTIFS & MAINTENANCE (Modil 7) ----------
+      // NÒT: pa gen wòl 'Responsable Maintenance' nan sistèm wòl la (genWol()) —
+      // seMagasinierOswaAdmin itilize kòm apwoksimasyon pou koleksyon operasyonèl
+      // yo (plan/ticket antretyen), seKontablOswaAdmin pou koleksyon kontab yo
+      // (immobilisations/amortisman), menm patrón ak plan_comptes/depans.
+      // Konfime ak Emmanuel si sa dwe chanje pou yon vrè wòl dedye.
+
+      match /immobilisations/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seKontablOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /amortisman_istorik/{docId} {
+        allow read: if manmBiznis(bizId);
+        // Kreye sèlman pa AssetsService.egzekiteAmortisMwa() — jamè modifye/efase
+        // (menm prensip ak jounal: yon ekriti istorik pa dwe chanje apre fèt).
+        allow create: if seKontablOswaAdmin(bizId);
+        allow update, delete: if false;
+      }
+
+      match /antretyen_plan/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seMagasinierOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /antretyen_ticket/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create, update: if seMagasinierOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
       // ---------- SAAS, LOCALISATION & PARAMÈTRES GLOBAUX (Modil 10) ----------
 
       match /tauxChange/{docId} {

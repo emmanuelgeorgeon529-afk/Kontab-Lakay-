@@ -46,6 +46,9 @@
     <script src="js/services/customersService.js"></script>
     <script src="js/services/salesService.js"></script>
     <script src="js/services/purchasesService.js"></script>
+    <script src="js/services/biService.js"></script>
+    <script src="js/services/assetsService.js"></script>
+    <script src="js/services/maintenanceService.js"></script>
     <script src="js/services/veyikilSevis.js"></script>
     <script src="js/services/chofeSevis.js"></script>
     <script src="js/services/quotesService.js"></script>
@@ -73,6 +76,8 @@
     <script src="js/modules/rh_ui.js"></script>
     <script src="js/modules/saas_ui.js"></script>
     <script src="js/modules/ged_ui.js"></script>
+    <script src="js/modules/bi_ui.js"></script>
+    <script src="js/modules/actifs_ui.js"></script>
     <!-- ... ajoute lòt sèvis yo menm jan ... -->
 
 </head>
@@ -2166,14 +2171,14 @@
 
     <!-- Dashboard Modil 7 -->
     <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-        <div class="kpi-card"><div class="label">💰 Valè Total</div><div class="value" style="color:var(--primary);">8 450 000 HTG</div></div>
-        <div class="kpi-card"><div class="label">📉 Amortisman Akimile</div><div class="value">3 200 000 HTG</div></div>
-        <div class="kpi-card"><div class="label">📊 Valè Nèt Comptable</div><div class="value" style="color:var(--secondary);">5 250 000 HTG</div></div>
-        <div class="kpi-card"><div class="label">🔧 Antretyen Pwograme</div><div class="value">5</div></div>
-        <div class="kpi-card"><div class="label">⚠️ Antretyen An Reta</div><div class="value" style="color:var(--danger);">2</div></div>
-        <div class="kpi-card"><div class="label">🚚 Machin Aktif</div><div class="value">6</div></div>
-        <div class="kpi-card"><div class="label">🏢 Ekipman Aktif</div><div class="value">38</div></div>
-        <div class="kpi-card"><div class="label">📈 Depans Antretyen (ane)</div><div class="value">185 000 HTG</div></div>
+        <div class="kpi-card"><div class="label">💰 Valè Total</div><div class="value" id="kpiActifsValèTotal" style="color:var(--primary);">—</div></div>
+        <div class="kpi-card"><div class="label">📉 Amortisman Akimile</div><div class="value" id="kpiActifsAmortAkimile">—</div></div>
+        <div class="kpi-card"><div class="label">📊 Valè Nèt Comptable</div><div class="value" id="kpiActifsValèNette" style="color:var(--secondary);">—</div></div>
+        <div class="kpi-card"><div class="label">🔧 Antretyen Pwograme</div><div class="value" id="kpiActifsAntretyenPwograme">—</div></div>
+        <div class="kpi-card"><div class="label">⚠️ Antretyen An Reta</div><div class="value" id="kpiActifsAntretyenReta" style="color:var(--danger);">—</div></div>
+        <div class="kpi-card"><div class="label">🚚 Machin Aktif</div><div class="value" id="kpiActifsMachin">—</div></div>
+        <div class="kpi-card"><div class="label">🏢 Ekipman Aktif</div><div class="value" id="kpiActifsEkipman">—</div></div>
+        <div class="kpi-card"><div class="label">📈 Depans Antretyen (ane)</div><div class="value" id="kpiActifsDepansAntretyenAne">—</div></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -2188,14 +2193,10 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Kòd</th><th>Non Byen</th><th>Kategori</th><th>Dat Acha</th><th>Pri Acha</th><th>Sit</th></tr>
-                <tr><td>IMB-001</td><td>Kamyon Isuzu NPR</td><td>Kamyon</td><td>12/03/2023</td><td style="text-align:right;">1 200 000 HTG</td><td>Dépôt Principal</td></tr>
-                <tr><td>IMB-002</td><td>Òdinatè Dell</td><td>Òdinatè</td><td>05/06/2024</td><td style="text-align:right;">60 000 HTG</td><td>Biwo</td></tr>
-                <tr><td>IMB-003</td><td>Machine Emballage</td><td>Ekipman Pwodiksyon</td><td>20/01/2022</td><td style="text-align:right;">850 000 HTG</td><td>Izin</td></tr>
+                <tbody id="registreImmobTableBody"><tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr></tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Anrejistre</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">💾 Sove Brouyon</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✖️ Anile</button>
+                <button onclick="ActifsUI.openNewAssetModal()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Anrejistre</button>
             </div>
         </div>
     </details>
@@ -2206,14 +2207,13 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Byen</th><th>Pri Orijinal</th><th>Durée</th><th>Amortisman/An</th><th>Valè Nèt</th></tr>
-                <tr><td>Òdinatè Dell</td><td style="text-align:right;">60 000</td><td>5 ans</td><td style="text-align:right;">12 000 HTG</td><td style="text-align:right; font-weight:600;">36 000 HTG</td></tr>
-                <tr><td>Kamyon Isuzu</td><td style="text-align:right;">1 200 000</td><td>8 ans</td><td style="text-align:right;">150 000 HTG</td><td style="text-align:right; font-weight:600;">750 000 HTG</td></tr>
+                <tbody id="amortissementTableBody"><tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr></tbody>
             </table>
             <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📋 Tableau Amortissement</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📒 Journal Amortissement</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✅ Byen Amòti</button>
-                <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🟢 Byen Aktif</button>
+                <button onclick="ActifsUI.egzekiteAmortisMwa()" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">⚙️ Egzekite Amortisman Mwa sa a</button>
+                <button onclick="ActifsUI.filtreByenAmòti()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">✅ Byen Amòti</button>
+                <button onclick="ActifsUI.filtreByenAktif()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">🟢 Byen Aktif</button>
+                <button onclick="ActifsUI.filtreByenTout()" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">📋 Tout</button>
             </div>
         </div>
     </details>
@@ -2223,11 +2223,10 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔧 7.3 — Maintenance Préventive</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>Byen</th><th>Kalite</th><th>Dat Pwograme</th><th>Frekans</th><th>Responsab</th></tr>
-                <tr><td>Kamyon Isuzu</td><td>Chanjman Lwil</td><td>15/08/2026</td><td>Chak 3 mwa</td><td>Garage Central</td></tr>
-                <tr><td>Machine Emballage</td><td>Enspeksyon</td><td>01/09/2026</td><td>Chak 6 mwa</td><td>Teknisyen Jean</td></tr>
+                <tr><th>Byen</th><th>Kalite</th><th>Dat Pwograme</th><th>Frekans</th><th>Responsab</th><th>Estati</th></tr>
+                <tbody id="antretyenPreventifTableBody"><tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr></tbody>
             </table>
-            <button style="margin-top:14px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye Plan</button>
+            <button onclick="ActifsUI.openNewPlanModal()" style="margin-top:14px; background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye Plan</button>
         </div>
     </details>
 
@@ -2237,10 +2236,9 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>N° Ticket</th><th>Byen</th><th>Pwoblèm</th><th>Ijans</th><th>Estati</th></tr>
-                <tr><td>TCK-0021</td><td>Kamyon Isuzu</td><td>Pann motè</td><td><span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Kritik</span></td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">An Reparasyon</span></td></tr>
-                <tr><td>TCK-0020</td><td>Printer Biwo</td><td>Bouche papye</td><td><span class="ged-status" style="background:#F1F5F9;">Ba</span></td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">Fèmen</span></td></tr>
+                <tbody id="antretyenCorrectifTableBody"><tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr></tbody>
             </table>
-            <button style="margin-top:14px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye Ticket</button>
+            <button onclick="ActifsUI.openNewTicketModal()" style="margin-top:14px; background:var(--bg-white); border:1px solid #E2E8F0; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px;">➕ Kreye Ticket</button>
         </div>
     </details>
 
@@ -2250,9 +2248,9 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Plak</th><th>Mak/Modèl</th><th>Chofè</th><th>Asirans Ekspire</th></tr>
-                <tr><td>T-2201</td><td>Isuzu NPR</td><td>Jean D.</td><td style="color:var(--danger);">20/08/2026</td></tr>
-                <tr><td>T-1150</td><td>Toyota Hilux</td><td>Wilner P.</td><td>02/2027</td></tr>
+                <tbody id="flotteTableBody"><tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr></tbody>
             </table>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:12px;">Jesyon veyikil/chofè fèt nan Modil 5 — Logistique. Sa a se yon vi lekti sèl.</p>
         </div>
     </details>
 
@@ -2260,14 +2258,13 @@
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📊 7.6 — Rapò & Analitik</summary>
         <div style="padding:0 20px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:10px;">
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📋 Registre Complet</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💰 Valè pa Kategori</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🏢 Valè pa Depatman</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📍 Valè pa Sit</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🔧 Antretyen Fèt</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">⏰ Antretyen An Reta</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💵 Pri Antretyen</button>
-            <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📜 Istorik Pann</button>
+            <button onclick="ActifsUI.ouvriRapò('registre')" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📋 Registre Complet</button>
+            <button onclick="ActifsUI.ouvriRapò('kategori')" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💰 Valè pa Kategori</button>
+            <button onclick="ActifsUI.ouvriRapò('sit')" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📍 Valè pa Sit</button>
+            <button onclick="ActifsUI.ouvriRapò('antretyenFèt')" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🔧 Antretyen Fèt</button>
+            <button onclick="ActifsUI.ouvriRapò('antretyenReta')" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">⏰ Antretyen An Reta</button>
+            <button onclick="ActifsUI.ouvriRapò('priAntretyen')" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💵 Pri Antretyen</button>
+            <button onclick="ActifsUI.ouvriRapò('istorikPann')" style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📜 Istorik Pann</button>
         </div>
     </details>
 
@@ -2932,14 +2929,14 @@
 
     <!-- 11.1 Dashboard Egzekitif -->
     <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-        <div class="kpi-card"><div class="label">💰 Kès Disponib</div><div class="value">45 200 HTG</div></div>
-        <div class="kpi-card"><div class="label">📈 Revni Mwa a</div><div class="value">890 000 HTG</div><div class="change up">↑ 12%</div></div>
-        <div class="kpi-card"><div class="label">📉 Depans Mwa a</div><div class="value">645 000 HTG</div><div class="change down">↑ 4%</div></div>
-        <div class="kpi-card"><div class="label">🏆 Benefis Nèt</div><div class="value" style="color:var(--secondary);">245 000 HTG</div><div class="change up">↑ 8%</div></div>
-        <div class="kpi-card"><div class="label">👥 Kliyan Aktif</div><div class="value">312</div></div>
-        <div class="kpi-card"><div class="label">📦 Pwodwi Vann</div><div class="value">1 240</div></div>
-        <div class="kpi-card"><div class="label">🛒 Lavant Jodi a</div><div class="value">125 000 HTG</div></div>
-        <div class="kpi-card"><div class="label">🚚 Kòmand An Kour</div><div class="value">18</div></div>
+        <div class="kpi-card"><div class="label">💰 Kès Disponib</div><div class="value" id="kpiBiKesDisponib">—</div></div>
+        <div class="kpi-card"><div class="label">📈 Revni Mwa a</div><div class="value" id="kpiBiRevniMwa">—</div><div class="change" id="kpiBiRevniMwaChange"></div></div>
+        <div class="kpi-card"><div class="label">📉 Depans Mwa a</div><div class="value" id="kpiBiDepansMwa">—</div><div class="change" id="kpiBiDepansMwaChange"></div></div>
+        <div class="kpi-card"><div class="label">🏆 Benefis Nèt</div><div class="value" id="kpiBiBenefisNet" style="color:var(--secondary);">—</div><div class="change" id="kpiBiBenefisNetChange"></div></div>
+        <div class="kpi-card"><div class="label">👥 Kliyan Aktif</div><div class="value" id="kpiBiKliyanAktif">—</div></div>
+        <div class="kpi-card"><div class="label">📦 Pwodwi Vann</div><div class="value" id="kpiBiPwodwiVann">—</div></div>
+        <div class="kpi-card"><div class="label">🛒 Lavant Jodi a</div><div class="value" id="kpiBiLavantJodi">—</div></div>
+        <div class="kpi-card"><div class="label">🚚 Kòmand An Kour</div><div class="value" id="kpiBiKòmandAnKour">—</div></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -2957,10 +2954,10 @@
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
                 <tr><th>Endikatè</th><th>Mwa sa</th><th>Mwa Pase</th><th>Ane Pase</th></tr>
-                <tr><td>💵 Chiffre d'Affaires</td><td style="text-align:right;">890 000</td><td style="text-align:right;">795 000</td><td style="text-align:right;">680 000</td></tr>
-                <tr><td>📈 Marge Brute</td><td style="text-align:right;">42%</td><td style="text-align:right;">40%</td><td style="text-align:right;">38%</td></tr>
-                <tr><td>📊 Marge Nette</td><td style="text-align:right;">27,5%</td><td style="text-align:right;">25%</td><td style="text-align:right;">22%</td></tr>
-                <tr><td>🏦 Liquidité</td><td style="text-align:right;">1,8x</td><td style="text-align:right;">1,6x</td><td style="text-align:right;">1,4x</td></tr>
+                <tr><td>💵 Chiffre d'Affaires</td><td style="text-align:right;" id="kpiBiCaMwa">—</td><td style="text-align:right;" id="kpiBiCaMwaPase">—</td><td style="text-align:right;" id="kpiBiCaAnePase">—</td></tr>
+                <tr><td>📈 Marge Brute</td><td style="text-align:right;" id="kpiBiMargeBrute">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+                <tr><td>📊 Marge Nette</td><td style="text-align:right;" id="kpiBiMargeNette">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+                <tr><td>🏦 Liquidité</td><td style="text-align:right;" id="kpiBiLiquidite">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
             </table>
         </div>
     </details>
@@ -2970,12 +2967,12 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💰 11.3 — Prévisions de Trésorerie</summary>
         <div style="padding:0 20px 20px;">
             <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); margin-bottom:0;">
-                <div class="kpi-card"><div class="label">7 jou</div><div class="value" style="color:var(--secondary);">+52 000</div></div>
-                <div class="kpi-card"><div class="label">30 jou</div><div class="value" style="color:var(--secondary);">+185 000</div></div>
-                <div class="kpi-card"><div class="label">90 jou</div><div class="value" style="color:var(--secondary);">+540 000</div></div>
-                <div class="kpi-card"><div class="label">1 ane</div><div class="value" style="color:var(--secondary);">+2,1M</div></div>
+                <div class="kpi-card"><div class="label">7 jou</div><div class="value" id="kpiBiCash7j">—</div></div>
+                <div class="kpi-card"><div class="label">30 jou</div><div class="value" id="kpiBiCash30j">—</div></div>
+                <div class="kpi-card"><div class="label">90 jou</div><div class="value" id="kpiBiCash90j">—</div></div>
+                <div class="kpi-card"><div class="label">1 ane</div><div class="value" id="kpiBiCash1an">—</div></div>
             </div>
-            <p style="font-size:12px; color:var(--text-muted); margin-top:12px;">Baze sou: Lavant · Depans · Dèt kliyan · Dèt founisè · Pewòl</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:12px;">Pwojeksyon lineyè senp baze sou mwayèn 30 dènye jou (Lavant − Depans − Acha − Pewòl).</p>
         </div>
     </details>
 
@@ -2985,11 +2982,11 @@
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📦 11.4 — Analyse Stock</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
-                    <tr><td>📦 Valè Stòk</td><td style="text-align:right;">2 850 000 HTG</td></tr>
-                    <tr><td>⚠️ Stock Faible</td><td style="text-align:right; color:#B45309;">18</td></tr>
-                    <tr><td>🔄 Rotation Stock</td><td style="text-align:right;">4,2x/an</td></tr>
-                    <tr><td>🏆 Top Vente</td><td style="text-align:right;">Riz 25lb</td></tr>
-                    <tr><td>📉 Pa Deplase</td><td style="text-align:right; color:var(--danger);">6</td></tr>
+                    <tr><td>📦 Valè Stòk</td><td style="text-align:right;" id="kpiBiStockValè">—</td></tr>
+                    <tr><td>⚠️ Stock Faible</td><td style="text-align:right; color:#B45309;" id="kpiBiStockFaible">—</td></tr>
+                    <tr><td>🔄 Rotation Stock</td><td style="text-align:right;" id="kpiBiStockRotation">—</td></tr>
+                    <tr><td>🏆 Top Vente</td><td style="text-align:right;" id="kpiBiStockTopVente">—</td></tr>
+                    <tr><td>📉 Pa Deplase</td><td style="text-align:right; color:var(--danger);" id="kpiBiStockPaDeplase">—</td></tr>
                 </table>
             </div>
         </details>
@@ -2997,17 +2994,12 @@
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👥 11.5 — Analyse Client</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
-                    <tr><td>👥 Nouvo Kliyan</td><td style="text-align:right;">18</td></tr>
-                    <tr><td>🏆 Pi Bon Kliyan</td><td style="text-align:right;">Marie L.</td></tr>
-                    <tr><td>💰 Revni pa Kliyan</td><td style="text-align:right;">28 500 HTG</td></tr>
-                    <tr><td>📈 Frekans Acha</td><td style="text-align:right;">2,4x/mwa</td></tr>
+                    <tr><td>👥 Nouvo Kliyan</td><td style="text-align:right;" id="kpiBiNouvoKliyan">—</td></tr>
+                    <tr><td>🏆 Pi Bon Kliyan</td><td style="text-align:right;" id="kpiBiPiBonKliyan">—</td></tr>
+                    <tr><td>💰 Revni pa Kliyan</td><td style="text-align:right;" id="kpiBiRevniPaKliyan">—</td></tr>
+                    <tr><td>📈 Frekans Acha</td><td style="text-align:right;" id="kpiBiFrekansAcha">—</td></tr>
                 </table>
-                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-                    <span class="ged-status" style="background:#EEF2FF; color:var(--primary);">VIP</span>
-                    <span class="ged-status" style="background:#F1F5F9;">Régulier</span>
-                    <span class="ged-status" style="background:#F1F5F9;">Occasionnel</span>
-                    <span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">Inactif</span>
-                </div>
+                <div id="biKliyanBadges" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
             </div>
         </details>
     </div>
@@ -3018,10 +3010,10 @@
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🏭 11.6 — Analyse Fournisseurs</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
-                    <tr><td>🏭 Founisè Aktif</td><td style="text-align:right;">18</td></tr>
-                    <tr><td>💰 Montan Acha</td><td style="text-align:right;">540 000 HTG</td></tr>
-                    <tr><td>📈 Delè Livrezon</td><td style="text-align:right;">4,2 jou</td></tr>
-                    <tr><td>⭐ Top Founisè</td><td style="text-align:right;">Distributeur National</td></tr>
+                    <tr><td>🏭 Founisè Aktif</td><td style="text-align:right;" id="kpiBiFounise">—</td></tr>
+                    <tr><td>💰 Montan Acha</td><td style="text-align:right;" id="kpiBiMontanAcha">—</td></tr>
+                    <tr><td>📈 Delè Livrezon</td><td style="text-align:right; color:var(--text-muted);">🚧 Pa swiv ankò</td></tr>
+                    <tr><td>⭐ Top Founisè</td><td style="text-align:right;" id="kpiBiTopFounise">—</td></tr>
                 </table>
             </div>
         </details>
@@ -3029,10 +3021,10 @@
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👨‍💼 11.7 — Analyse RH</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
-                    <tr><td>👥 Total Anplwaye</td><td style="text-align:right;">47</td></tr>
-                    <tr><td>💵 Kout Salè</td><td style="text-align:right;">1 850 000 HTG</td></tr>
-                    <tr><td>📊 Absans</td><td style="text-align:right; color:var(--danger);">3</td></tr>
-                    <tr><td>🏖 Konje</td><td style="text-align:right;">3</td></tr>
+                    <tr><td>👥 Total Anplwaye</td><td style="text-align:right;" id="kpiBiTotalAnplwaye">—</td></tr>
+                    <tr><td>💵 Kout Salè</td><td style="text-align:right;" id="kpiBiKoutSalè">—</td></tr>
+                    <tr><td>📊 Absans</td><td style="text-align:right; color:var(--danger);" id="kpiBiAbsans">—</td></tr>
+                    <tr><td>🏖 Konje</td><td style="text-align:right;" id="kpiBiKonje">—</td></tr>
                 </table>
             </div>
         </details>
@@ -4100,5 +4092,86 @@
             <div id="genericModalFooter" style="display:flex; gap:10px; margin-top:18px;"></div>
         </div>
     </div>
+<!-- MODAL: NOUVO BYEN (7.1) -->
+<div id="newAssetModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:12px; padding:20px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-weight:600;">➕ Nouvo Byen</h3>
+            <span onclick="ActifsUI.closeNewAssetModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+        </div>
+        <div id="newAssetError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:8px; border-radius:8px; font-size:12px; margin-bottom:12px;"></div>
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Non Byen</label>
+        <input type="text" id="assetNon" class="settings-input" style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kategori</label>
+        <input type="text" id="assetKategori" class="settings-input" placeholder="Kamyon, Òdinatè, Ekipman..." style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Dat Acha</label>
+        <input type="date" id="assetDateAcha" class="settings-input" style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Pri Acha (HTG)</label>
+        <input type="number" id="assetPriAcha" class="settings-input" value="0" min="0" style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Dirè de Vi (ane)</label>
+        <input type="number" id="assetDirèDeVi" class="settings-input" value="5" min="1" style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Valè Résiduelle (HTG)</label>
+        <input type="number" id="assetValèResiduelle" class="settings-input" value="0" min="0" style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Sit</label>
+        <input type="text" id="assetSit" class="settings-input" style="margin-bottom:20px;">
+        <button id="assetSubmitBtn" onclick="ActifsUI.submitNewAsset()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Anrejistre Byen</button>
+    </div>
+</div>
+
+<!-- MODAL: NOUVO PLAN ANTRETYEN (7.3) -->
+<div id="newPlanModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:12px; padding:20px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-weight:600;">➕ Nouvo Plan Antretyen</h3>
+            <span onclick="ActifsUI.closeNewPlanModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+        </div>
+        <div id="newPlanError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:8px; border-radius:8px; font-size:12px; margin-bottom:12px;"></div>
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Byen</label>
+        <select id="planByenSelect" class="settings-input" style="margin-bottom:12px;"></select>
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Kalite Antretyen</label>
+        <input type="text" id="planKalite" class="settings-input" placeholder="Chanjman Lwil, Enspeksyon..." style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Dat Pwograme</label>
+        <input type="date" id="planDateProgram" class="settings-input" style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Frekans</label>
+        <input type="text" id="planFrekans" class="settings-input" placeholder="Chak 3 mwa..." style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Responsab</label>
+        <input type="text" id="planResponsab" class="settings-input" style="margin-bottom:20px;">
+        <button id="planSubmitBtn" onclick="ActifsUI.submitNewPlan()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Kreye Plan</button>
+    </div>
+</div>
+
+<!-- MODAL: NOUVO TICKET PANN (7.4) -->
+<div id="newTicketModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:12px; padding:20px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-weight:600;">➕ Nouvo Ticket Pann</h3>
+            <span onclick="ActifsUI.closeNewTicketModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+        </div>
+        <div id="newTicketError" style="display:none; background:#FEE2E2; color:#B91C1C; padding:8px; border-radius:8px; font-size:12px; margin-bottom:12px;"></div>
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Byen</label>
+        <select id="ticketByenSelect" class="settings-input" style="margin-bottom:12px;"></select>
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Deskripsyon Pwoblèm</label>
+        <textarea id="ticketPwoblèm" class="settings-input" rows="3" style="margin-bottom:12px;"></textarea>
+        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Ijans</label>
+        <select id="ticketIjans" class="settings-input" style="margin-bottom:20px;">
+            <option value="ba">Ba</option>
+            <option value="mwayen" selected>Mwayen</option>
+            <option value="kritik">Kritik</option>
+        </select>
+        <button id="ticketSubmitBtn" onclick="ActifsUI.submitNewTicket()" style="width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:14px;">✅ Kreye Ticket</button>
+    </div>
+</div>
+
+<!-- MODAL: RAPÒ ACTIFS JENERIK (7.6) -->
+<div id="rapòActifsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:12px; padding:20px; width:90%; max-width:600px; max-height:85vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 id="rapòActifsTitle" style="font-weight:600;">Rapò</h3>
+            <span onclick="ActifsUI.fèmenRapòModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted);">✕</span>
+        </div>
+        <div id="rapòActifsContenu" style="overflow-x:auto;"></div>
+    </div>
+</div>
+
 </body>
 </html>
