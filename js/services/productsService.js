@@ -21,6 +21,9 @@ const ProductsService = (() => {
      *   data.kantiteStock- kantite inisyal nan stock
      *   data.stockMinimum- sèy pou alèt stock ba
      *   data.inite       - inite (Pyès, Sac, Litre, Kg, elt.)
+     *   data.imageUrl    - URL foto pwodwi (opsyonèl, pou 13.3/13.2)
+     *   data.vizib_ecommerce - true/false, si pwodwi a parèt nan boutik online (13.2)
+     *   data.pri_ecommerce   - pri separe pou vant online, si diferan de priVente (opsyonèl)
      */
     async function createProduct(data) {
         if (!data.non || !data.non.trim()) {
@@ -43,6 +46,9 @@ const ProductsService = (() => {
             kantiteStock: data.kantiteStock || 0,
             stockMinimum: data.stockMinimum || 5,
             inite: data.inite || 'Pyès',
+            imageUrl: data.imageUrl || null,
+            vizib_ecommerce: data.vizib_ecommerce || false,
+            pri_ecommerce: data.pri_ecommerce || null,
             aktif: true,
             dat: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -83,7 +89,7 @@ const ProductsService = (() => {
 
     async function updateProduct(productId, updates) {
         const bizRef = getBizRef();
-        const allowedFields = ['non', 'sku', 'barcode', 'kategori', 'priAchat', 'priVente', 'stockMinimum', 'inite'];
+        const allowedFields = ['non', 'sku', 'barcode', 'kategori', 'priAchat', 'priVente', 'stockMinimum', 'inite', 'imageUrl', 'vizib_ecommerce', 'pri_ecommerce'];
         const cleanUpdates = {};
         allowedFields.forEach(f => {
             if (updates[f] !== undefined) cleanUpdates[f] = updates[f];
@@ -106,11 +112,6 @@ const ProductsService = (() => {
 
     // ---------- AJISTMAN STOCK MANYÈL (transaksyon separe de vant) ----------
 
-    /**
-     * @param {string} productId
-     * @param {number} kantiteChanjman - pozitif (antre) oswa negatif (sòti)
-     * @param {string} rezon - "Enventè Fizik", "Domaje", "Resepsyon", elt.
-     */
     async function adjustStock(productId, kantiteChanjman, rezon) {
         if (!kantiteChanjman || kantiteChanjman === 0) {
             throw new Error("Kantite ajistman dwe diferan de 0.");
