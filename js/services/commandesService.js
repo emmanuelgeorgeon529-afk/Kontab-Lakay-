@@ -1,250 +1,285 @@
-// js/services/commandesService.js
-// Depann de window.db, window.currentCompanyId, window.AdminService,
-// window.ProductsService, window.SalesService, window.BonLivrezonSevis
-//
-// Commande = entansyon/validasyon acha kliyan an SÈLMAN.
-// Vente = tranzaksyon ki konfime (jounal + stock).
-// BonLivrezon = egzekisyon fizik livrezon an.
-// commande.estati PA gen okenn etap livrezon — se bon_livrezon.estati
-// ki sèl sous verite pou sa (gade getOrderDisplayStatus() pi ba).
+// js/services/salesService.js
+// Depann de window.db, window.currentCompanyId, window.DiscountEngine, window.AdminService
 
-const CommandesService = (() => {
+const SalesService = (() => {
 
     function getBizRef() {
         if (!window.currentCompanyId) throw new Error("Pa gen biznis aktif chwazi.");
         return window.db.collection('biznis').doc(window.currentCompanyId);
     }
 
-    const ESTATI_VALID = ['brouillon', 'confirmée', 'annulée'];
-
-    const TRANZISYON_VALID = {
-        brouillon: ['confirmée', 'annulée'],
-        confirmée: [],   // apre konfimasyon, se convertOrderToSale() ki pran men l
-        annulée: []
-    };
-
-    async function getNextOrderNumber(transaction, bizRef) {
-        const counterRef = bizRef.collection('konte').doc('commande');
+    async function getNextInvoiceNumber(transaction, bizRef) {
+        const counterRef = bizRef.collection('konte').doc('lavant');
         const counterDoc = await transaction.get(counterRef);
         let nextNum = 1;
         if (counterDoc.exists) {
             nextNum = (counterDoc.data().dènyeNimewo || 0) + 1;
         }
         transaction.set(counterRef, { dènyeNimewo: nextNum }, { merge: true });
-        return 'CMD-' + String(nextNum).padStart(6, '0');
+        return 'LV-' + String(nextNum).padStart(6, '0');
     }
 
     /**
-     * Kreye yon kòmand kliyan. Pa touche stock — sa fèt sèlman lè li
-     * konfime (estati 'confirmée') e konvèti an vant.
+     * Kreye yon nouvo vant, ak mòtè rediksyon konplè (Rabais/Remise/Ristourne
+     * an kaskad + Escompte separe), stock, limit kredi, ak ekriti jounal.
      *
-     * @param {Object} data
-     *   data.kliyanId, kliyanNon, kliyanAuthUid (opsyonèl, si kliyan konekte)
-     *   data.atik - [{ pwodwiId, non, kantite, priInite }]
-     *   data.adrèsLivrezon
-     *   data.canal - 'magazen'|'web'|'whatsapp'|'facebook'|'marketplace'
+     * @param {Object} saleData
+     *   saleData.kliyanId, kliyanNon, mòdPeman, vandèId
+     *   saleData.atik - [{ pwodwiId, non, kantite, priInite,
+     *                       rabais?, remise?, ristourne?, tauxTaks? }]
+     *     rabais/remise/ristourne: { valeur, estPousantaj } (opsyonèl)
+     *   saleData.tauxEscompte - % escompte si peman kach imedya (opsyonèl)
+     *   saleData.canal - 'magazen'|'web'|'whatsapp'|'facebook'|'marketplace' (opsyonèl, default 'magazen')
+     *   saleData.kliyanAuthUid - Firebase Auth uid kliyan an, si vant lan soti nan kont kliyan konekte (opsyonèl)
+     *   saleData.kòdPromoAplike - kòd pwomosyon ki te aplike sou vant lan (opsyonèl)
      */
-    async function createOrder(data) {
-        if (!data.atik || data.atik.length === 0) {
-            throw new Error("Kòmand lan dwe gen pou pi piti yon atik.");
-        }
-
+    async function createSale(saleData) {
         const bizRef = getBizRef();
-        const total = data.atik.reduce((s, a) => s + (a.kantite * a.priInite), 0);
 
         const rezilta = await window.db.runTransaction(async (transaction) => {
-            const nimewoCommande = await getNextOrderNumber(transaction, bizRef);
-            const cmdRef = bizRef.collection('commande').doc();
+            // ---- 1. TOUT LEKTI ANVAN NENPÒT EKRITI ----
+            const productRefs = saleData.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
+            const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
 
-            transaction.set(cmdRef, {
-                nimewoCommande,
-                kliyanId: data.kliyanId || null,
-                kliyanNon: data.kliyanNon || 'Kliyan Divès',
-                kliyanAuthUid: data.kliyanAuthUid || null,
-                atik: data.atik,
-                total,
-                adrèsLivrezon: data.adrèsLivrezon || '',
-                canal: data.canal || 'magazen',
-                estati: 'brouillon',
-                venteId: null,
-                bonLivraisonId: null,
-                istorik: [{ etap: 'brouillon', dat: new Date().toISOString() }],
-                dat: firebase.firestore.FieldValue.serverTimestamp()
+            let kliyanRef = null;
+            let kliyanDoc = null;
+            if (saleData.mòdPeman === 'kredi' && saleData.kliyanId) {
+                kliyanRef = bizRef.collection('kliyan').doc(saleData.kliyanId);
+                kliyanDoc = await transaction.get(kliyanRef);
+                if (!kliyanDoc.exists) throw new Error("Kliyan sa a pa egziste.");
+            }
+
+            // ---- 2. VERIFYE STOCK + KALKILE PRI (DiscountEngine) ----
+            const stockUpdates = [];
+            const liyPourCalcul = [];
+
+            productDocs.forEach((doc, i) => {
+                const atikSaisie = saleData.atik[i];
+                if (!doc.exists) {
+                    throw new Error(`Pwodwi "${atikSaisie.non}" pa egziste.`);
+                }
+                const data = doc.data();
+                if ((data.kantiteStock || 0) < atikSaisie.kantite) {
+                    throw new Error(`Stock pa sifi pou "${data.non}". Rete: ${data.kantiteStock}, mande: ${atikSaisie.kantite}`);
+                }
+
+                stockUpdates.push({
+                    ref: productRefs[i],
+                    nouvoKantite: data.kantiteStock - atikSaisie.kantite
+                });
+
+                liyPourCalcul.push({
+                    prixBrut: atikSaisie.kantite * atikSaisie.priInite,
+                    rabais: atikSaisie.rabais,
+                    remise: atikSaisie.remise,
+                    ristourne: atikSaisie.ristourne,
+                    tauxTaks: atikSaisie.tauxTaks || 0,
+                    tauxEscompte: saleData.tauxEscompte || 0
+                });
             });
 
-            return { id: cmdRef.id, nimewoCommande, total };
+            const kalkil = window.DiscountEngine.calculeFakti(liyPourCalcul);
+            const total = kalkil.totaux.netAPayer; // <- sa a rete "Net à Payer" sou fakti a
+
+            // ---- 3. VERIFYE LIMIT KREDI (sou vrè total apre rediksyon) ----
+            let dètAvan = 0;
+            let dètApre = 0;
+            if (kliyanDoc) {
+                dètAvan = kliyanDoc.data().dèt || 0;
+                dètApre = dètAvan + total;
+                const limitKredi = kliyanDoc.data().limitKredi || 0;
+                if (limitKredi > 0 && dètApre > limitKredi) {
+                    throw new Error(
+                        `Vant sa a depase limit kredi kliyan an. ` +
+                        `Limit: ${limitKredi.toLocaleString()} HTG, ` +
+                        `Dèt aktyèl: ${dètAvan.toLocaleString()} HTG, ` +
+                        `Dèt apre vant: ${dètApre.toLocaleString()} HTG.`
+                    );
+                }
+            }
+
+            // ---- 4. NIMEWO FAKTI SEKANSYÈL ----
+            const nimewoFakti = await getNextInvoiceNumber(transaction, bizRef);
+
+            // ---- 5. EKRITI ----
+
+            stockUpdates.forEach(u => {
+                transaction.update(u.ref, { kantiteStock: u.nouvoKantite });
+            });
+
+            const venteRef = bizRef.collection('lavant').doc();
+            transaction.set(venteRef, {
+                nimewoFakti,
+                kliyanId: saleData.kliyanId || null,
+                kliyanNon: saleData.kliyanNon || 'Kliyan Divès',
+                kliyanAuthUid: saleData.kliyanAuthUid || null,
+                mòdPeman: saleData.mòdPeman,
+                canal: saleData.canal || 'magazen',
+                kòdPromoAplike: saleData.kòdPromoAplike || null,
+                atik: saleData.atik,
+                detayKalkil: kalkil.liy,      // detay pa liy: rabais/remise/ristourne/net
+                prixBrut: kalkil.totaux.prixBrut,
+                totalRRR: kalkil.totaux.totalRRR,
+                netCommercial: kalkil.totaux.netCommercial,
+                montanTaks: kalkil.totaux.montanTaks,
+                montanEscompte: kalkil.totaux.montanEscompte,
+                total,                          // Net à Payer — chif ofisyèl fakti a
+                estati: 'aktif',
+                dat: firebase.firestore.FieldValue.serverTimestamp(),
+                vandèId: saleData.vandèId || (window.auth?.currentUser?.uid ?? null)
+            });
+
+            // ---- 5a. Ekriti jounal prensipal: Débit Kès/Kliyan, Crédit Ventes + Taxes ----
+            const journalRef = bizRef.collection('jounal').doc();
+            const kontDebit = saleData.mòdPeman === 'kredi' ? '1030' : '1010';
+            const liyJournal = [
+                { kont: kontDebit, débit: total, crédit: 0 },
+                { kont: '4010', débit: 0, crédit: kalkil.totaux.netCommercial }
+            ];
+            if (kalkil.totaux.montanTaks > 0) {
+                liyJournal.push({ kont: '4457', débit: 0, crédit: kalkil.totaux.montanTaks });
+            }
+            transaction.set(journalRef, {
+                nimewoEkriti: nimewoFakti,
+                dat: firebase.firestore.FieldValue.serverTimestamp(),
+                liy: liyJournal,
+                referans: venteRef.id,
+                sous: 'automatique'
+            });
+
+            // ---- 5b. Escompte (si genyen) — ekriti jounal SEPARE, kont finansye ----
+            if (kalkil.totaux.montanEscompte > 0) {
+                const escompteRef = bizRef.collection('jounal').doc();
+                transaction.set(escompteRef, {
+                    nimewoEkriti: nimewoFakti + '-ESC',
+                    dat: firebase.firestore.FieldValue.serverTimestamp(),
+                    liy: [
+                        { kont: '665', débit: kalkil.totaux.montanEscompte, crédit: 0 }, // Charges Financières
+                        { kont: kontDebit, débit: 0, crédit: kalkil.totaux.montanEscompte }
+                    ],
+                    referans: venteRef.id,
+                    sous: 'escompte_accordé'
+                });
+            }
+
+            // ---- 5c. Si kredi, mete ajou dèt kliyan ----
+            if (kliyanRef) {
+                transaction.update(kliyanRef, { dèt: dètApre });
+            }
+
+            return { id: venteRef.id, nimewoFakti, total, kalkil: kalkil.totaux };
         });
 
+        // ---- 6. AUDIT LOG (apre transaksyon an konfime, san blòke vant si sa echwe) ----
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
-                window.currentCompanyId, 'Ventes', 'Kreye Kòmand Kliyan', '—',
-                `${rezilta.nimewoCommande} (${rezilta.total.toLocaleString()} HTG)`
+                window.currentCompanyId,
+                'Ventes',
+                'Kreye Vant',
+                '—',
+                `${rezilta.nimewoFakti} (${rezilta.total.toLocaleString()} HTG)`
             ).catch(err => console.warn('Audit log echwe:', err));
+        }
+
+        // ---- 7. PWEN FIDÉLITÉ (apre vant konfime, san blòke vant si sa echwe) ----
+        if (saleData.kliyanId && window.FideliteService?.ajoutePwenApreVant) {
+            window.FideliteService.ajoutePwenApreVant(saleData.kliyanId, rezilta.total)
+                .catch(err => console.warn('Ajoute pwen fidélité echwe:', err));
         }
 
         return rezilta;
     }
 
-    async function getOrders(limitCount = 50) {
+    async function getSales(limitCount = 50) {
         const bizRef = getBizRef();
-        const snapshot = await bizRef.collection('commande')
-            .orderBy('dat', 'desc').limit(limitCount).get();
-        return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        const snapshot = await bizRef.collection('lavant')
+            .orderBy('dat', 'desc')
+            .limit(limitCount)
+            .get();
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     }
 
-    async function getOrderById(orderId) {
+    async function getSaleById(saleId) {
         const bizRef = getBizRef();
-        const doc = await bizRef.collection('commande').doc(orderId).get();
-        if (!doc.exists) throw new Error("Kòmand sa a pa egziste.");
+        const doc = await bizRef.collection('lavant').doc(saleId).get();
+        if (!doc.exists) throw new Error("Vant sa a pa egziste.");
         return { id: doc.id, ...doc.data() };
     }
 
-    // ---------- ANILE KÒMAND (sèlman anvan konvèsyon an vant) ----------
-
-    async function cancelOrder(orderId, rezon) {
+    async function cancelSale(saleId, rezon) {
         const bizRef = getBizRef();
-        const ref = bizRef.collection('commande').doc(orderId);
 
-        const cmdInfo = await window.db.runTransaction(async (transaction) => {
-            const doc = await transaction.get(ref);
-            if (!doc.exists) throw new Error("Kòmand sa a pa egziste.");
-            const cmd = doc.data();
+        const vanteAnile = await window.db.runTransaction(async (transaction) => {
+            const venteRef = bizRef.collection('lavant').doc(saleId);
+            const venteDoc = await transaction.get(venteRef);
+            if (!venteDoc.exists) throw new Error("Vant sa a pa egziste.");
+            const vente = venteDoc.data();
+            if (vente.estati === 'anile') throw new Error("Vant sa a deja anile.");
 
-            if (cmd.estati === 'annulée') throw new Error("Kòmand sa a deja anile.");
-            if (cmd.venteId) {
-                throw new Error(
-                    "Kòmand sa a deja konvèti an vant — " +
-                    "sèvi ak SalesService.cancelSale() pou anile vant lan."
-                );
+            const productRefs = vente.atik.map(a => bizRef.collection('pwodwi').doc(a.pwodwiId));
+            const productDocs = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+
+            let kliyanRef = null;
+            let kliyanDoc = null;
+            if (vente.mòdPeman === 'kredi' && vente.kliyanId) {
+                kliyanRef = bizRef.collection('kliyan').doc(vente.kliyanId);
+                kliyanDoc = await transaction.get(kliyanRef);
             }
 
-            transaction.update(ref, {
-                estati: 'annulée',
+            productDocs.forEach((doc, i) => {
+                if (doc.exists) {
+                    const nouvoKantite = (doc.data().kantiteStock || 0) + vente.atik[i].kantite;
+                    transaction.update(productRefs[i], { kantiteStock: nouvoKantite });
+                }
+            });
+
+            transaction.update(venteRef, {
+                estati: 'anile',
                 rezonAnilasyon: rezon,
-                istorik: firebase.firestore.FieldValue.arrayUnion({
-                    etap: 'annulée', dat: new Date().toISOString(), rezon
-                })
+                datAnilasyon: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            return { nimewoCommande: cmd.nimewoCommande };
+            const rvRef = bizRef.collection('jounal').doc();
+            const kontDebit = vente.mòdPeman === 'kredi' ? '1030' : '1010';
+            const liyRV = [
+                { kont: '4010', débit: vente.netCommercial || vente.total, crédit: 0 },
+                { kont: kontDebit, débit: 0, crédit: vente.total }
+            ];
+            if (vente.montanTaks > 0) {
+                liyRV.push({ kont: '4457', débit: vente.montanTaks, crédit: 0 });
+            }
+            transaction.set(rvRef, {
+                nimewoEkriti: 'RV-' + vente.nimewoFakti.replace('LV-', ''),
+                dat: firebase.firestore.FieldValue.serverTimestamp(),
+                liy: liyRV,
+                referans: saleId,
+                sous: 'anilasyon',
+                rezon
+            });
+
+            if (kliyanRef && kliyanDoc && kliyanDoc.exists) {
+                const dètAktyèl = kliyanDoc.data().dèt || 0;
+                const nouvoDèt = Math.max(0, dètAktyèl - vente.total);
+                transaction.update(kliyanRef, { dèt: nouvoDèt });
+            }
+
+            return { nimewoFakti: vente.nimewoFakti, total: vente.total };
         });
 
+        // ---- AUDIT LOG ----
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
-                window.currentCompanyId, 'Ventes', 'Anile Kòmand', cmdInfo.nimewoCommande, `rezon: ${rezon}`
+                window.currentCompanyId,
+                'Ventes',
+                'Anile Vant',
+                vanteAnile.nimewoFakti,
+                `RV — rezon: ${rezon}`
             ).catch(err => console.warn('Audit log echwe:', err));
         }
     }
 
-    // ---------- KONFIME KÒMAND → KREYE VANT + BL (idompotan) ----------
-
-    /**
-     * Konfime yon kòmand: kreye Vant lan (jounal + stock), epi kreye
-     * BonLivrezon ki lye a otomatikman. Idompotan — si rele 2 fwa
-     * (doub-klik, retry, offline sync), pa gen doublon.
-     *
-     * @param {string} orderId
-     * @param {string} mòdPeman - 'kach'|'kredi'|'moncash'|'natcash'|'kat'|'vèman'
-     * @param {Object} opsyonLivrezon - { chofeId, veyikilId, adrèsLivrezon } (opsyonèl, pou BL a)
-     */
-    async function convertOrderToSale(orderId, mòdPeman, opsyonLivrezon = {}) {
-        const bizRef = getBizRef();
-        const cmdRef = bizRef.collection('commande').doc(orderId);
-
-        // ETAP 1 : lock + verifye — idompotan sou venteId
-        const commande = await window.db.runTransaction(async (transaction) => {
-            const doc = await transaction.get(cmdRef);
-            if (!doc.exists) throw new Error("Kòmand sa a pa egziste.");
-            const c = doc.data();
-
-            if (c.venteId) {
-                return { ...c, id: doc.id, _dejaKonvèti: true };
-            }
-            if (c.estati === 'annulée') {
-                throw new Error("Kòmand sa a anile, li pa ka konvèti an vant.");
-            }
-            if (c.konvèsyonAnKou) {
-                throw new Error("Konvèsyon deja an kou pou kòmand sa a.");
-            }
-
-            transaction.update(cmdRef, {
-                estati: 'confirmée',
-                konvèsyonAnKou: true,
-                istorik: firebase.firestore.FieldValue.arrayUnion({
-                    etap: 'confirmée', dat: new Date().toISOString()
-                })
-            });
-
-            return { ...c, id: doc.id, _dejaKonvèti: false };
-        });
-
-        if (commande._dejaKonvèti) {
-            return window.SalesService.getSaleById(commande.venteId);
-        }
-
-        // ETAP 2 : kreye vant lan (transaksyon separe — SalesService gen pwòp li)
-        let vant;
-        try {
-            vant = await window.SalesService.createSale({
-                kliyanId: commande.kliyanId,
-                kliyanNon: commande.kliyanNon,
-                kliyanAuthUid: commande.kliyanAuthUid || null,
-                mòdPeman: mòdPeman || 'kach',
-                canal: commande.canal || 'magazen',
-                atik: commande.atik
-            });
-        } catch (e) {
-            await cmdRef.update({ konvèsyonAnKou: false }).catch(() => {});
-            throw e;
-        }
-
-        await cmdRef.update({ venteId: vant.id, konvèsyonAnKou: false });
-
-        // ETAP 3 : kreye BL a (idompotan — id BL a se venteId)
-        let bl = null;
-        try {
-            bl = await window.BonLivrezonSevis.kreyeBL(vant.id, opsyonLivrezon);
-        } catch (e) {
-            console.warn('Kreyasyon BL echwe apre vant konfime:', e);
-            // Pa relanse — vant lan REYÈL e konfime; BL a ka kreye apre manyèlman
-        }
-
-        if (bl) {
-            await cmdRef.update({ bonLivraisonId: bl.id });
-        }
-
-        if (window.AdminService?.anrejistreLog) {
-            window.AdminService.anrejistreLog(
-                window.currentCompanyId, 'Ventes', 'Konfime Kòmand → Vant + BL',
-                commande.nimewoCommande, vant.nimewoFakti
-            ).catch(err => console.warn('Audit log echwe:', err));
-        }
-
-        return vant;
-    }
-
-    // ---------- ESTATI AFICHAJ INIFYE (commande + BL, san 2èm source of truth) ----------
-
-    /**
-     * @param {Object} commande - dokiman kòmand
-     * @param {Object|null} bonLivraison - dokiman BL ki lye a (si genyen)
-     * @returns {string} youn nan: brouillon | annulée | confirmée | preparasyon | en_route | livre
-     */
-    function getOrderDisplayStatus(commande, bonLivraison) {
-        if (commande.estati === 'annulée') return 'annulée';
-        if (commande.estati === 'brouillon') return 'brouillon';
-        // estati === 'confirmée'
-        if (!bonLivraison) return 'confirmée'; // vant kreye, BL poko kreye
-        return bonLivraison.estati; // preparasyon | en_route | livre
-    }
-
-    return {
-        ESTATI_VALID, TRANZISYON_VALID,
-        createOrder, getOrders, getOrderById,
-        cancelOrder, convertOrderToSale,
-        getOrderDisplayStatus
-    };
+    return { createSale, getSales, getSaleById, cancelSale };
 })();
 
-window.CommandesService = CommandesService;
-                                                       
+window.SalesService = SalesService;
+                
