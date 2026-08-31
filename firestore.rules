@@ -433,7 +433,7 @@ service cloud.firestore {
         allow delete: if false;
       }
 
-      match /fòmasyon/{docId} {
+      match /fomasyon/{docId} {
         allow read: if seRHOswaAdmin(bizId);
         allow create, update: if seRHOswaAdmin(bizId);
         allow delete: if false;
@@ -481,7 +481,7 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
-      match /abònman/{docId} {
+      match /abonman/{docId} {
         allow read: if manmBiznis(bizId);
         allow create, update: if seAdministrate(bizId);
         allow delete: if false;
@@ -509,7 +509,7 @@ service cloud.firestore {
         allow update: if manmBiznis(bizId);
         allow delete: if false;
 
-        match /vèsyon/{vèsyonId} {
+        match /vesyon/{vesyonId} {
           allow read: if manmBiznis(bizId);
           allow create: if manmBiznis(bizId);
           allow update, delete: if false;
