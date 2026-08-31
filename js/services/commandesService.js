@@ -1,5 +1,12 @@
 // js/services/commandesService.js
-// Depann de window.db, window.currentCompanyId, window.AdminService, window.ProductsService
+// Depann de window.db, window.currentCompanyId, window.AdminService,
+// window.ProductsService, window.SalesService, window.BonLivrezonSevis
+//
+// Commande = entansyon/validasyon acha kliyan an SÈLMAN.
+// Vente = tranzaksyon ki konfime (jounal + stock).
+// BonLivrezon = egzekisyon fizik livrezon an.
+// commande.estati PA gen okenn etap livrezon — se bon_livrezon.estati
+// ki sèl sous verite pou sa (gade getOrderDisplayStatus() pi ba).
 
 const CommandesService = (() => {
 
@@ -8,13 +15,12 @@ const CommandesService = (() => {
         return window.db.collection('biznis').doc(window.currentCompanyId);
     }
 
-    const ESTATI_VALID = ['brouillon', 'confirmée', 'en_préparation', 'expédiée', 'livrée', 'annulée'];
+    const ESTATI_VALID = ['brouillon', 'confirmée', 'annulée'];
 
-    const PWOCHEN_ESTATI = {
-        brouillon: 'confirmée',
-        confirmée: 'en_préparation',
-        en_préparation: 'expédiée',
-        expédiée: 'livrée'
+    const TRANZISYON_VALID = {
+        brouillon: ['confirmée', 'annulée'],
+        confirmée: [],   // apre konfimasyon, se convertOrderToSale() ki pran men l
+        annulée: []
     };
 
     async function getNextOrderNumber(transaction, bizRef) {
@@ -29,12 +35,14 @@ const CommandesService = (() => {
     }
 
     /**
-     * Kreye yon kòmand kliyan. Pa touche stock — sa fèt lè li konvèti an vant
-     * apre livrezon (evite bloke stock pou kòmand ki ka anile).
+     * Kreye yon kòmand kliyan. Pa touche stock — sa fèt sèlman lè li
+     * konfime (estati 'confirmée') e konvèti an vant.
+     *
      * @param {Object} data
-     *   data.kliyanId, kliyanNon
+     *   data.kliyanId, kliyanNon, kliyanAuthUid (opsyonèl, si kliyan konekte)
      *   data.atik - [{ pwodwiId, non, kantite, priInite }]
      *   data.adrèsLivrezon
+     *   data.canal - 'magazen'|'web'|'whatsapp'|'facebook'|'marketplace'
      */
     async function createOrder(data) {
         if (!data.atik || data.atik.length === 0) {
@@ -52,10 +60,14 @@ const CommandesService = (() => {
                 nimewoCommande,
                 kliyanId: data.kliyanId || null,
                 kliyanNon: data.kliyanNon || 'Kliyan Divès',
+                kliyanAuthUid: data.kliyanAuthUid || null,
                 atik: data.atik,
                 total,
                 adrèsLivrezon: data.adrèsLivrezon || '',
+                canal: data.canal || 'magazen',
                 estati: 'brouillon',
+                venteId: null,
+                bonLivraisonId: null,
                 istorik: [{ etap: 'brouillon', dat: new Date().toISOString() }],
                 dat: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -87,45 +99,7 @@ const CommandesService = (() => {
         return { id: doc.id, ...doc.data() };
     }
 
-    // ---------- AVANSE NAN PWOCHEN ETAP WORKFLOW LA ----------
-
-    async function advanceOrderStatus(orderId) {
-        const bizRef = getBizRef();
-        const ref = bizRef.collection('commande').doc(orderId);
-
-        const rezilta = await window.db.runTransaction(async (transaction) => {
-            const doc = await transaction.get(ref);
-            if (!doc.exists) throw new Error("Kòmand sa a pa egziste.");
-            const cmd = doc.data();
-
-            if (cmd.estati === 'annulée' || cmd.estati === 'livrée') {
-                throw new Error(`Kòmand sa a deja ${cmd.estati}, pa ka avanse ankò.`);
-            }
-
-            const nouvoEstati = PWOCHEN_ESTATI[cmd.estati];
-            if (!nouvoEstati) throw new Error("Pa gen pwochen etap pou estati sa a.");
-
-            transaction.update(ref, {
-                estati: nouvoEstati,
-                istorik: firebase.firestore.FieldValue.arrayUnion({
-                    etap: nouvoEstati, dat: new Date().toISOString()
-                })
-            });
-
-            return { nimewoCommande: cmd.nimewoCommande, ansyenEstati: cmd.estati, nouvoEstati };
-        });
-
-        if (window.AdminService?.anrejistreLog) {
-            window.AdminService.anrejistreLog(
-                window.currentCompanyId, 'Ventes', 'Avanse Estati Kòmand',
-                `${rezilta.nimewoCommande}: ${rezilta.ansyenEstati}`, rezilta.nouvoEstati
-            ).catch(err => console.warn('Audit log echwe:', err));
-        }
-
-        return rezilta;
-    }
-
-    // ---------- ANILE KÒMAND ----------
+    // ---------- ANILE KÒMAND (sèlman anvan konvèsyon an vant) ----------
 
     async function cancelOrder(orderId, rezon) {
         const bizRef = getBizRef();
@@ -135,8 +109,14 @@ const CommandesService = (() => {
             const doc = await transaction.get(ref);
             if (!doc.exists) throw new Error("Kòmand sa a pa egziste.");
             const cmd = doc.data();
-            if (cmd.estati === 'livrée') throw new Error("Pa ka anile yon kòmand ki deja livre.");
+
             if (cmd.estati === 'annulée') throw new Error("Kòmand sa a deja anile.");
+            if (cmd.venteId) {
+                throw new Error(
+                    "Kòmand sa a deja konvèti an vant — " +
+                    "sèvi ak SalesService.cancelSale() pou anile vant lan."
+                );
+            }
 
             transaction.update(ref, {
                 estati: 'annulée',
@@ -156,49 +136,86 @@ const CommandesService = (() => {
         }
     }
 
-    // ---------- KONVÈTI AN VANT LÈ LIVRE (touche stock + jounal) ----------
+    // ---------- KONFIME KÒMAND → KREYE VANT + BL (idompotan) ----------
 
-    // FIKS: lock kòmand la nan yon transaksyon AVAN kreye vant lan, pou anpeche
-    // doub-konvèsyon si etap 2 (mete ajou venteId sou kòmand la) echwe apre vant lan deja kreye.
-    async function convertOrderToSale(orderId, mòdPeman) {
+    /**
+     * Konfime yon kòmand: kreye Vant lan (jounal + stock), epi kreye
+     * BonLivrezon ki lye a otomatikman. Idompotan — si rele 2 fwa
+     * (doub-klik, retry, offline sync), pa gen doublon.
+     *
+     * @param {string} orderId
+     * @param {string} mòdPeman - 'kach'|'kredi'|'moncash'|'natcash'|'kat'|'vèman'
+     * @param {Object} opsyonLivrezon - { chofeId, veyikilId, adrèsLivrezon } (opsyonèl, pou BL a)
+     */
+    async function convertOrderToSale(orderId, mòdPeman, opsyonLivrezon = {}) {
         const bizRef = getBizRef();
         const cmdRef = bizRef.collection('commande').doc(orderId);
 
-        // ETAP 1: verifye + lock AVAN kreye vant — anpeche doub-konvèsyon
+        // ETAP 1 : lock + verifye — idompotan sou venteId
         const commande = await window.db.runTransaction(async (transaction) => {
             const doc = await transaction.get(cmdRef);
             if (!doc.exists) throw new Error("Kòmand sa a pa egziste.");
             const c = doc.data();
-            if (c.estati !== 'livrée') {
-                throw new Error("Kòmand lan dwe nan estati 'livrée' anvan konvèsyon an vant.");
-            }
-            if (c.venteId) throw new Error("Kòmand sa a deja konvèti an vant.");
-            if (c.konvèsyonAnKou) throw new Error("Konvèsyon deja an kou pou kòmand sa a.");
 
-            transaction.update(cmdRef, { konvèsyonAnKou: true }); // lock
-            return { id: doc.id, ...c };
+            if (c.venteId) {
+                return { ...c, id: doc.id, _dejaKonvèti: true };
+            }
+            if (c.estati === 'annulée') {
+                throw new Error("Kòmand sa a anile, li pa ka konvèti an vant.");
+            }
+            if (c.konvèsyonAnKou) {
+                throw new Error("Konvèsyon deja an kou pou kòmand sa a.");
+            }
+
+            transaction.update(cmdRef, {
+                estati: 'confirmée',
+                konvèsyonAnKou: true,
+                istorik: firebase.firestore.FieldValue.arrayUnion({
+                    etap: 'confirmée', dat: new Date().toISOString()
+                })
+            });
+
+            return { ...c, id: doc.id, _dejaKonvèti: false };
         });
 
-        // ETAP 2: kreye vant lan
+        if (commande._dejaKonvèti) {
+            return window.SalesService.getSaleById(commande.venteId);
+        }
+
+        // ETAP 2 : kreye vant lan (transaksyon separe — SalesService gen pwòp li)
         let vant;
         try {
             vant = await window.SalesService.createSale({
                 kliyanId: commande.kliyanId,
                 kliyanNon: commande.kliyanNon,
+                kliyanAuthUid: commande.kliyanAuthUid || null,
                 mòdPeman: mòdPeman || 'kach',
+                canal: commande.canal || 'magazen',
                 atik: commande.atik
             });
         } catch (e) {
-            // Vant echwe → retire lock la pou moun ka eseye ankò
             await cmdRef.update({ konvèsyonAnKou: false }).catch(() => {});
             throw e;
         }
 
         await cmdRef.update({ venteId: vant.id, konvèsyonAnKou: false });
 
+        // ETAP 3 : kreye BL a (idompotan — id BL a se venteId)
+        let bl = null;
+        try {
+            bl = await window.BonLivrezonSevis.kreyeBL(vant.id, opsyonLivrezon);
+        } catch (e) {
+            console.warn('Kreyasyon BL echwe apre vant konfime:', e);
+            // Pa relanse — vant lan REYÈL e konfime; BL a ka kreye apre manyèlman
+        }
+
+        if (bl) {
+            await cmdRef.update({ bonLivraisonId: bl.id });
+        }
+
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
-                window.currentCompanyId, 'Ventes', 'Konvèti Kòmand an Vant',
+                window.currentCompanyId, 'Ventes', 'Konfime Kòmand → Vant + BL',
                 commande.nimewoCommande, vant.nimewoFakti
             ).catch(err => console.warn('Audit log echwe:', err));
         }
@@ -206,11 +223,28 @@ const CommandesService = (() => {
         return vant;
     }
 
+    // ---------- ESTATI AFICHAJ INIFYE (commande + BL, san 2èm source of truth) ----------
+
+    /**
+     * @param {Object} commande - dokiman kòmand
+     * @param {Object|null} bonLivraison - dokiman BL ki lye a (si genyen)
+     * @returns {string} youn nan: brouillon | annulée | confirmée | preparasyon | en_route | livre
+     */
+    function getOrderDisplayStatus(commande, bonLivraison) {
+        if (commande.estati === 'annulée') return 'annulée';
+        if (commande.estati === 'brouillon') return 'brouillon';
+        // estati === 'confirmée'
+        if (!bonLivraison) return 'confirmée'; // vant kreye, BL poko kreye
+        return bonLivraison.estati; // preparasyon | en_route | livre
+    }
+
     return {
-        ESTATI_VALID,
+        ESTATI_VALID, TRANZISYON_VALID,
         createOrder, getOrders, getOrderById,
-        advanceOrderStatus, cancelOrder, convertOrderToSale
+        cancelOrder, convertOrderToSale,
+        getOrderDisplayStatus
     };
 })();
 
 window.CommandesService = CommandesService;
+                                                       
