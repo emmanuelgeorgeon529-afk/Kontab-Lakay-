@@ -121,7 +121,10 @@ service cloud.firestore {
       // ---------- 3. VENTES, CRM & RELATION CLIENT ----------
 
       match /pwodwi/{pwodwiId} {
-        allow read: if manmBiznis(bizId);
+        // PATCH 13.2 : pwodwi ki make vizib_ecommerce=true li piblik (boutik online),
+        // san bezwen manmBiznis. Kliyan dwe filtre .where('vizib_ecommerce','==',true).
+        allow read: if manmBiznis(bizId)
+          || resource.data.vizib_ecommerce == true;
         // FIKS: ajoute seKontablOswaAdmin pou wòl Direkte ka mete ajou stock pandan yon Acha
         allow create, update: if seMagasinierOswaAdmin(bizId) || seVandeOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
         allow delete: if false;
@@ -140,8 +143,20 @@ service cloud.firestore {
       }
 
       match /kliyan/{kliyanId} {
-        allow read: if manmBiznis(bizId);
-        allow create, update: if seVandeOswaAdmin(bizId);
+        // PATCH 13.9 : kliyan konekte ka li/modifye SÈLMAN pwòp fich li,
+        // izole pa authUid — kliyan A pa ka li kliyan B.
+        allow read: if manmBiznis(bizId)
+          || (konekte() && resource.data.authUid == request.auth.uid);
+        allow create: if seVandeOswaAdmin(bizId)
+          || (konekte()
+              && request.resource.data.authUid == request.auth.uid
+              && request.resource.data.dèt == 0
+              && request.resource.data.limitKredi == 0);
+        allow update: if seVandeOswaAdmin(bizId)
+          || (konekte() && resource.data.authUid == request.auth.uid
+              // kliyan ka modifye SÈLMAN pwòp done kontak li, pa dèt/limitKredi/kategori
+              && request.resource.data.diff(resource.data).affectedKeys()
+                   .hasOnly(['non', 'telefòn', 'adrès', 'imèl']));
         allow delete: if false;
       }
 
@@ -164,7 +179,10 @@ service cloud.firestore {
       }
 
       match /lavant/{venteId} {
-        allow read: if manmBiznis(bizId);
+        // PATCH 13.9 : kliyan ka li SÈLMAN pwòp vant li (via kliyanAuthUid).
+        // Kreyasyon/modifikasyon rete rezève pou anplwaye (createSale() konfime pa staff).
+        allow read: if manmBiznis(bizId)
+          || (konekte() && resource.data.kliyanAuthUid == request.auth.uid);
         allow create, update: if seVandeOswaAdmin(bizId);
         allow delete: if false;
       }
@@ -182,8 +200,17 @@ service cloud.firestore {
       }
 
       match /commande/{docId} {
-        allow read: if manmBiznis(bizId);
-        allow create, update: if seVandeOswaAdmin(bizId);
+        // PATCH 13.2/13.9 : kliyan konekte ka kreye pwòp kòmand li (checkout boutik)
+        // e li sèlman pwòp kòmand li. Kliyan pa ka konfime (estati dwe rete
+        // 'brouillon', venteId dwe rete null) — sèl anplwaye konfime (13.4).
+        allow read: if manmBiznis(bizId)
+          || (konekte() && resource.data.kliyanAuthUid == request.auth.uid);
+        allow create: if seVandeOswaAdmin(bizId)
+          || (konekte()
+              && request.resource.data.kliyanAuthUid == request.auth.uid
+              && request.resource.data.estati == 'brouillon'
+              && request.resource.data.venteId == null);
+        allow update: if seVandeOswaAdmin(bizId);
         allow delete: if false;
       }
 
@@ -202,6 +229,13 @@ service cloud.firestore {
         allow read: if manmBiznis(bizId);
         allow create, update: if seVandeOswaAdmin(bizId);
         allow delete: if false;
+      }
+
+      // NOUVO (Modil 13.7/13.8) : jounal senkwonizasyon adapter Meta/Marketplace
+      match /ecom_sync_log/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if seVandeOswaAdmin(bizId) || seAdministrate(bizId);
+        allow update, delete: if false;
       }
 
       match /sav/{docId} {
@@ -241,7 +275,9 @@ service cloud.firestore {
       }
 
       match /bon_livrezon/{docId} {
-        allow read: if manmBiznis(bizId);
+        // PATCH 13.9 : kliyan ka swiv pwòp livrezon li (via kliyanAuthUid).
+        allow read: if manmBiznis(bizId)
+          || (konekte() && resource.data.kliyanAuthUid == request.auth.uid);
         // BL egzije yon referans venteId valid — menm wòl ak lavant, paske BL se ekstansyon dirèk Vant lan
         allow create: if seVandeOswaAdmin(bizId)
           && request.resource.data.keys().hasAll(['venteId', 'nimewoBL', 'estati'])
@@ -306,7 +342,10 @@ service cloud.firestore {
 
       match /konte/{docId} {
         allow read: if manmBiznis(bizId);
-        allow write: if seVandeOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
+        // PATCH 13.2 : kliyan konekte ka enkremante SÈLMAN konte 'commande'
+        // (nimewotasyon sekansyèl CMD-XXXXXX pandan checkout).
+        allow write: if seVandeOswaAdmin(bizId) || seKontablOswaAdmin(bizId)
+          || (docId == 'commande' && konekte());
       }
 
       match /jounal/{docId} {
