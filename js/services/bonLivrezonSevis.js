@@ -7,7 +7,9 @@
 // salesService.createSale() / cancelSale().
 //
 // Chak Vant gen MAKSIMÒM 1 BL — ID dokiman BL a se DIRÈKTEMAN venteId la,
-// sa garanti inisite san bezwen kèri anndan transaction.
+// sa garanti inisite san bezwen kèri anndan transaction. kreyeBL() se
+// IDOMPOTAN: si l rele 2 fwa pou menm venteId, li retounen BL ki egziste
+// a olye leve yon erè (pwoteje kont retry/doub-klik/offline sync).
 
 const BonLivrezonSevis = (() => {
 
@@ -37,7 +39,7 @@ const BonLivrezonSevis = (() => {
     }
 
     /**
-     * Kreye yon BL ki lye ak yon Vant ki deja egziste.
+     * Kreye yon BL ki lye ak yon Vant ki deja egziste. Idompotan.
      * @param {string} venteId
      * @param {Object} opsyon
      *   opsyon.chofeId    - opsyonèl
@@ -55,7 +57,16 @@ const BonLivrezonSevis = (() => {
 
             const blRef = bizRef.collection('bon_livrezon').doc(venteId);
             const blDoc = await transaction.get(blRef);
-            if (blDoc.exists) throw new Error("Gen deja yon BL pou vant sa a.");
+            if (blDoc.exists) {
+                // Idompotans : BL a deja egziste (retry, offline sync, doub-apèl).
+                // Retounen enfòmasyon ki egziste a, pa kreye yon dezyèm.
+                return {
+                    id: blDoc.id,
+                    nimewoBL: blDoc.data().nimewoBL,
+                    nimewoFakti: blDoc.data().nimewoFakti,
+                    _dejaEgziste: true
+                };
+            }
 
             let chofeDoc = null;
             if (opsyon.chofeId) {
@@ -84,6 +95,7 @@ const BonLivrezonSevis = (() => {
                 nimewoFakti: vente.nimewoFakti,
                 kliyanId: vente.kliyanId || null,
                 kliyanNon: vente.kliyanNon || 'Kliyan Divès',
+                kliyanAuthUid: vente.kliyanAuthUid || null,
                 chofeId: opsyon.chofeId || null,
                 chofeNon: chofeDoc ? chofeDoc.data().non : null,
                 veyikilId: opsyon.veyikilId || null,
@@ -97,8 +109,10 @@ const BonLivrezonSevis = (() => {
                 kreyePaId: window.auth?.currentUser?.uid ?? null
             });
 
-            return { id: blRef.id, nimewoBL, nimewoFakti: vente.nimewoFakti };
+            return { id: blRef.id, nimewoBL, nimewoFakti: vente.nimewoFakti, _dejaEgziste: false };
         });
+
+        if (rezilta._dejaEgziste) return rezilta;
 
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
@@ -169,7 +183,6 @@ const BonLivrezonSevis = (() => {
         return { id: doc.id, ...doc.data() };
     }
 
-    // Alias klè — depi ID dokiman an se venteId, sa se menm apèl ak getBLById
     async function getBLByVenteId(venteId) {
         return getBLById(venteId);
     }
@@ -182,3 +195,4 @@ const BonLivrezonSevis = (() => {
 })();
 
 window.BonLivrezonSevis = BonLivrezonSevis;
+                
