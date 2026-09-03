@@ -447,7 +447,9 @@
 
   // ---------- 1.11 AUDIT LOGS ----------
 
-  async function anrejistreLog(bizId, modil, aksyon, ansyenValè, nouvoValè) {
+  // NÒT (Modil 12.2/12.3 — Risk Engine): 6yèm paramèt 'metadata' AJOUTE, opsyonèl,
+  // backward-compatible ak tout ansyen apèl ki pa pase l (metadata: {} pa defo).
+  async function anrejistreLog(bizId, modil, aksyon, ansyenValè, nouvoValè, metadata = {}) {
     const ref = db.collection('biznis').doc(bizId)
       .collection('auditLog').doc();
     await ref.set({
@@ -457,6 +459,7 @@
       aksyon,
       ansyenValè: String(ansyenValè ?? '—'),
       nouvoValè: String(nouvoValè ?? '—'),
+      metadata: metadata || {},
       dat: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
@@ -532,3 +535,4 @@
     kreyeNotifikasyon, rezoudNotifikasyon, abònmanNotifikasyon
   };
 })();
+      
