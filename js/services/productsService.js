@@ -97,7 +97,34 @@ const ProductsService = (() => {
         if (Object.keys(cleanUpdates).length === 0) {
             throw new Error("Pa gen chan valid pou modifye.");
         }
+
+        // NÒT (Modil 12.2/12.3 — Risk Engine): kaptire chanjman pri a AVAN ekri,
+        // pou AntiFraudService ka detekte chanjman pri san otorizasyon.
+        let chanjmanPri = null;
+        if (cleanUpdates.priVente !== undefined) {
+            const avanDoc = await bizRef.collection('pwodwi').doc(productId).get();
+            const priAvan = avanDoc.exists ? (avanDoc.data().priVente || 0) : 0;
+            if (priAvan !== cleanUpdates.priVente) {
+                chanjmanPri = {
+                    pwodwiNon: avanDoc.data()?.non || '—',
+                    priAvan,
+                    priApre: cleanUpdates.priVente
+                };
+            }
+        }
+
         await bizRef.collection('pwodwi').doc(productId).update(cleanUpdates);
+
+        if (chanjmanPri) {
+            bizRef.collection('chanjman_pri').add({
+                pwodwiId: productId,
+                pwodwiNon: chanjmanPri.pwodwiNon,
+                priAvan: chanjmanPri.priAvan,
+                priApre: chanjmanPri.priApre,
+                dat: firebase.firestore.FieldValue.serverTimestamp(),
+                itilizatèId: window.auth?.currentUser?.uid || null
+            }).catch(err => console.warn('Chanjman pri log echwe:', err));
+        }
 
         if (window.AdminService?.anrejistreLog) {
             window.AdminService.anrejistreLog(
