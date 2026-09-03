@@ -136,6 +136,12 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
+      match /chanjman_pri/{docId} {
+        allow read: if manmBiznis(bizId);
+        allow create: if manmBiznis(bizId);
+        allow update, delete: if false;
+      }
+
       match /stock_istorik/{docId} {
         allow read: if manmBiznis(bizId);
         allow create, update: if seMagasinierOswaAdmin(bizId) || seKontablOswaAdmin(bizId);
@@ -253,6 +259,24 @@ service cloud.firestore {
           && request.resource.data.ticketSavId is string
           && docId == request.resource.data.ticketSavId;
         allow update: if seVandeOswaAdmin(bizId);
+        allow delete: if false;
+      }
+
+      match /ai_recommendation/{docId} {
+        // Modil 12.13 — AI Governance & Audit. Log tou repons/rekòmandasyon
+        // ki soti nan Co-Pilot IA (12.1) ak Chat Documents (12.9).
+        // Egzije itilizateId matche moun k ap ekri a (anpeche fosifikasyon, menm patwon ak auditLog)
+        allow read: if manmBiznis(bizId);
+        allow create: if manmBiznis(bizId)
+          && request.resource.data.itilizateId == request.auth.uid;
+        allow update, delete: if false;
+      }
+
+      match /workflow_instance/{docId} {
+        // Modil 12.12 — Workflow Builder (egzekisyon "best-effort" kliyan-side,
+        // pa gen Cloud Functions). Deklanche/verifye chak fwa yon moun louvri #ia.
+        allow read: if manmBiznis(bizId);
+        allow create, update: if manmBiznis(bizId);
         allow delete: if false;
       }
 
@@ -433,7 +457,7 @@ service cloud.firestore {
         allow delete: if false;
       }
 
-      match /fomasyon/{docId} {
+      match /fòmasyon/{docId} {
         allow read: if seRHOswaAdmin(bizId);
         allow create, update: if seRHOswaAdmin(bizId);
         allow delete: if false;
@@ -481,7 +505,7 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
-      match /abonman/{docId} {
+      match /abònman/{docId} {
         allow read: if manmBiznis(bizId);
         allow create, update: if seAdministrate(bizId);
         allow delete: if false;
@@ -509,7 +533,7 @@ service cloud.firestore {
         allow update: if manmBiznis(bizId);
         allow delete: if false;
 
-        match /vesyon/{vesyonId} {
+        match /vèsyon/{vèsyonId} {
           allow read: if manmBiznis(bizId);
           allow create: if manmBiznis(bizId);
           allow update, delete: if false;

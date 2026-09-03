@@ -2918,6 +2918,16 @@
 
             <!-- ===================== 11. BI ===================== -->
             <!-- ===================== 11. BUSINESS INTELLIGENCE & EXECUTIVE DASHBOARD ===================== -->
+<style>
+    #bi .chart-section, #bi .kpi-card, #bi .fin-table { box-sizing: border-box; }
+    #bi { max-width: 100vw; overflow-x: hidden; }
+    @media (max-width: 768px) {
+        #bi > div[style*="grid-template-columns:1fr 1fr"],
+        #bi > div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+        #bi .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        #bi table.fin-table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+</style>
 <section id="bi" class="view-section">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div>
@@ -3132,6 +3142,20 @@
 
             <!-- ===================== 12. IA ===================== -->
             <!-- ===================== 12. IA, AUTOMATISATION & ANTI-FRAUDE ENGINE ===================== -->
+<style>
+    #ia .chart-section, #ia .kpi-card, #ia .fin-table { box-sizing: border-box; }
+    #ia { max-width: 100vw; overflow-x: hidden; }
+    @media (max-width: 768px) {
+        #ia > div[style*="grid-template-columns:1fr 1fr"],
+        #ia > div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+        #ia .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        #ia table.fin-table { display: block; overflow-x: auto; white-space: nowrap; }
+        #ia .ia-fraud-row { flex-direction: column; align-items: flex-start !important; gap: 8px; }
+        #ia .ia-fraud-row .ia-fraud-actions { width: 100%; display: flex; gap: 6px; }
+        #ia .ia-fraud-row .ia-fraud-actions button { flex: 1; }
+        #ia .ia-chat-bubble { font-size: 14px !important; max-width: 92% !important; }
+    }
+</style>
 <section id="ia" class="view-section">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div>
@@ -3161,25 +3185,27 @@
     <details class="chart-section" open style="padding:0;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💬 12.1 — Co-Pilot IA Kontab Lakay</summary>
         <div style="padding:0 20px 20px;">
-            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
-                <div style="background:#F1F5F9; border-radius:12px 12px 12px 4px; padding:10px 14px; max-width:80%; font-size:13px;">Konbyen benefis mwen fè mwa sa?</div>
-                <div style="background:#EEF2FF; color:var(--primary); border-radius:12px 12px 4px 12px; padding:10px 14px; max-width:80%; font-size:13px; align-self:flex-end;">Ou fè 245 000 HTG benefis nèt mwa sa, yon ogmantasyon 8% konpare ak mwa pase.</div>
+            <div id="ia121ChatLog" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:320px; overflow-y:auto;">
+                <div class="ia-chat-bubble" style="background:#F1F5F9; border-radius:12px 12px 12px 4px; padding:10px 14px; max-width:80%; font-size:14px; line-height:1.4;">Bonjou! Mwen se Co-Pilot Kontab Lakay. Mwen ka reponn kesyon sou vant, depans, stock, ak kliyan w yo — baze sou vrè done biznis ou. Kisa w vle konnen?</div>
             </div>
-            <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                <span class="ged-status" style="background:#F1F5F9;">Ki kliyan ki dwe plis?</span>
-                <span class="ged-status" style="background:#F1F5F9;">Ki pwodwi ki pi vann?</span>
-                <span class="ged-status" style="background:#F1F5F9;">Fè rezime finansye</span>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                <span class="ged-status ia-suggestion" style="background:#F1F5F9; cursor:pointer;">Ki pwodwi ki pi vann?</span>
+                <span class="ged-status ia-suggestion" style="background:#F1F5F9; cursor:pointer;">Fè yon rezime finansye</span>
+                <span class="ged-status ia-suggestion" style="background:#F1F5F9; cursor:pointer;">Konbyen benefis mwen fè mwa sa?</span>
             </div>
+            <div style="display:flex; gap:8px;">
+                <input id="ia121Input" type="text" placeholder="Ekri kesyon w la..." style="flex:1; min-width:0; padding:10px 14px; border-radius:8px; border:1px solid #E2E8F0; font-size:14px;">
+                <button id="ia121BtnVoye" style="background:var(--primary); color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:600; white-space:nowrap;">Voye</button>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">IA a li sèlman — li pa ka modifye okenn done san w pase pa modil ki konsène a.</p>
         </div>
     </details>
 
     <!-- 12.2 Détection Anti-Fraude -->
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🚨 12.2 — Détection Anti-Fraude</summary>
-        <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>🔴 Fakti FT-000440 efase san rezon endike</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEE2E2;"><span>🔴 Chanjman pri Riz 25lb san otorizasyon</span><span style="color:var(--danger); font-weight:600;">Ijan</span></div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-radius:8px; background:#FEF3C7;"><span>⚠️ Modifikasyon stock masiv detekte</span><span style="color:#B45309; font-weight:600;">Atansyon</span></div>
+        <div id="ia122FraudList" style="padding:0 20px 20px; display:flex; flex-direction:column; gap:10px;">
+            <div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">Chajman...</div>
         </div>
     </details>
 
@@ -3188,10 +3214,10 @@
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🕵️ 12.3 — Analyse Comportement Utilisateur</summary>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>Itilizatè</th><th>Dènye Aksyon</th><th>Risk Score</th></tr>
-                <tr><td>Jean D.</td><td>Kreye Fakti</td><td><span class="ged-status" style="background:#D1FAE5; color:#047857;">12 — Ba</span></td></tr>
-                <tr><td>Marie L.</td><td>Modifikasyon Pri</td><td><span class="ged-status" style="background:#FEF3C7; color:#B45309;">45 — Mwayen</span></td></tr>
-                <tr><td>Pierre A.</td><td>Efase Fakti</td><td><span class="ged-status" style="background:#FEE2E2; color:#B91C1C;">82 — Wo</span></td></tr>
+                <tr><th>Itilizatè</th><th>Aksyon Risk</th><th>Risk Score</th></tr>
+                <tbody id="ia123RiskTable">
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr>
+                </tbody>
             </table>
         </div>
     </details>
@@ -3203,20 +3229,22 @@
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
                     <tr><th>Pwodwi</th><th>Kilè Fini</th><th>Rekòmande</th></tr>
-                    <tr><td>Luil Kris</td><td style="color:var(--danger);">8 jou</td><td style="text-align:right;">80 L</td></tr>
-                    <tr><td>Riz 25lb</td><td>25 jou</td><td style="text-align:right;">50 sacs</td></tr>
+                    <tbody id="ia124StockForecast">
+                        <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </details>
         <details class="chart-section" style="padding:0;">
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">💰 12.5 — Prévision Trésorerie</summary>
             <div style="padding:0 20px 20px;">
-                <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(100px,1fr)); margin-bottom:0;">
-                    <div class="kpi-card"><div class="label">7 jou</div><div class="value" style="color:var(--secondary); font-size:16px;">+52k</div></div>
-                    <div class="kpi-card"><div class="label">30 jou</div><div class="value" style="color:var(--secondary); font-size:16px;">+185k</div></div>
-                    <div class="kpi-card"><div class="label">90 jou</div><div class="value" style="color:var(--secondary); font-size:16px;">+540k</div></div>
-                    <div class="kpi-card"><div class="label">365 jou</div><div class="value" style="color:var(--secondary); font-size:16px;">+2,1M</div></div>
+                <div id="ia125CashForecast" class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(100px,1fr)); margin-bottom:0;">
+                    <div class="kpi-card"><div class="label">7 jou</div><div class="value" style="color:var(--text-muted); font-size:16px;">...</div></div>
+                    <div class="kpi-card"><div class="label">30 jou</div><div class="value" style="color:var(--text-muted); font-size:16px;">...</div></div>
+                    <div class="kpi-card"><div class="label">90 jou</div><div class="value" style="color:var(--text-muted); font-size:16px;">...</div></div>
+                    <div class="kpi-card"><div class="label">365 jou</div><div class="value" style="color:var(--text-muted); font-size:16px;">...</div></div>
                 </div>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">Pwojeksyon lineyè baze sou mwayèn kotidyen 30 dènye jou (Vant − Depans − Acha − Pewòl). Sous: BiService.getCashFlowForecast()</p>
             </div>
         </details>
     </div>
@@ -3227,9 +3255,10 @@
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📞 12.6 — Smart Collection</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
-                    <tr><th>Kliyan</th><th>Rekòmandasyon IA</th></tr>
-                    <tr><td>Ti Boutik Delmas</td><td>📱 Voye WhatsApp jodi a</td></tr>
-                    <tr><td>Founisè X</td><td>📞 Rele nan 3 jou</td></tr>
+                    <tr><th>Kliyan</th><th>Rekòmandasyon</th></tr>
+                    <tbody id="ia126Collection">
+                        <tr><td colspan="2" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </details>
@@ -3237,9 +3266,12 @@
             <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛒 12.7 — Smart Purchasing</summary>
             <div style="padding:0 20px 20px;">
                 <table class="fin-table">
-                    <tr><th>Pwodwi</th><th>Pi Bon Founisè</th><th>Pri</th></tr>
-                    <tr><td>Riz 25lb</td><td>Distributeur National</td><td style="text-align:right;">1 180 HTG</td></tr>
+                    <tr><th>Pwodwi</th><th>Pi Bon Founisè (istorik)</th><th>Pri Moyèn</th></tr>
+                    <tbody id="ia127Purchasing">
+                        <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr>
+                    </tbody>
                 </table>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">Baze sou pri istorik reyèl (6 dènye mwa). Kalite/dèlè livrezon pa disponib nan done a kounye a.</p>
             </div>
         </details>
     </div>
@@ -3253,58 +3285,100 @@
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">💰 Cash Flow</button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">📦 Rapò Stock</button>
             <button style="background:var(--bg-white); border:1px solid #E2E8F0; padding:10px; border-radius:8px; font-weight:600; text-align:left;">👥 Rapò RH</button>
+            <button id="ia128BtnAnalize" style="background:var(--primary); color:white; border:none; padding:10px; border-radius:8px; font-weight:600; text-align:left;">🤖 Analize Mwa sa a</button>
         </div>
+        <div id="ia128Rapò" style="display:none; padding:0 20px 20px;"></div>
     </details>
 
     <!-- 12.9 Chat With Documents -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">📎 12.9 — Chat With Documents</summary>
         <div style="padding:0 20px 20px;">
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Konekte ak GED (Modil 8)</p>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                <div style="background:#F1F5F9; border-radius:12px 12px 12px 4px; padding:10px 14px; max-width:80%; font-size:13px;">Montre mwen kontra Digicel la.</div>
-                <div style="background:#EEF2FF; color:var(--primary); border-radius:12px 12px 4px 12px; padding:10px 14px; max-width:80%; font-size:13px; align-self:flex-end;">Kontra Digicel ekspire 15/12/2026, montan 85 000 HTG/an.</div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Konekte ak GED (Modil 8) — PDF sèlman pou kounye a</p>
+            <select id="ia129Select" style="width:100%; padding:10px; border-radius:8px; border:1px solid #E2E8F0; font-size:14px; margin-bottom:10px;">
+                <option value="">Chajman dokiman...</option>
+            </select>
+            <div id="ia129ChatLog" style="display:none; flex-direction:column; gap:8px; margin-bottom:10px; max-height:280px; overflow-y:auto;"></div>
+            <div id="ia129InputZone" style="display:none; gap:8px;">
+                <input id="ia129Input" type="text" placeholder="Poze yon kesyon sou dokiman an..." style="flex:1; min-width:0; padding:10px 14px; border-radius:8px; border:1px solid #E2E8F0; font-size:14px;">
+                <button id="ia129BtnVoye" style="background:var(--primary); color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:600; white-space:nowrap;">Voye</button>
             </div>
         </div>
     </details>
 
     <!-- 12.10 IA RH -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
-        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👨‍💼 12.10 — IA RH</summary>
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👨‍💼 12.10 — Analiz RH</summary>
+        <div id="ia1210RhKpi" class="kpi-grid" style="padding:0 20px 20px; grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); margin-bottom:0;">
+            <div class="kpi-card"><div class="label">👥 Anplwaye Aktif</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">🏖️ An Konje</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">📄 Kontra Ap Ekspire</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">📅 Absans (14j)</div><div class="value" style="color:var(--text-muted);">...</div></div>
+        </div>
         <div style="padding:0 20px 20px; overflow-x:auto;">
             <table class="fin-table">
-                <tr><th>Anplwaye</th><th>Absans</th><th>Retad</th><th>Pwodiktivite</th></tr>
-                <tr><td>Marie L.</td><td style="text-align:right;">1</td><td style="text-align:right;">3</td><td style="text-align:right; color:var(--secondary);">88%</td></tr>
+                <tr><th>Anplwaye</th><th>Depatman</th><th>Absans (14j)</th></tr>
+                <tbody id="ia1210RhAbsans">
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr>
+                </tbody>
             </table>
+            <div id="ia1210RhRekòmandasyon" style="margin-top:12px; font-size:12px; color:var(--text-muted);"></div>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">⚠️ Reta pa disponib — estrikti orè travay ofisyèl (lè kòmansman) poko konfime nan done a.</p>
         </div>
     </details>
 
     <!-- 12.11 IA Executive Dashboard -->
     <details class="chart-section" open style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">👔 12.11 — IA Executive Dashboard</summary>
-        <div class="kpi-grid" style="padding:0 20px 20px; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); margin-bottom:0;">
-            <div class="kpi-card"><div class="label">💰 Cash Disponible</div><div class="value">45 200 HTG</div></div>
-            <div class="kpi-card"><div class="label">📈 Chiffre d'Affaires</div><div class="value">8,2M HTG</div></div>
-            <div class="kpi-card"><div class="label">📉 Charges</div><div class="value">645 000 HTG</div></div>
-            <div class="kpi-card"><div class="label">🏆 Profit</div><div class="value" style="color:var(--secondary);">245 000 HTG</div></div>
-            <div class="kpi-card"><div class="label">⚠️ Risques</div><div class="value" style="color:var(--danger);">2</div></div>
-            <div class="kpi-card"><div class="label">🎯 Opportunités</div><div class="value" style="color:var(--secondary);">3</div></div>
+        <div id="ia1211Dashboard" class="kpi-grid" style="padding:0 20px 20px; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); margin-bottom:0;">
+            <div class="kpi-card"><div class="label">💰 Cash Disponib</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">📈 Chif Afè (mwa)</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">📉 Depans (mwa)</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">🏆 Benefis Nèt</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">⚠️ Alèt Risk (30j)</div><div class="value" style="color:var(--text-muted);">...</div></div>
+            <div class="kpi-card"><div class="label">🎯 Nouvo Kliyan (mwa)</div><div class="value" style="color:var(--text-muted);">...</div></div>
         </div>
     </details>
 
     <!-- 12.12 Workflow Builder -->
     <details class="chart-section" style="padding:0; margin-top:16px;">
         <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🔧 12.12 — Workflow Builder</summary>
-        <div style="padding:0 20px 20px; text-align:center; font-size:13px; line-height:2.4;">
-            <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Nouvo Fakti</div>
-            <div>⬇</div>
-            <div style="background:#EEF2FF; color:var(--primary); border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Email</div>
-            <div>⬇</div>
-            <div style="background:#EEF2FF; color:var(--primary); border-radius:8px; padding:8px; display:inline-block; min-width:180px;">WhatsApp</div>
-            <div>⬇</div>
-            <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Suivi</div>
-            <div>⬇</div>
-            <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:180px;">Recouvrement</div>
+        <div style="padding:0 20px 20px;">
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">⚠️ Egzekisyon "best-effort" (san Cloud Functions) — verifye chak fwa yon moun louvri modil sa a, pa 24/7.</p>
+            <div style="text-align:center; font-size:13px; line-height:2.4; margin-bottom:14px;">
+                <div style="background:#F1F5F9; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Kliyan gen dèt ≥ 50 000 HTG</div>
+                <div>⬇</div>
+                <div style="background:#FEF3C7; color:#B45309; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Atann 7 jou</div>
+                <div>⬇</div>
+                <div style="background:#EEF2FF; color:var(--primary); border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Dèt peye?</div>
+                <div>⬇</div>
+                <div style="background:#D1FAE5; color:#047857; border-radius:8px; padding:8px; display:inline-block; min-width:200px;">Wi → Fèmen · Non → Relanse</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span style="font-weight:600; font-size:13px;">Workflow Aktif</span>
+                <button id="ia1212BtnEgzekite" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600;">▶️ Egzekite Kounye a</button>
+            </div>
+            <table class="fin-table">
+                <tr><th>Kliyan</th><th>Dèt Deklanche</th><th>Pwochen Tcheke</th></tr>
+                <tbody id="ia1212Workflow">
+                    <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr>
+                </tbody>
+            </table>
+            <div id="ia1212Rezilta" style="margin-top:10px; font-size:12px;"></div>
+        </div>
+    </details>
+
+    <!-- 12.13 AI Governance & Audit -->
+    <details class="chart-section" style="padding:0; margin-top:16px;">
+        <summary style="padding:20px; cursor:pointer; font-weight:600; font-size:16px; list-style:none;">🛡️ 12.13 — AI Governance & Audit</summary>
+        <div style="padding:0 20px 20px; overflow-x:auto;">
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Istorik tou sa Co-Pilot IA (12.1) ak Chat Documents (12.9) te reponn — pou tras/verifikasyon.</p>
+            <table class="fin-table">
+                <tr><th>Dat</th><th>Sous</th><th>Kesyon</th><th>Itilizatè</th></tr>
+                <tbody id="ia1213Governance">
+                    <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Chajman...</td></tr>
+                </tbody>
+            </table>
         </div>
     </details>
 </section>
@@ -3980,6 +4054,7 @@
             saas: () => window.SaasUI?.chajeSeksyonSaas(),
             ged: () => window.GedUI?.chajeSeksyonGed(),
             ecommerce: () => window.EcommerceUI?.init(),
+            ia: () => window.IaUI?.chajeSeksyonIa(),
             // kes: () => window.KesUI?.chajeSesyon(),      // dekomante lè siyati egzat konfime
             // depans: () => window.DepansUI?.chajeDepans(), // dekomante lè siyati egzat konfime
         };
@@ -4122,15 +4197,15 @@
 
         // BI
         const ctxBi1 = document.getElementById('biSalesTrendChart')?.getContext('2d');
-        if(ctxBi1) new Chart(ctxBi1, { type: 'bar', data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin'], datasets: [{ label:'Reyalizasyon', data:[6200,6800,7200,6500,7800,8200], backgroundColor:'#4F46E5', borderRadius:4 }, { label:'Objektif', data:[7500,7500,7500,7500,7500,7500], type:'line', borderColor:'#EF4444', borderWidth:2, fill:false }] }, options: { responsive:true, maintainAspectRatio:false } });
+        if(ctxBi1) new Chart(ctxBi1, { type: 'bar', data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin'], datasets: [{ label:'Reyalizasyon', data:[6200,6800,7200,6500,7800,8200], backgroundColor:'#4F46E5', borderRadius:4 }, { label:'Objektif', data:[7500,7500,7500,7500,7500,7500], type:'line', borderColor:'#EF4444', borderWidth:2, fill:false }] }, options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } } });
         const ctxBi2 = document.getElementById('biDeptRadarChart')?.getContext('2d');
-        if(ctxBi2) new Chart(ctxBi2, { type: 'radar', data: { labels: ['Vant','Finans','RH','Stock','Direksyon'], datasets: [{ label:'Pèfòmans', data:[85,92,78,88,75], borderColor:'#4F46E5', backgroundColor:'rgba(79,70,229,0.2)' }] }, options: { responsive:true, maintainAspectRatio:false } });
+        if(ctxBi2) new Chart(ctxBi2, { type: 'radar', data: { labels: ['Vant','Finans','RH','Stock','Direksyon'], datasets: [{ label:'Pèfòmans', data:[85,92,78,88,75], borderColor:'#4F46E5', backgroundColor:'rgba(79,70,229,0.2)' }] }, options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } } });
 
         // IA
         const ctxIa1 = document.getElementById('iaUsageChart')?.getContext('2d');
-        if(ctxIa1) new Chart(ctxIa1, { type: 'line', data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin'], datasets: [{ label:'Interaksyon', data:[400,550,680,900,1100,1240], borderColor:'#4F46E5', tension:0.4, fill:true, backgroundColor:'rgba(79,70,229,0.1)' }] }, options: { responsive:true, maintainAspectRatio:false } });
+        if(ctxIa1) new Chart(ctxIa1, { type: 'line', data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin'], datasets: [{ label:'Interaksyon', data:[400,550,680,900,1100,1240], borderColor:'#4F46E5', tension:0.4, fill:true, backgroundColor:'rgba(79,70,229,0.1)' }] }, options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } } });
         const ctxIa2 = document.getElementById('iaWorkflowChart')?.getContext('2d');
-        if(ctxIa2) new Chart(ctxIa2, { type: 'bar', data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin'], datasets: [{ label:'Tan Ekonomize', data:[40,55,65,80,110,120], backgroundColor:'#10B981', borderRadius:4 }, { label:'Workflows', data:[2,3,3,5,6,8], backgroundColor:'#4F46E5', borderRadius:4 }] }, options: { responsive:true, maintainAspectRatio:false } });
+        if(ctxIa2) new Chart(ctxIa2, { type: 'bar', data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin'], datasets: [{ label:'Tan Ekonomize', data:[40,55,65,80,110,120], backgroundColor:'#10B981', borderRadius:4 }, { label:'Workflows', data:[2,3,3,5,6,8], backgroundColor:'#4F46E5', borderRadius:4 }] }, options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } } });
 
         // E-commerce
         const ctxEcom1 = document.getElementById('ecomChannelChart')?.getContext('2d');
