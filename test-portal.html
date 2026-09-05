@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tès Pòtal</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="js/config.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 16px; font-size: 14px; line-height: 1.6; }
+        .ligne { padding: 8px; border-radius: 6px; margin-bottom: 6px; white-space: pre-wrap; word-break: break-word; }
+        .ok { background: #D1FAE5; color: #047857; }
+        .erè { background: #FEE2E2; color: #B91C1C; }
+        .info { background: #F1F5F9; color: #334155; }
+        button { padding: 12px 20px; font-size: 16px; border-radius: 8px; background: #6366F1; color: white; border: none; width: 100%; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <h3>Tès Pòtal — CollectionGroup</h3>
+    <p style="color:#666; font-size:12px;">Bezwen konekte kòm Admin nan biznis ou anvan (window.currentCompanyId). Si pa konekte, mete l manyèlman anba a.</p>
+    <input id="bizIdInput" placeholder="ID biznis (si pa deja konekte)" style="width:100%; padding:10px; margin-bottom:12px; box-sizing:border-box;">
+    <button onclick="kouriTès()">▶️ Kouri Tès la</button>
+    <div id="rezilta"></div>
+
+    <script>
+        function ajouteLigne(txt, klas) {
+            const div = document.createElement('div');
+            div.className = 'ligne ' + klas;
+            div.textContent = txt;
+            document.getElementById('rezilta').appendChild(div);
+        }
+
+        async function kouriTès() {
+            document.getElementById('rezilta').innerHTML = '';
+            const bizId = window.currentCompanyId || document.getElementById('bizIdInput').value.trim();
+            if (!bizId) { ajouteLigne('❌ Pa gen ID biznis. Mete l nan chan an.', 'erè'); return; }
+
+            ajouteLigne('🧪 Kòmanse tès...', 'info');
+
+            const secondaryApp = firebase.initializeApp(firebase.app().options, 'TesPòtal' + Date.now());
+            const imèlTès = 'tes.kliyan.' + Date.now() + '@kontablakay.test';
+            const modpasTès = 'TesModpas123!';
+            let uidTès;
+
+            try {
+                const cred = await secondaryApp.auth().createUserWithEmailAndPassword(imèlTès, modpasTès);
+                uidTès = cred.user.uid;
+                await secondaryApp.auth().signOut();
+                ajouteLigne('✅ Kont tès kreye, UID: ' + uidTès, 'ok');
+            } catch (err) {
+                ajouteLigne('❌ Echwe kreye kont tès: ' + err.message, 'erè');
+                await secondaryApp.delete();
+                return;
+            }
+
+            const bizRef = window.db.collection('biznis').doc(bizId);
+            const kliyanTèsRef = bizRef.collection('kliyan').doc();
+            try {
+                await kliyanTèsRef.set({
+                    non: 'Kliyan Tès Pòtal',
+                    authUid: uidTès,
+                    aktif: true,
+                    dèt: 0,
+                    dat: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                ajouteLigne('✅ Fich kliyan tès kreye nan biznis: ' + bizId, 'ok');
+            } catch (err) {
+                ajouteLigne('❌ Echwe kreye fich kliyan (verifye ou konekte kòm Admin): ' + err.message, 'erè');
+                await secondaryApp.delete();
+                return;
+            }
+
+            await secondaryApp.auth().signInWithEmailAndPassword(imèlTès, modpasTès);
+            ajouteLigne('🔑 Konekte kòm itilizatè tès la...', 'info');
+
+            try {
+                const snap = await secondaryApp.firestore().collectionGroup('kliyan')
+                    .where('authUid', '==', uidTès).get();
+                ajouteLigne('🎯 REZILTA: ' + snap.size + ' dokiman jwenn', snap.size > 0 ? 'ok' : 'erè');
+                snap.docs.forEach(d => {
+                    ajouteLigne('→ bizId: ' + d.ref.parent.parent.id + ' | id: ' + d.id, 'info');
+                });
+                if (snap.size > 0) {
+                    ajouteLigne('✅✅✅ TÈS REYISI — règ + query mache san endèks!', 'ok');
+                }
+            } catch (err) {
+                ajouteLigne('❌ ERÈ QUERY: ' + err.code + ' — ' + err.message, 'erè');
+                if (err.message.includes('index')) {
+                    ajouteLigne('👉 Gen yon lyen nan mesaj erè a pi wo a pou kreye endèks. Kopye lyen an, ouvri l nan navigatè a.', 'info');
+                }
+            }
+
+            await secondaryApp.auth().signOut();
+            await kliyanTèsRef.delete();
+            await secondaryApp.delete();
+            ajouteLigne('🧹 Netwaye — fich tès efase.', 'info');
+        }
+    </script>
+</body>
+</html>
